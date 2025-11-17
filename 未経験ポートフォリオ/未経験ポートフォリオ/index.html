@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>佐藤直人 | 転職準備中のポートフォリオ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --color-primary: #28887a;
+        --color-primary-dark: #1f6c63;
+        --color-accent: #ffd476;
+        --color-bg: #f8fbfa;
+        --color-surface: #ffffff;
+        --color-text: #243433;
+        --color-text-light: #51615f;
+        --shadow-soft: 0 18px 50px rgba(27, 61, 54, 0.15);
+        --shadow-sharp: 0 12px 24px rgba(24, 60, 51, 0.18);
+        --radius-large: 28px;
+        --radius-medium: 20px;
+        --radius-small: 12px;
+        --font-en: "Poppins", "Segoe UI", sans-serif;
+        --font-jp: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        font-family: var(--font-jp);
+        background: var(--color-bg);
+        color: var(--color-text);
+        line-height: 1.7;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      img {
+        max-width: 100%;
+        display: block;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .container {
+        width: min(1100px, 90vw);
+        margin: 0 auto;
+      }
+
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: rgba(248, 251, 250, 0.92);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(36, 52, 51, 0.06);
+      }
+
+      .site-header.is-scrolled {
+        box-shadow: 0 15px 35px rgba(12, 49, 40, 0.12);
+        background: rgba(248, 251, 250, 0.98);
+      }
+
+      .site-header .container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 18px 0;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-family: var(--font-en);
+        font-weight: 600;
+        letter-spacing: 0.08em;
+      }
+
+      .brand__mark {
+        display: inline-grid;
+        place-items: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: var(--color-primary);
+        color: var(--color-surface);
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      .site-nav ul {
+        display: flex;
+        gap: 24px;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        font-size: 0.95rem;
+      }
+
+      .site-nav a {
+        position: relative;
+        padding: 8px 0;
+      }
+
+      .site-nav a::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 0;
+        height: 2px;
+        background: var(--color-primary);
+        transition: width 0.25s ease;
+      }
+
+      .site-nav a.is-active::after {
+        width: 70%;
+      }
+
+      .site-nav a:focus-visible::after,
+      .site-nav a:hover::after {
+        width: 70%;
+      }
+
+      .cta-link {
+        font-weight: 600;
+        color: var(--color-primary);
+        border: 1px solid rgba(36, 52, 51, 0.18);
+        padding: 10px 18px;
+        border-radius: 999px;
+        transition: background 0.3s ease, color 0.3s ease;
+      }
+
+      .cta-link:hover {
+        background: var(--color-primary);
+        color: var(--color-surface);
+      }
+
+      .hero {
+        position: relative;
+        padding: 120px 0 80px;
+        background: radial-gradient(120% 120% at 15% 20%, #43bba8 0%, var(--color-primary) 55%, #155248 100%);
+        color: var(--color-surface);
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(circle at 25% 20%, rgba(255, 255, 255, 0.18), transparent 42%),
+          radial-gradient(circle at 85% 30%, rgba(255, 211, 118, 0.25), transparent 45%);
+        pointer-events: none;
+      }
+
+      .hero__inner {
+        position: relative;
+        display: grid;
+        gap: 48px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: center;
+      }
+
+      .hero__content {
+        position: relative;
+        z-index: 1;
+      }
+
+      .hero__intro {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.12);
+        color: var(--color-surface);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-family: var(--font-en);
+      }
+
+      .hero h1 {
+        margin: 24px 0 16px;
+        font-size: clamp(2.5rem, 5vw, 3.4rem);
+        line-height: 1.15;
+        font-family: var(--font-en);
+        font-weight: 700;
+      }
+
+      .hero h1 span {
+        display: block;
+        font-size: 1rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.75);
+      }
+
+      .hero__description {
+        font-size: 1.05rem;
+        color: rgba(248, 251, 250, 0.85);
+        margin-bottom: 30px;
+      }
+
+      .hero__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 36px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 14px 26px;
+        font-weight: 600;
+        border-radius: 999px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        border: none;
+        font-family: inherit;
+      }
+
+      .btn--primary {
+        background: var(--color-accent);
+        color: #7c5a00;
+        box-shadow: 0 15px 30px rgba(11, 34, 26, 0.25);
+      }
+
+      .btn--primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(11, 34, 26, 0.25);
+      }
+
+      .btn--ghost {
+        background: rgba(255, 255, 255, 0.14);
+        color: var(--color-surface);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+      }
+
+      .btn--ghost:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .hero__stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 28px;
+        margin: 0;
+        padding: 0;
+      }
+
+      .hero__stats div {
+        min-width: 140px;
+      }
+
+      .hero__stats dt {
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.65);
+        margin-bottom: 6px;
+      }
+
+      .hero__stats dd {
+        margin: 0;
+        font-size: 1.6rem;
+        font-family: var(--font-en);
+        font-weight: 600;
+      }
+
+      .hero__card {
+        position: relative;
+        z-index: 1;
+      }
+
+      .profile-card {
+        background: rgba(255, 255, 255, 0.92);
+        color: var(--color-text);
+        border-radius: var(--radius-large);
+        padding: 36px;
+        box-shadow: var(--shadow-soft);
+        backdrop-filter: blur(10px);
+        position: relative;
+      }
+
+      .profile-card::after {
+        content: "";
+        position: absolute;
+        inset: 12px;
+        border-radius: var(--radius-medium);
+        border: 1px dashed rgba(40, 136, 122, 0.18);
+        pointer-events: none;
+      }
+
+      .profile-card__caption {
+        font-size: 0.75rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--color-primary);
+        font-family: var(--font-en);
+        margin-bottom: 18px;
+      }
+
+      .profile-card h2 {
+        font-size: 1.4rem;
+        line-height: 1.5;
+        margin-bottom: 20px;
+      }
+
+      .profile-card ul {
+        margin: 0;
+        padding-left: 20px;
+        display: grid;
+        gap: 10px;
+        color: var(--color-text-light);
+      }
+
+      .profile-card__footer {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+        margin-top: 28px;
+        font-size: 0.9rem;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(40, 136, 122, 0.1);
+        color: var(--color-primary);
+        font-weight: 600;
+        font-size: 0.85rem;
+        font-family: var(--font-en);
+      }
+
+      .chip--light {
+        background: rgba(255, 212, 118, 0.18);
+        color: #755800;
+      }
+
+      section {
+        padding: 110px 0;
+      }
+
+      .section__header {
+        display: grid;
+        gap: 16px;
+        text-align: center;
+        margin-bottom: 64px;
+      }
+
+      .section__header h2 {
+        margin: 0;
+        font-size: clamp(2rem, 4vw, 2.5rem);
+        line-height: 1.4;
+      }
+
+      .section__header p {
+        max-width: 720px;
+        margin: 0 auto;
+        color: var(--color-text-light);
+      }
+
+      .section__eyebrow {
+        font-size: 0.8rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--color-primary);
+        font-family: var(--font-en);
+      }
+
+      .about {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 251, 250, 1) 100%);
+      }
+
+      .about__grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 28px;
+      }
+
+      .about__card {
+        background: var(--color-surface);
+        border-radius: var(--radius-medium);
+        padding: 32px;
+        box-shadow: 0 18px 40px rgba(19, 50, 42, 0.08);
+        border: 1px solid rgba(36, 52, 51, 0.06);
+      }
+
+      .about__card h3 {
+        margin-top: 0;
+        font-size: 1.2rem;
+        margin-bottom: 18px;
+      }
+
+      .about__card ul {
+        margin: 0;
+        padding-left: 20px;
+        display: grid;
+        gap: 12px;
+        color: var(--color-text-light);
+      }
+
+      .skills__grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 28px;
+      }
+
+      .skills__card {
+        background: var(--color-surface);
+        border-radius: var(--radius-medium);
+        padding: 32px;
+        border: 1px solid rgba(36, 52, 51, 0.08);
+        box-shadow: 0 12px 28px rgba(16, 49, 40, 0.07);
+      }
+
+      .skills__card--accent {
+        background: linear-gradient(160deg, rgba(255, 212, 118, 0.32), rgba(255, 212, 118, 0.12));
+        border: none;
+      }
+
+      .skills__card h3 {
+        margin-top: 0;
+        margin-bottom: 16px;
+        font-size: 1.15rem;
+      }
+
+      .skills__card ul {
+        margin: 0;
+        padding-left: 20px;
+        display: grid;
+        gap: 12px;
+        color: var(--color-text-light);
+      }
+
+      .projects {
+        background: rgba(21, 82, 72, 0.04);
+      }
+
+      .projects__grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 28px;
+      }
+
+      .project-card {
+        background: var(--color-surface);
+        border-radius: var(--radius-medium);
+        padding: 32px;
+        box-shadow: 0 16px 36px rgba(19, 58, 47, 0.12);
+        border: 1px solid rgba(36, 52, 51, 0.08);
+        display: grid;
+        gap: 18px;
+      }
+
+      .project-card h3 {
+        margin: 0;
+        font-size: 1.3rem;
+      }
+
+      .project-card p {
+        margin: 0;
+        color: var(--color-text-light);
+      }
+
+      .project-card ul {
+        margin: 0;
+        padding-left: 20px;
+        display: grid;
+        gap: 10px;
+        color: var(--color-text-light);
+      }
+
+      .journey {
+        background: linear-gradient(180deg, rgba(40, 136, 122, 0.12) 0%, rgba(248, 251, 250, 0.85) 100%);
+      }
+
+      .journey__timeline {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 24px;
+        position: relative;
+      }
+
+      .journey__timeline::before {
+        content: "";
+        position: absolute;
+        top: 40px;
+        left: 20px;
+        right: 20px;
+        height: 2px;
+        background: rgba(36, 52, 51, 0.15);
+        z-index: 0;
+      }
+
+      .journey__item {
+        background: var(--color-surface);
+        border-radius: var(--radius-medium);
+        padding: 32px;
+        box-shadow: 0 16px 38px rgba(19, 50, 42, 0.09);
+        border: 1px solid rgba(36, 52, 51, 0.08);
+        position: relative;
+        z-index: 1;
+        display: grid;
+        gap: 12px;
+      }
+
+      .journey__item::before {
+        content: "";
+        position: absolute;
+        top: 32px;
+        left: -24px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: rgba(40, 136, 122, 0.4);
+        border: 3px solid var(--color-surface);
+        box-shadow: 0 0 0 3px rgba(40, 136, 122, 0.25);
+      }
+
+      .journey__item:first-child::before {
+        left: 0;
+      }
+
+      .journey__item--active {
+        border: 1px solid rgba(255, 212, 118, 0.65);
+        box-shadow: 0 16px 40px rgba(255, 212, 118, 0.3);
+      }
+
+      .journey__item--active::before {
+        background: var(--color-accent);
+        box-shadow: 0 0 0 4px rgba(255, 212, 118, 0.4);
+      }
+
+      .journey__date {
+        margin: 0;
+        font-size: 0.85rem;
+        font-family: var(--font-en);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: rgba(40, 136, 122, 0.7);
+      }
+
+      .journey__item h3 {
+        margin: 0;
+        font-size: 1.2rem;
+      }
+
+      .journey__item p {
+        margin: 0;
+        color: var(--color-text-light);
+      }
+
+      .cta {
+        background: linear-gradient(90deg, #155248 0%, var(--color-primary) 45%, #1c5b52 100%);
+        color: var(--color-surface);
+        padding: 110px 0 120px;
+      }
+
+      .cta__inner {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 48px;
+        align-items: center;
+      }
+
+      .cta__inner p {
+        color: rgba(248, 251, 250, 0.85);
+      }
+
+      .cta__details {
+        display: grid;
+        gap: 16px;
+        padding: 36px;
+        border-radius: var(--radius-medium);
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(12px);
+        box-shadow: inset 0 0 0 1px rgba(248, 251, 250, 0.14);
+      }
+
+      .contact-link {
+        font-family: var(--font-en);
+        font-size: 1.4rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+
+      .contact-note {
+        margin: 0;
+        font-size: 0.95rem;
+      }
+
+      .cta__buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+      }
+
+      .site-footer {
+        padding: 32px 0 36px;
+        background: rgba(16, 49, 40, 0.1);
+      }
+
+      .site-footer .container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 14px;
+        color: rgba(36, 52, 51, 0.65);
+        font-size: 0.9rem;
+      }
+
+      .footer-links {
+        display: flex;
+        gap: 18px;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .footer-links a {
+        position: relative;
+      }
+
+      .footer-links a::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -4px;
+        width: 0;
+        height: 1px;
+        background: rgba(36, 52, 51, 0.4);
+        transition: width 0.2s ease;
+      }
+
+      .footer-links a:hover::after {
+        width: 100%;
+      }
+
+      @media (max-width: 1080px) {
+        .hero__inner,
+        .about__grid,
+        .skills__grid,
+        .projects__grid,
+        .cta__inner {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .journey__timeline {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .journey__timeline::before {
+          display: none;
+        }
+
+        .journey__item {
+          padding-left: 56px;
+        }
+
+        .journey__item::before {
+          left: 24px;
+          top: 28px;
+        }
+
+        .journey__item:first-child::before {
+          left: 24px;
+        }
+      }
+
+      @media (max-width: 860px) {
+        .site-header .container {
+          flex-wrap: wrap;
+        }
+
+        .site-nav ul {
+          order: 3;
+          width: 100%;
+          justify-content: space-between;
+          gap: 12px;
+        }
+
+        .hero__inner,
+        .about__grid,
+        .skills__grid,
+        .projects__grid,
+        .cta__inner {
+          grid-template-columns: 1fr;
+        }
+
+        .hero {
+          padding-top: 100px;
+        }
+
+        .hero__card {
+          order: -1;
+        }
+
+        .profile-card {
+          padding: 32px;
+        }
+
+        .journey__timeline {
+          grid-template-columns: 1fr;
+          gap: 20px;
+        }
+
+        .journey__timeline::before {
+          display: none;
+        }
+
+        .journey__item::before {
+          left: 24px;
+          top: 24px;
+        }
+
+        .journey__item {
+          padding-left: 56px;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .site-header .container {
+          padding: 14px 0;
+        }
+
+        .site-nav ul {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .section__header {
+          text-align: left;
+        }
+
+        .section__header p {
+          margin: 0;
+        }
+
+        .about__card,
+        .skills__card,
+        .project-card {
+          padding: 28px;
+        }
+
+        .hero__stats {
+          gap: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header" id="top">
+      <div class="container">
+        <a class="brand" href="#top">
+          <span class="brand__mark">NS</span>
+          <span class="brand__name">Naoto Sato</span>
+        </a>
+        <nav class="site-nav" aria-label="メインナビゲーション">
+          <ul>
+            <li><a href="#about">プロフィール</a></li>
+            <li><a href="#skills">スキル</a></li>
+            <li><a href="#projects">プロジェクト</a></li>
+            <li><a href="#journey">学習ロードマップ</a></li>
+            <li><a href="#contact">コンタクト</a></li>
+          </ul>
+        </nav>
+        <a class="cta-link" href="#contact">相談する</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container hero__inner">
+          <div class="hero__content">
+            <p class="hero__intro">IT未経験 → フロントエンド志望</p>
+            <h1>
+              佐藤 直人
+              <span>Naoto Sato</span>
+            </h1>
+            <p class="hero__description">
+              旅行業界で5年間、法人営業としてクライアントの課題解決を推進。<br />
+              現在はWebアプリ開発に軸足を移し、UI/UXと業務改善の双方から価値提供できるエンジニアを目指しています。
+            </p>
+            <div class="hero__actions">
+              <a class="btn btn--primary" href="#projects">プロジェクトを見る</a>
+              <a class="btn btn--ghost" href="#journey">学習記録を見る</a>
+            </div>
+            <dl class="hero__stats">
+              <div>
+                <dt>学習時間</dt>
+                <dd>720 h</dd>
+              </div>
+              <div>
+                <dt>制作コンポーネント</dt>
+                <dd>43</dd>
+              </div>
+              <div>
+                <dt>習得中の技術</dt>
+                <dd>React / Vue</dd>
+              </div>
+            </dl>
+          </div>
+          <div class="hero__card">
+            <div class="profile-card">
+              <p class="profile-card__caption">Next Career Vision</p>
+              <h2>ビジネス視点を活かした「伝わる」UIをつくる</h2>
+              <ul>
+                <li>伴走型プロジェクトの経験で培った調整力</li>
+                <li>データ分析 × デザイン思考で仮説検証</li>
+                <li>モダンフロントエンドを中心とした開発志向</li>
+              </ul>
+              <div class="profile-card__footer">
+                <span>興味分野</span>
+                <span class="chip">SaaS</span>
+                <span class="chip">社内ツール</span>
+                <span class="chip">教育</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="about" id="about">
+        <div class="container section__header">
+          <span class="section__eyebrow">About</span>
+          <h2>ビジネスサイドからエンジニアへ、価値提供の幅を広げる挑戦</h2>
+          <p>
+            前職では旅行会社で法人向け企画提案に従事し、年間120件以上の案件を担当しました。業務改善の一環で社内向けツールを試作したことをきっかけに、質の高いユーザー体験をつくる開発職に魅力を感じ、キャリアチェンジを決意しました。
+          </p>
+        </div>
+        <div class="container about__grid">
+          <article class="about__card">
+            <h3>強み</h3>
+            <ul>
+              <li>ヒアリングから要件整理まで一貫して対応できるコミュニケーション力</li>
+              <li>Notionやスプレッドシートでの業務フロー設計・自動化の実践経験</li>
+              <li>学習ロードマップを設計し継続的に改善するセルフマネジメント力</li>
+            </ul>
+          </article>
+          <article class="about__card">
+            <h3>最近取り組んでいること</h3>
+            <ul>
+              <li>TypeScript + ReactでのSPA作成とAtomic Designによる設計練習</li>
+              <li>FigmaでのUIプロトタイピングとユーザーテストの実施</li>
+              <li>Udemy / ドットインストールを活用したバックエンド基礎学習</li>
+            </ul>
+          </article>
+          <article class="about__card">
+            <h3>直近で貢献した成果</h3>
+            <ul>
+              <li>社内問い合わせの一次回答時間を40%削減するFAQツールをノーコードで構築</li>
+              <li>販売データの可視化ダッシュボードを提案し、意思決定リードタイムを短縮</li>
+              <li>小規模イベントのLPをリニューアルし、申込率を1.8倍に改善</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="skills" id="skills">
+        <div class="container section__header">
+          <span class="section__eyebrow">Skills</span>
+          <h2>学習中も含めた技術スタック</h2>
+          <p>
+            基本的なWeb制作スキルに加えて、Reactを中心にモダンな開発体験を習得中です。アウトプットを優先しながら、チーム開発に対応できる実践力を磨いています。
+          </p>
+        </div>
+        <div class="container skills__grid">
+          <article class="skills__card">
+            <h3>コアスキル</h3>
+            <ul>
+              <li><strong>HTML5 / CSS3</strong> – セマンティックなマークアップとレスポンシブ対応</li>
+              <li><strong>JavaScript (ES6+)</strong> – 非同期処理、API連携、状態管理の基礎</li>
+              <li><strong>TypeScript</strong> – 型定義とコンポーネント設計で安全性を担保</li>
+            </ul>
+          </article>
+          <article class="skills__card">
+            <h3>ツール &amp; プラットフォーム</h3>
+            <ul>
+              <li><strong>React / Next.js</strong> – 学習中。個人開発でSPAを構築</li>
+              <li><strong>Vite / Tailwind CSS</strong> – 開発効率向上のため導入</li>
+              <li><strong>GitHub / Vercel</strong> – バージョン管理とデプロイの実践</li>
+            </ul>
+          </article>
+          <article class="skills__card skills__card--accent">
+            <h3>ソフトスキル</h3>
+            <ul>
+              <li>定量目標に基づくKPI設計と振り返り</li>
+              <li>ワークショップ運営・ファシリテーション</li>
+              <li>課題整理から改善提案までのドキュメンテーション</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="projects" id="projects">
+        <div class="container section__header">
+          <span class="section__eyebrow">Projects</span>
+          <h2>理解を深めるためのアウトプット</h2>
+          <p>
+            実務を想定した個人開発や、学習コミュニティでの共同制作を通じてスキルを検証しています。
+          </p>
+        </div>
+        <div class="container projects__grid">
+          <article class="project-card">
+            <div class="project-card__meta">
+              <span class="chip chip--light">個人開発</span>
+              <span class="chip chip--light">React / Firebase</span>
+            </div>
+            <h3>学習ログダッシュボード</h3>
+            <p>
+              学習時間と理解度を可視化するSPA。Firebase Authenticationを用いたログイン、Chart.jsでのグラフ表示、Atomic DesignでのUI設計を実施。
+            </p>
+            <ul>
+              <li>ログイン率を高めるためのオンボーディングフローを設計</li>
+              <li>Hooksを利用した再利用可能なチャートコンポーネントを実装</li>
+              <li>GitHub Actionsでの自動デプロイを設定</li>
+            </ul>
+          </article>
+          <article class="project-card">
+            <div class="project-card__meta">
+              <span class="chip chip--light">チーム制作</span>
+              <span class="chip chip--light">Next.js / Supabase</span>
+            </div>
+            <h3>イベント参加者管理ツール</h3>
+            <p>
+              学習コミュニティ向けの参加者管理Webアプリを3名で開発。情報整理とUIデザイン、実装まで担当しました。
+            </p>
+            <ul>
+              <li>ユーザーインタビューを通じて必須機能を特定</li>
+              <li>Tailwind CSSでコンポーネント化し開発スピードを向上</li>
+              <li>UIレビューとPull Requestベースの開発フローを経験</li>
+            </ul>
+          </article>
+          <article class="project-card">
+            <div class="project-card__meta">
+              <span class="chip chip--light">デザイン → コーディング</span>
+              <span class="chip chip--light">HTML / CSS / GSAP</span>
+            </div>
+            <h3>旅のプランニングLPリメイク</h3>
+            <p>
+              既存LPをヒートマップ分析から見直し、構造とビジュアルを刷新。アニメーションでスクロール誘導を強化し、CV率向上に貢献。
+            </p>
+            <ul>
+              <li>Figmaでワイヤー・モックを作成し顧客と合意</li>
+              <li>Intersection Observerでフェードイン演出を実装</li>
+              <li>PageSpeed Insightsで表示速度を改善 (LCP 1.8s)</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="journey" id="journey">
+        <div class="container section__header">
+          <span class="section__eyebrow">Journey</span>
+          <h2>学習ロードマップとコミットメント</h2>
+          <p>
+            「なぜ作るのか」を言語化しながら、短いサイクルで振り返りを行っています。未経験ながらも、数字とユーザーの声をもとに改善する姿勢は前職からの強みです。
+          </p>
+        </div>
+        <div class="container journey__timeline">
+          <article class="journey__item">
+            <p class="journey__date">2024年4月</p>
+            <h3>基礎固め期</h3>
+            <p>
+              Progate / ドットインストールでHTML・CSS・JavaScriptを体系的に学習。Udemy講座でDOM操作や非同期処理を実装練習。
+            </p>
+          </article>
+          <article class="journey__item">
+            <p class="journey__date">2024年8月</p>
+            <h3>初めての個人開発</h3>
+            <p>
+              ToDoアプリと模擬ECサイトを制作。Git/GitHubフローを導入し、Issue管理とPull Requestレビューの体験を積む。
+            </p>
+          </article>
+          <article class="journey__item">
+            <p class="journey__date">2024年11月</p>
+            <h3>UI/UX視点を強化</h3>
+            <p>
+              Figmaでのデザイン演習とユーザーテストを実施。アクセシビリティ基準 (WCAG) を意識したカラー設計を取り入れる。
+            </p>
+          </article>
+          <article class="journey__item journey__item--active">
+            <p class="journey__date">2025年2月 - 現在</p>
+            <h3>チーム開発準備</h3>
+            <p>
+              React + TypeScriptで設計力を向上。API設計の学習やテストコード導入を進め、実務参画に向けた成果物を磨いています。
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="cta" id="contact">
+        <div class="container cta__inner">
+          <div>
+            <span class="section__eyebrow">Contact</span>
+            <h2>カジュアル面談・学習相談を随時受付中です</h2>
+            <p>
+              ポートフォリオの詳細説明や共同プロジェクトのお誘いなど、気軽にご連絡ください。24時間以内の返信を心掛けています。
+            </p>
+          </div>
+          <div class="cta__details">
+            <a class="contact-link" href="mailto:naoto.sato.dev@example.com">
+              naoto.sato.dev@example.com
+            </a>
+            <p class="contact-note">
+              GitHubや履歴書のURLはお問い合わせ時に共有いたします。オンライン面談の調整も柔軟に対応します。
+            </p>
+            <div class="cta__buttons">
+              <a class="btn btn--primary" href="mailto:naoto.sato.dev@example.com">メールを送る</a>
+              <a class="btn btn--ghost" href="#top">ページトップに戻る</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2025 Naoto Sato. All rights reserved.</p>
+        <ul class="footer-links">
+          <li><a href="#projects">Projects</a></li>
+          <li><a href="#skills">Skills</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+    </footer>
+    <script>
+      const header = document.querySelector(".site-header");
+      const navLinks = document.querySelectorAll(".site-nav a");
+      const sections = Array.from(document.querySelectorAll("main section[id]"));
+
+      const activateLink = (id) => {
+        navLinks.forEach((link) => {
+          const targetId = link.getAttribute("href").replace("#", "");
+          if (targetId === id) {
+            link.classList.add("is-active");
+          } else {
+            link.classList.remove("is-active");
+          }
+        });
+      };
+
+      if (header) {
+        const handleScroll = () => {
+          if (window.scrollY > 20) {
+            header.classList.add("is-scrolled");
+          } else {
+            header.classList.remove("is-scrolled");
+          }
+        };
+
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        handleScroll();
+      }
+
+      if (sections.length && "IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries
+              .filter((entry) => entry.isIntersecting)
+              .forEach((entry) => activateLink(entry.target.id));
+          },
+          {
+            rootMargin: "-40% 0px -40% 0px",
+            threshold: 0.1,
+          }
+        );
+
+        sections.forEach((section) => observer.observe(section));
+      }
+    </script>
+  </body>
+</html>

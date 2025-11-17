@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Portfolio 2024 – Sakura Nakamura</title>
+    <meta name="description" content="未経験からIT転職を目指すポートフォリオの見本。UI/UX学習記録、制作物、スキル、連絡先を掲載。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #1B1B1B;
+            --panel: #161616;
+            --panel-2: #1B1B1B;
+            --text: #FDFDFD;
+            --muted: #C0C0C0;
+            --accent: #E63E21;
+            --accent-2: #F35034;
+            --stroke: #262626;
+            --chip: #0a0a0a;
+            --radius-lg: 14px;
+            --radius-md: 8px;
+            --radius-pill: 48px;
+            --gap-lg: 70px;
+            --gap-md: 20px;
+            --gap-sm: 12px;
+        }
+
+        * { box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            margin: 0;
+            font-family: "Inter", "Noto Sans JP", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1140px;
+            padding: 0 20px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            border-bottom: 1px solid var(--stroke);
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(6px);
+            background: rgba(27,27,27,0.6);
+            z-index: 20;
+        }
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 20px 0;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text);
+            font-weight: 700;
+            letter-spacing: .02em;
+        }
+        .brand-mark {
+            width: 36px; height: 36px; border-radius: 50%;
+            display: grid; place-items: center;
+            background: var(--accent);
+            box-shadow: 0 6px 16px rgba(230,62,33,.28);
+        }
+        nav ul { list-style: none; display: flex; gap: 36px; margin: 0; padding: 0; }
+        nav a { color: var(--muted); text-decoration: none; font-size: 14px; letter-spacing: .08em; text-transform: uppercase; }
+        nav a.active, nav a:hover { color: var(--text); }
+
+        /* Hero */
+        .hero {
+            padding: 60px 0;
+            display: grid;
+            grid-template-columns: 1.2fr .8fr;
+            gap: 40px;
+        }
+        .badge {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 6px 12px; border-radius: var(--radius-pill);
+            background: var(--panel);
+            border: 1px solid var(--stroke);
+            color: var(--muted);
+            font-size: 13px;
+        }
+        .badge-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); display: inline-block; }
+        .hero h1 { font-size: 36px; line-height: 1.2; margin: 16px 0 10px; }
+        .hero p.lead { color: var(--muted); line-height: 1.6; margin: 0 0 20px; max-width: 42ch; }
+
+        .cta-row { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+        .btn {
+            display: inline-flex; align-items: center; gap: 12px;
+            padding: 12px 18px; border-radius: 7px; border: 1px solid var(--stroke);
+            background: transparent; color: var(--text);
+            cursor: pointer; text-decoration: none; font-weight: 500;
+        }
+        .btn.primary {
+            background: var(--text); color: #000;
+            border-color: #000;
+        }
+        .btn .plus { width: 18px; height: 18px; display: inline-block; border: 2px solid currentColor; border-radius: 4px; position: relative; }
+        .btn .plus:before, .btn .plus:after { content: ""; position: absolute; background: currentColor; }
+        .btn .plus:before { width: 10px; height: 2px; top: 7px; left: 3px; }
+        .btn .plus:after { width: 2px; height: 10px; top: 3px; left: 7px; }
+
+        .hero-card {
+            border: 2px solid var(--stroke);
+            border-radius: var(--radius-lg);
+            padding: 42px;
+            display: grid; gap: 28px;
+        }
+        .hero-card .row { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+        .hero-card h3 { font-size: 24px; color: var(--muted); margin: 0; }
+        .availability { display: inline-flex; align-items: center; gap: 10px; padding: 6px 12px; border-radius: var(--radius-md); background: var(--panel); border: 1px solid var(--stroke); color: var(--muted); font-size: 13px; }
+        .hero-card .case-shot { aspect-ratio: 4/3; border-radius: var(--radius-md); overflow: hidden; position: relative; }
+        .hero-card .case-shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .hero-card .case-shot::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(14,14,14,0) 0%, rgba(14,14,14,0.55) 100%); }
+
+        /* Sections */
+        section { margin: 40px 0; }
+        .section-panel { border: 2px solid var(--stroke); border-radius: var(--radius-lg); padding: 60px 40px; }
+        .section-title { display: flex; align-items: center; gap: 13px; margin: 0 0 30px; color: var(--muted); font-weight: 500; }
+        .section-title .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--muted); }
+
+        /* Recent Work */
+        .work-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .work-card { position: relative; border: 2px solid var(--stroke); border-radius: var(--radius-lg); overflow: hidden; background: linear-gradient(189deg, rgba(230,62,33,1) 12%, rgba(51,19,14,0) 100%), var(--panel-2); }
+        .work-card .thumb { aspect-ratio: 3/4; position: relative; }
+        .work-card .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .work-card .thumb::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,10,10,0) 0%, rgba(10,10,10,.55) 100%); }
+        .work-card .meta { position: absolute; left: 40px; top: 50px; display: grid; gap: 6px; z-index: 1; }
+        .work-card .meta .title { font-weight: 600; font-size: 24px; }
+        .work-card .meta .sub { color: var(--muted); }
+        .work-card .arrow { position: absolute; right: 20px; top: 20px; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: #fff; color: #000; box-shadow: 0 4px 13px rgba(230,62,33,.18), inset 0 3px 0 rgba(228,100,63,1); z-index: 1; }
+
+        /* Skills */
+        .skills { display: grid; grid-template-columns: 286px 1fr; gap: 20px; }
+        .skill-col { border: 2px solid var(--stroke); border-radius: var(--radius-lg); padding: 60px 40px; display: grid; gap: 70px; }
+        .skill-col h4 { margin: 0; color: var(--muted); font-size: 24px; }
+        .skill-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .skill-card { border: 2px solid var(--stroke); border-radius: var(--radius-lg); padding: 40px; background: linear-gradient(16deg, rgba(230,62,33,1) 0%, rgba(51,19,14,0) 36%), var(--panel-2); display: grid; gap: 20px; }
+        .skill-card figure { margin: 0; aspect-ratio: 3/2; border-radius: var(--radius-md); overflow: hidden; position: relative; }
+        .skill-card figure img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .skill-card figure::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,10,10,0) 0%, rgba(10,10,10,.5) 100%); }
+        .skill-card h5 { margin: 0; color: var(--muted); font-size: 24px; }
+
+        /* Footer / Contact */
+        footer { margin: 40px 0 60px; }
+        .contact { border: 2px solid var(--stroke); border-radius: var(--radius-lg); padding: 45px 46px; background: linear-gradient(16deg, rgba(230,62,33,1) 0%, rgba(51,19,14,0) 36%), var(--panel-2); }
+        .contact-top { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+        .social { display: flex; align-items: center; gap: 12px; color: var(--muted); }
+        .social a { color: var(--text); text-decoration: none; }
+
+        /* Responsive */
+        @media (max-width: 960px) {
+            .hero { grid-template-columns: 1fr; }
+            .skills { grid-template-columns: 1fr; }
+            .work-grid { grid-template-columns: 1fr; }
+            .contact-top { flex-direction: column; align-items: flex-start; gap: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container nav">
+            <div class="brand">
+                <span class="brand-mark" aria-hidden="true"></span>
+                <span>Portfolio 2024</span>
+            </div>
+            <nav aria-label="Primary">
+                <ul>
+                    <li><a href="#about" class="active">About</a></li>
+                    <li><a href="#work">Portfolio</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="container hero" id="about">
+            <div>
+                <span class="badge"><span class="badge-dot"></span> 転職活動中</span>
+                <h1>はじめまして、<br>中村 さくら と申します。</h1>
+                <p class="lead">飲食・接客の現場で培った課題発見力とコミュニケーション力を活かし、IT業界で<strong>UI/UX</strong>に軸足を置いたキャリアを目指しています。個人学習と小規模制作の経験から、わかりやすく、使いやすい体験づくりを心がけています。</p>
+                <div class="cta-row">
+                    <a href="#contact" class="btn primary"><span class="plus" aria-hidden="true"></span> Hire me</a>
+                    <button class="btn" id="copyEmailBtn" type="button">Copy Email</button>
+                </div>
+            </div>
+            <aside class="hero-card" aria-label="プロフィール概要">
+                <div class="row">
+                    <h3>UI/UX Designer</h3>
+                    <span class="availability"><span class="badge-dot"></span> AVAILABLE FOR JOB</span>
+                </div>
+                <div class="row" style="gap:15px; align-items:center;">
+                    <img src="assets/images/portrait-uiux.jpg" alt="UI/UXデザイナーのプロフィールポートレート" width="80" height="80" style="border-radius: 12px; object-fit: cover;">
+                    <div style="color: var(--muted);">
+                        <div>居住地: 東京</div>
+                        <div>関心: プロダクトデザイン / アクセシビリティ / NoCode</div>
+                        <div>現在: 職業訓練校でWeb基礎を学習中</div>
+                    </div>
+                </div>
+                <figure class="case-shot">
+                    <img src="assets/images/workspace-uiux.jpg" alt="Figmaでワイヤーフレームを設計しているラップトップ画面" loading="lazy" decoding="async">
+                </figure>
+            </aside>
+        </section>
+
+        <section class="container" id="work">
+            <div class="section-panel">
+                <h2 class="section-title"><span class="dot"></span> Recent Work</h2>
+                <div class="work-grid">
+                    <article class="work-card">
+                        <div class="thumb">
+                            <img src="https://images.unsplash.com/photo-1523475472560-d2df97ec485c?q=80&w=780&auto=format&fit=crop" alt="スマートフォンでUIモックアップを確認するデザイナー" loading="lazy" decoding="async">
+                        </div>
+                        <div class="meta">
+                            <div class="title">iOS Mobile app</div>
+                            <div class="sub">Product develop</div>
+                        </div>
+                        <div class="arrow" aria-hidden="true">↑</div>
+                    </article>
+                    <article class="work-card">
+                        <div class="thumb">
+                            <img src="https://images.unsplash.com/photo-1524678606370-a47ad25cb82a?q=80&w=780&auto=format&fit=crop" alt="ヘッドホンとサウンドウェーブの可視化を映したUI画面" loading="lazy" decoding="async">
+                        </div>
+                        <div class="meta">
+                            <div class="title">AI Music product</div>
+                            <div class="sub">UX Case study</div>
+                        </div>
+                        <div class="arrow" aria-hidden="true">↑</div>
+                    </article>
+                    <article class="work-card">
+                        <div class="thumb">
+                            <img src="assets/images/map-redesign.jpg" alt="タブレットに表示したナビゲーションマップを操作するUI" loading="lazy" decoding="async">
+                        </div>
+                        <div class="meta">
+                            <div class="title">AI Map redesign</div>
+                            <div class="sub">UX Case study</div>
+                        </div>
+                        <div class="arrow" aria-hidden="true">↑</div>
+                    </article>
+                    <article class="work-card">
+                        <div class="thumb">
+                            <img src="assets/images/portfolio-site.jpg" alt="ラップトップでポートフォリオサイトをデザインしている作業風景" loading="lazy" decoding="async">
+                        </div>
+                        <div class="meta">
+                            <div class="title">Portfolio Site</div>
+                            <div class="sub">NoCode / HTML</div>
+                        </div>
+                        <div class="arrow" aria-hidden="true">↑</div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="container" id="skills">
+            <div class="skills">
+                <div class="skill-col">
+                    <div>
+                        <h4>Product design</h4>
+                        <p style="color: var(--muted); margin: 8px 0 0;">要件整理、画面設計、ユーザーストーリー作成の演習を実施。</p>
+                    </div>
+                    <div>
+                        <h4>User Experience</h4>
+                        <p style="color: var(--muted); margin: 8px 0 0;">ユーザーインタビュー/プロトタイピング/ユーザビリティ観点の学習。</p>
+                    </div>
+                </div>
+                <div class="skill-grid">
+                    <div class="skill-card">
+                        <figure>
+                            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=540&q=80" alt="オンラインで共同作業を行うチームのデスクトップ画面" loading="lazy" decoding="async">
+                        </figure>
+                        <div>
+                            <h5>NoCode develop</h5>
+                            <p style="color: var(--muted); margin-top:8px;">Canva / STUDIO / Glide でのモック作成。</p>
+                        </div>
+                    </div>
+                    <div class="skill-card">
+                        <figure>
+                            <img src="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=540&q=80" alt="HTMLとCSSのコードを表示したディスプレイとメモ帳" loading="lazy" decoding="async">
+                        </figure>
+                        <div>
+                            <h5>Frontend basics</h5>
+                            <p style="color: var(--muted); margin-top:8px;">HTML / CSS / JavaScript の基礎、アクセシビリティ配慮。</p>
+                        </div>
+                    </div>
+                    <div class="skill-card">
+                        <figure>
+                            <img src="https://images.unsplash.com/photo-1481277542470-605612bd2d61?auto=format&fit=crop&w=540&q=80" alt="ノートパソコンとデザインツールが並ぶワークスペース" loading="lazy" decoding="async">
+                        </figure>
+                        <div>
+                            <h5>Tools</h5>
+                            <p style="color: var(--muted); margin-top:8px;">Figma / GitHub / Notion / Slack</p>
+                        </div>
+                    </div>
+                    <div class="skill-card">
+                        <figure>
+                            <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=540&q=80" alt="ディスカッションを行うチームメンバーの集合写真" loading="lazy" decoding="async">
+                        </figure>
+                        <div>
+                            <h5>Soft skills</h5>
+                            <p style="color: var(--muted); margin-top:8px;">接客で培った傾聴・説明・チーム連携。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer id="contact" class="container">
+            <div class="contact">
+                <div class="contact-top">
+                    <h2 class="section-title" style="margin:0"><span class="dot"></span> Portfolio 2024</h2>
+                    <div class="social" aria-label="SNS">
+                        <span>Twitter</span>
+                        <a href="#" aria-label="Instagram">Instagram</a>
+                        <a href="#" aria-label="LinkedIn">LinkedIn</a>
+                    </div>
+                </div>
+                <div style="margin-top: 16px; color: var(--muted);">
+                    連絡先: <a href="mailto:sakura.nakamura@example.com" style="color: var(--text);">sakura.nakamura@example.com</a>
+                </div>
+                <div style="margin-top: 10px; color: var(--muted); font-size: 13px;">※ 本ページはデザイン見本として作成されたポートフォリオのサンプルです。</div>
+            </div>
+        </footer>
+    </main>
+
+    <script>
+        const copyBtn = document.getElementById('copyEmailBtn');
+        copyBtn?.addEventListener('click', async () => {
+            const email = 'sakura.nakamura@example.com';
+            try {
+                await navigator.clipboard.writeText(email);
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => copyBtn.textContent = 'Copy Email', 1500);
+            } catch (e) {
+                window.prompt('コピーできない場合は手動で選択してコピーしてください', email);
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
+
