@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>オリジナルクイズゲーム</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #17a2b8;
+            --background-color: #f4f7f6;
+            --card-background: #ffffff;
+            --text-color: #333;
+            --correct-color: #28a745;
+            --incorrect-color: #dc3545;
+            --font-main: 'Noto Sans JP', sans-serif;
+            --font-display: 'M PLUS Rounded 1c', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .game-container {
+            background: var(--card-background);
+            padding: 2em 3em;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            border-top: 5px solid var(--primary-color);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        h1, h2 {
+            font-family: var(--font-display);
+            font-weight: 800;
+            margin-bottom: 0.5em;
+            color: var(--primary-color);
+        }
+        
+        h1 {
+             font-size: 2.8em;
+        }
+
+        #start-screen p {
+            font-size: 1.2em;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 1em auto 2em;
+        }
+
+        .btn {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.5em;
+            padding: 12px 30px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            background: var(--primary-color);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+        }
+        
+        #progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            margin-bottom: 1.5em;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+        
+        #question-header {
+             font-family: var(--font-display);
+             font-size: 1.2em;
+             color: var(--secondary-color);
+             margin-bottom: 1em;
+        }
+
+        #question {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 1.5em;
+            line-height: 1.6;
+        }
+
+        #choices {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 2em;
+        }
+        .choice-btn {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            color: var(--text-color);
+            padding: 15px;
+            font-size: 1.1em;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 700;
+        }
+        .choice-btn:hover:not(.disabled) {
+            background-color: #e9ecef;
+            border-color: var(--primary-color);
+        }
+        .choice-btn.correct {
+            background: var(--correct-color);
+            border-color: var(--correct-color);
+            color: #fff;
+        }
+        .choice-btn.incorrect {
+            background: var(--incorrect-color);
+            border-color: var(--incorrect-color);
+            color: #fff;
+        }
+        .choice-btn.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        #explanation-box {
+            display: none;
+            margin-top: 1.5em;
+            padding: 1.5em;
+            background: #f8f9fa;
+            border-radius: 12px;
+            text-align: left;
+            border-left: 5px solid var(--primary-color);
+            animation: slideIn 0.5s;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #explanation-box h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        #results-screen h2 {
+            font-size: 2.5em;
+        }
+
+        #score-text {
+            font-size: 1.8em;
+            margin: 0.5em 0;
+            font-family: var(--font-display);
+        }
+        
+        #akiba-level {
+            font-size: 3.5em;
+            font-weight: 800;
+            color: var(--secondary-color);
+            margin: 0.5em 0 1em 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <div id="start-screen" class="screen active">
+            <h1>オリジナルクイズゲーム</h1>
+            <p>ここにクイズの説明文が入ります。</p>
+            <button id="start-btn" class="btn">ゲームスタート！</button>
+        </div>
+
+        <div id="quiz-screen" class="screen">
+            <div id="progress-bar-container">
+                <div id="progress-bar"></div>
+            </div>
+            <div id="question-header"></div>
+            <div id="question"></div>
+            <div id="choices"></div>
+            <div id="explanation-box">
+                 <h3></h3>
+                 <p></p>
+            </div>
+        </div>
+
+        <div id="results-screen" class="screen">
+            <h2>結果発表</h2>
+            <p id="score-text"></p>
+            <p>あなたのレベルは…</p>
+            <div id="akiba-level"></div>
+            <button id="retry-btn" class="btn">もう一度挑戦する</button>
+        </div>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // ▼▼▼ このallQuizDataを編集して、オリジナルのクイズを作成してください ▼▼▼
+    const allQuizData = [];
+    const choiceLabels = ["回答A", "回答B", "回答C", "回答D"];
+
+    // テンプレートデータを20問分、自動で生成します
+    for (let i = 0; i < 20; i++) {
+        const questionNumber = i + 1;
+        // 正解が A -> B -> C -> D -> A... となるように設定
+        const correctChoiceIndex = i % 4; 
+        
+        allQuizData.push({
+            question: `設問${questionNumber}`,
+            choices: choiceLabels,
+            correct: choiceLabels[correctChoiceIndex],
+            explanation: `ここに「設問${questionNumber}」の詳しい解説が入ります。正解の理由や豆知識などを書きましょう。`
+        });
+    }
+    // ▲▲▲ ここまでを編集 ▲▲▲
+
+
+    // DOM要素
+    const startScreen = document.getElementById('start-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultsScreen = document.getElementById('results-screen');
+    const startBtn = document.getElementById('start-btn');
+    const retryBtn = document.getElementById('retry-btn');
+    
+    const questionHeaderEl = document.getElementById('question-header');
+    const questionEl = document.getElementById('question');
+    const choicesEl = document.getElementById('choices');
+    const progressBar = document.getElementById('progress-bar');
+    
+    const explanationBox = document.getElementById('explanation-box');
+    const explanationHeader = explanationBox.querySelector('h3');
+    const explanationText = explanationBox.querySelector('p');
+
+    const scoreTextEl = document.getElementById('score-text');
+    const akibaLevelEl = document.getElementById('akiba-level');
+
+    // ゲームの状態
+    let currentQuiz = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    // イベントリスナー
+    startBtn.addEventListener('click', startGame);
+    retryBtn.addEventListener('click', startGame);
+
+    // Fisher-Yates shuffle
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function startGame() {
+        currentQuiz = shuffleArray([...allQuizData]).slice(0, 5);
+        currentQuestionIndex = 0;
+        score = 0;
+
+        startScreen.classList.remove('active');
+        resultsScreen.classList.remove('active');
+        quizScreen.classList.add('active');
+
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        explanationBox.style.display = 'none';
+
+        const questionData = currentQuiz[currentQuestionIndex];
+        
+        const progress = ((currentQuestionIndex) / currentQuiz.length) * 100;
+        progressBar.style.width = `${progress}%`;
+
+        questionHeaderEl.textContent = `第 ${currentQuestionIndex + 1} 問`;
+        questionEl.textContent = questionData.question;
+        
+        choicesEl.innerHTML = '';
+        questionData.choices.forEach(choice => {
+            const button = document.createElement('button');
+            button.innerHTML = choice; 
+            button.dataset.choice = choice;
+            button.classList.add('choice-btn');
+            button.addEventListener('click', selectAnswer);
+            choicesEl.appendChild(button);
+        });
+    }
+
+    function selectAnswer(e) {
+        const selectedBtn = e.target;
+        const selectedAnswer = selectedBtn.dataset.choice;
+        const correctAnswer = currentQuiz[currentQuestionIndex].correct;
+
+        Array.from(choicesEl.children).forEach(btn => {
+            btn.classList.add('disabled');
+            if(btn.dataset.choice === correctAnswer) {
+                btn.classList.add('correct');
+            }
+        });
+        
+        if (selectedAnswer === correctAnswer) {
+            score++;
+            explanationHeader.textContent = "🎉 正解！ 🎉";
+        } else {
+            selectedBtn.classList.add('incorrect');
+            explanationHeader.textContent = "😭 不正解… 😭";
+        }
+
+        explanationText.innerHTML = currentQuiz[currentQuestionIndex].explanation;
+        explanationBox.style.display = 'block';
+        
+        const progress = ((currentQuestionIndex + 1) / currentQuiz.length) * 100;
+        progressBar.style.width = `${progress}%`;
+
+        setTimeout(() => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuiz.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }, 3500); 
+    }
+
+    function getLevel(finalScore) {
+        switch(finalScore) {
+            case 5: return "【レベル】パーフェクト";
+            case 4: return "【レベル】マスター";
+            case 3: return "【レベル】エキスパート";
+            case 2: return "【レベル】中級";
+            case 1: return "【レベル】初級";
+            default: return "【レベル】見習い";
+        }
+    }
+
+    function showResults() {
+        quizScreen.classList.remove('active');
+        resultsScreen.classList.add('active');
+
+        scoreTextEl.textContent = `${currentQuiz.length}問中 ${score}問 正解！`;
+        akibaLevelEl.textContent = getLevel(score);
+    }
+});
+</script>
+</body>
+</html>

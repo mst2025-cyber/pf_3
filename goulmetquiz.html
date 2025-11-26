@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>秋葉原グルメクイズ</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #quiz-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 700px;
+        }
+        #question-header {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        #question {
+            font-size: 1.4em;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        #choices {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .choice-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1em;
+            text-align: left;
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .choice-btn:hover:not(:disabled) {
+            background-color: #e9ecef;
+            border-color: #adb5bd;
+        }
+        .choice-btn.correct {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+            font-weight: bold;
+        }
+        .choice-btn.incorrect {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .choice-btn:disabled {
+            cursor: default;
+        }
+        #result-container {
+            display: none;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+        #result-container.correct {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+        }
+        #result-container.incorrect {
+            background-color: #f8d7da;
+             border: 1px solid #f5c6cb;
+        }
+        #result {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        #result.correct {
+            color: #0c5460;
+        }
+        #result.incorrect {
+            color: #721c24;
+        }
+        #explanation {
+            line-height: 1.7;
+            text-align: justify;
+        }
+        #explanation strong {
+            color: #0056b3;
+        }
+        #next-btn {
+            display: none;
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #fff;
+            background-color: #28a745;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.2s;
+        }
+        #next-btn:hover {
+            background-color: #218838;
+        }
+        #final-score {
+            text-align: center;
+        }
+        #final-score h2 {
+            font-size: 2em;
+        }
+         #final-score p {
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="quiz-container">
+        <div id="question-header"></div>
+        <div id="question"></div>
+        <div id="choices"></div>
+        <div id="result-container">
+            <div id="result"></div>
+            <div id="explanation"></div>
+        </div>
+        <button id="next-btn">次の問題へ</button>
+        <div id="final-score" style="display: none;">
+            <h2>クイズ終了！</h2>
+            <p id="score-text"></p>
+            <button onclick="location.reload()">もう一度挑戦する</button>
+        </div>
+    </div>
+
+<script>
+    const quizData = [
+        // ここにユーザー提供のクイズデータを挿入します
+        {
+            question: "秋葉原に位置し、日本最古のメイドカフェとして知られるお店はどれでしょう？",
+            choices: ["A. めいどり～みん", "B. あっとほぉ～むカフェ", "C. Cure Maid Cafe", "D. マジカルロリポップ"],
+            correct: "C. Cure Maid Cafe",
+            explanation: "<strong>正解: C. Cure Maid Cafe</strong><br><br><strong>解説:</strong> Cure Maid Cafe（キュアメイドカフェ）は、2001年にオープンした日本最古のメイドカフェです。一般的にメイドカフェでよく見られる「萌え萌えキューン」といったアイコメやチェキ撮影、メイドさんとの会話サービスなどが一切なく、純粋にカフェとして食事を楽しめるのが最大の特徴です。ヨーロッパの喫茶店のような落ち着いた雰囲気で、メイドさんを眺めながらゆったりとした時間を過ごせます。<br><strong>豆知識:</strong> Cure Maid Cafeは、TVアニメ「ラブライブ！」で南ことりが「ミナ」としてお給仕していたメイドカフェのモデルにもなりました。アニメ作品とのタイアップ企画も定期的に開催され、製作陣や声優のサインが飾られることもあります。"
+        },
+        {
+            question: "「大人なのに女児服着てるカフェ」でメイドさん（ここでは「女児」と呼ぶ）がお客様を呼ぶ際に使う特別な呼称は何でしょう？",
+            choices: ["A. ご主人さま、お嬢さま", "B. お兄ちゃん、お姉ちゃん", "C. 閣下、姫様", "D. 勇者さま、魔法使いさま"],
+            correct: "B. お兄ちゃん、お姉ちゃん",
+            explanation: "<strong>正解: B. お兄ちゃん、お姉ちゃん</strong><br><br><strong>解説:</strong> 「大人なのに女児服着てるカフェ」は、撮影スタジオがプロデュースするコンセプトカフェで、店内の装飾やメイドさん（女児）の衣装が全てパステルでかわいらしい雰囲気に統一されています。通常メイドカフェでは「ご主人さま」「お嬢さま」と呼ぶことが多いですが、このカフェでは「お兄ちゃん」「お姉ちゃん」と呼んでくれるのが特徴です。妹系が好きな方には特におすすめの空間です。<br><strong>豆知識:</strong> このカフェは「勇者系列」と呼ばれる系列店の一つで、定期的に女児服以外のコスプレイベントやお得なイベントが開催されています。公式Twitterで告知されるため、訪問前のチェックが推奨されています。"
+        },
+        {
+            question: "「鉄道居酒屋 LittleTGV」で「乗車代」と呼ばれる席料は、小学生以下のお子様の場合どうなりますか？",
+            choices: ["A. 半額になる", "B. 無料になる", "C. 通常料金の2割引きになる", "D. 親と同額になる"],
+            correct: "B. 無料になる",
+            explanation: "<strong>正解: B. 無料になる</strong><br><br><strong>解説:</strong> 「鉄道居酒屋 LittleTGV」は、その名の通り鉄道がコンセプトの居酒屋スタイルのお店です。店内には本物の機関車やディーゼルカーのプレート、鉄道模型のジオラマ、実際に使用されていた路線図など、鉄道にまつわる貴重なお宝が多数展示されています。席料は「乗車代」と呼ばれ、550円とかなり安いですが、小学生以下のお子様はなんと無料になります。お店全体が鉄道グッズで溢れているため、家族での旅行にも最適な場所とされています。<br><strong>豆知識:</strong> メニューも鉄道車両をイメージしたオリジナルカクテルや、昔懐かしの電車プレートメニュー、密着連結たまご、新幹線おにぎりなど、鉄道にちなんだものが豊富に用意されています。"
+        },
+        // ... (以下、全20問のデータを同様に記述) ...
+        {
+            question: "「ルナパラドックス -猫虎東狂-」の最大の特徴の一つとして挙げられる、入店時の料金システムは何でしょう？",
+            choices: ["A. 時間制で自動的にチャージが発生する", "B. メイドさん指名料が必須である", "C. チャージ代または席料が一切ない", "D. ドリンクが全て飲み放題である"],
+            correct: "C. チャージ代または席料が一切ない",
+            explanation: "<strong>正解: C. チャージ代または席料が一切ない</strong><br><br><strong>解説:</strong> 「ルナパラドックス -猫虎東狂-」は、元々肉料理をメインとする飲食店だった場所にメイドカフェ要素とヴェイパーウェイブを取り入れたお店です。このお店の大きな特徴は、チャージ代やお席代が一切かからないことです。ただ食事をするだけであれば、1階で1500円程度で済ませることが可能です。メイドさんとの会話を希望する場合は、キャストドリンク（1100円）が必須となります。<br><strong>豆知識:</strong> メイドカフェとしては珍しく、元々飲食店だった経緯から料理の味が非常に美味しいと評判です。店内には懐かしいアニメのOP/EDが常に流れており、会話のきっかけにもなります。"
+        },
+        {
+            question: "「MeltTune（メルトチューン）」の店内にある、人気配信者ゆゆうた氏のYouTubeチャンネルの登録者数100万人突破を記念した特別な展示物は何でしょう？",
+            choices: ["A. ゆゆうた氏のサイン入りギター", "B. ゆゆうた氏の等身大パネル", "C. YouTube公式から贈呈された「金の盾」", "D. ゆゆうた氏が使用していたPC"],
+            correct: "C. YouTube公式から贈呈された「金の盾」",
+            explanation: "<strong>正解: C. YouTube公式から贈呈された「金の盾」</strong><br><br><strong>解説:</strong> 「MeltTune」は、人気配信者であるゆゆうた氏がプロデュースし、衣装デザインをfamme fataleの戦慄かなの氏が担当した豪華布陣のメイドカフェです。店内のカウンター席には、ゆゆうた氏のYouTubeチャンネル登録者数100万人突破を記念してYouTube公式から贈呈された「金の盾」が埋め込まれています。これは非常に大胆な展示であり、お店の大きな見どころの一つです。<br><strong>豆知識:</strong> MeltTuneには、外の景色とお洒落な装飾を背景にメイドさんとのチェキが撮れるバルコニーがあります。また、日によってはゆゆうた氏本人が登場し、ゲリラで演奏会が開催されることもあるそうです。"
+        },
+        {
+            question: "秋葉原に210店舗以上存在すると言われる「コンセプトカフェ」の多くは、何を元に作られていますか？",
+            choices: ["A. 特定の地域文化", "B. 数々のコンセプト", "C. 伝統的な喫茶店の様式", "D. 海外のカフェチェーン"],
+            correct: "B. 数々のコンセプト",
+            explanation: "<strong>正解: B. 数々のコンセプト</strong><br><br><strong>解説:</strong> 現在の秋葉原のメイドカフェの大部分は、「コンセプトカフェ」と呼ばれるジャンルに属しており、数々のコンセプトを元に作られたお店が多く存在します。秋葉原だけでも、210店舗以上のコンセプトカフェが存在すると言われています。これにより、お客様は多様なテーマや雰囲気のお店を選ぶことができます。<br><strong>豆知識:</strong> 「大人なのに女児服着てるカフェ」や「龍龍 -ロンロン-」など、特定のテーマに特化したお店は、そのコンセプトに合わせた内装やメイドさんの衣装、呼び方、メニューなどが用意されています。"
+        },
+        {
+            question: "「ブラックロンド」の最大の特徴であり、他のメイドカフェではあまり見られない特別なチェキ撮影サービスは何でしょう？",
+            choices: ["A. メイドさんが客に指示を出してポーズを取らせる「演出チェキ」", "B. メイドさんが客の肌に直接触れる「接触チェキ」", "C. メイドさんが客の持ち物を持って撮る「アイテムチェキ」", "D. メイドさんがお客様の好きな場所で撮る「ロケーションチェキ」"],
+            correct: "B. メイドさんが客の肌に直接触れる「接触チェキ」",
+            explanation: "<strong>正解: B. メイドさんが客の肌に直接触れる「接触チェキ」</strong><br><br><strong>解説:</strong> 「ブラックロンド」は死神をコンセプトにしたメイドカフェで、店内や衣装がほぼ全て黒一色で統一されています。このお店の際立った特徴は、通常のチェキ撮影に加え、メイドさんがお客様の肌に直接触れてくれる「接触チェキ」や、メイドさんの携帯またはお客様自身の携帯で写真が撮れる「写メ」が常設で用意されている点です。これらは他の店舗では珍しいサービスであり、特に色濃い思い出を残したい方におすすめです。<br><strong>豆知識:</strong> ブラックロンドのチェキの落書きは非常に力が入っており、それ自体も見どころの一つです。"
+        },
+        {
+            question: "「マジカルロリポップ」は、「勇者系列」のどの店舗に当たりますか？",
+            choices: ["A. 最新店舗", "B. 郊外店", "C. 本店", "D. テイクアウト専門"],
+            correct: "C. 本店",
+            explanation: "<strong>正解: C. 本店</strong><br><br><strong>解説:</strong> 「マジカルロリポップ」は、「大人なのに女児服着てるカフェ」や「龍龍 -ロンロン-」といった店舗が所属する系列「勇者系列」の本店です。このカフェは「魔女見習いがお給仕する」というコンセプトで作られており、内装から衣装まで「ゆめかわいい」雰囲気で溢れています。衣装のカラーバリエーションが豊富で、ベテランのメイドさんにはその子だけに与えられる「オリジナル衣装」も存在します。<br><strong>豆知識:</strong> マジカルロリポップはYouTubeチャンネルも運営しており、メイドとして働きたい方向けの講座動画や、普段は聞けない話、さらには店長を務めるメイドさんがスポーツカーでサーキットを攻める企画なども公開しています。"
+        },
+        {
+            question: "「牛丼専門サンボ」で、牛丼の具に豆腐と白滝が加わり、玉子を付けてすき焼き風にして食べる常連の楽しみ方として知られるメニューは何でしょう？",
+            choices: ["A. 牛丼（大盛）", "B. お皿", "C. 牛皿", "D. 味噌汁セット"],
+            correct: "C. 牛皿",
+            explanation: "<strong>正解: C. 牛皿</strong><br><br><strong>解説:</strong> 秋葉原で長年愛される個人経営の牛丼専門店「牛丼専門サンボ」では、「牛皿」というメニューが特徴的です。これは、牛丼の具に豆腐と白滝が加わったもので、これに玉子を付けてすき焼き風にして食べるのが常連の間で楽しまれています。甘さ控えめのタレが染み込んだ牛肉と玉ねぎは、どこか懐かしさを感じさせる味わいです。<br><strong>豆知識:</strong> かつてサンボは「店内での携帯電話・ヘッドホンの使用禁止」「つゆだく不可」といった厳しいルールで知られていましたが、近年は緩和されているようです。しかし、お店の雰囲気を大切にする姿勢は変わらず、静かに食事と向き合いたい人には心地よい空間です。"
+        },
+        {
+            question: "「ごはん処あだち」で提供される名物「あだちランチ」（980円）の「普通盛り」のご飯の量はどのくらいでしょう？",
+            choices: ["A. 茶碗1杯分", "B. ご飯一升", "C. ご飯二升", "D. ご飯500g"],
+            correct: "B. ご飯一升",
+            explanation: "<strong>正解: B. ご飯一升</strong><br><br><strong>解説:</strong> 「ごはん処あだち」は、メディアでも度々取り上げられる秋葉原を代表するデカ盛りで有名な定食屋です。名物の「あだちランチ」は980円で、その普通盛りでなんとご飯一升という驚異的な量で提供されます。大盛りでは二升にもなります。おかずもから揚げ、コロッケ、天ぷら、煮物、厚焼き玉子などが桶にどっさり盛られて出てきます。<br><strong>豆知識:</strong> 大食いに自信がない方向けに、「少なめ（8合）」や「擦り切れ1軽（約600g、それでも2合相当）」といったサイズも用意されています。から揚げは特にジューシーで人気があります。"
+        },
+        {
+            question: "「たん清」で不定期に提供される、開店前から行列ができるほどの「幻のランチ」として知られるメニューは何でしょう？",
+            choices: ["A. 特製豚骨ラーメン", "B. 炭火焼き鳥定食", "C. 牛タンシチュー", "D. 刺身定食"],
+            correct: "C. 牛タンシチュー",
+            explanation: "<strong>正解: C. 牛タンシチュー</strong><br><br><strong>解説:</strong> 上質な牛タン料理が楽しめる「たん清」は、夜は炭火焼肉店として賑わいますが、B級グルメ好きの間では月に1～2度、不定期で提供されるランチ限定の「牛タンシチュー」が有名です。このシチューを求めて、開店前から行列ができることも珍しくありません。提供数は限定70食と少なく、整理券が配布されることもあるため、確実に食べたいなら早めの時間帯に訪れる必要があります。<br><strong>豆知識:</strong> この牛タンシチューは、胡椒がアクセントになったデミグラス系のさらりとしたルーに、スプーンでは持ち上げきれないほど大きな牛タンの塊がゴロゴロと入っています。じっくり煮込まれたタンは驚くほど柔らかく、このクオリティとボリュームで1000円という価格は破格と評されています。ランチの提供日は公式ホームページの「お知らせ」で告知されます。"
+        },
+        {
+            question: "「らーめん影武者」で、お店自慢の熟成生豚バラ肉をじっくり煮込んだ厚切りチャーシューを美味しく食べる「通の食べ方」として推奨されているのはどれでしょう？",
+            choices: ["A. 最初に全て食べてしまう", "B. スープに浸さずに食べる", "C. スープに浸しておき、味が染み込んだ後半にいただく", "D. 麺と一緒に一口で食べる"],
+            correct: "C. スープに浸しておき、味が染み込んだ後半にいただく",
+            explanation: "<strong>正解: C. スープに浸しておき、味が染み込んだ後半にいただく</strong><br><br><strong>解説:</strong> 「らーめん影武者」は、ガッツリ系のラーメン二郎インスパイア系として知られ、濃厚な豚骨スープとボリューム満点のトッピングが特徴です。イチオシの「影武者ラーメン（全部入）」（1000円）には、熟成生豚バラ肉をじっくり煮込んだ厚切りチャーシューがたっぷりと入っています。このチャーシューは、最初に全て食べずにスープに浸しておき、味が染み込んだ後半にいただくのが「通」の食べ方とされています。これにより、最後まで美味しくチャーシューを味わうことができます。<br><strong>豆知識:</strong> スープはオープン以来つぎ足しで作られており、深いコクと旨味が特徴です。麺はワシワシとした食感が楽しめる若干縮れのある中太麺です。"
+        },
+        {
+            question: "「あたりや食堂」で味わえる、宮崎県都城市発祥のご当地B級グルメは何でしょう？",
+            choices: ["A. 油そば", "B. ちゃんぽん麺", "C. 雷々麺（らいらいめん）", "D. 担々麺"],
+            correct: "C. 雷々麺（らいらいめん）",
+            explanation: "<strong>正解: C. 雷々麺（らいらいめん）</strong><br><br><strong>解説:</strong> 「あたりや食堂」では、ちょっと変わった麺料理として宮崎県都城市発祥のご当地B級グルメ「雷々麺（らいらいめん）」を味わうことができます。雷々麺は、ちゃんぽん麺のような太麺の上に、豚ひき肉、玉ねぎ、ニラ、椎茸、さつま揚げなどが入ったピリ辛でニンニク風味の効いた特製あんがかかった、いわゆる「あんかけまぜそば」です。<br><strong>豆知識:</strong> モチモチとした太麺に、とろりとしたあんがよく絡み、独特の風味がクセになります。麺自体はやや小ぶりなので、あんを少し残しておいて別売りの白ご飯を投入して「追い飯」で〆る食べ方がおすすめされています。"
+        },
+        {
+            question: "「とんかつ ふくよし」で、特に推奨されているメニュー「カツカレー」が土曜日に特別価格で提供される割引額はいくらでしょう？",
+            choices: ["A. 50円引き", "B. 100円引き", "C. 150円引き", "D. 200円引き"],
+            correct: "D. 200円引き",
+            explanation: "<strong>正解: D. 200円引き</strong><br><br><strong>解説:</strong> 秋葉原の細い路地裏に佇む隠れた名店「とんかつ ふくよし」では、とんかつ専門店ながら「カツカレー」（850円）が特におすすめされています。このカツカレーにはチキンカツが使われており、サクッと軽やかに揚げられたカツとスパイシーでさらっとしたカレーのバランスが絶妙です。そして、特筆すべきは、土曜日がサービスデーとなっており、このカツカレーがなんと200円引きの650円でいただけることです。<br><strong>豆知識:</strong> 路地裏という立地が「知る人ぞ知る」雰囲気を醸し出しており、ホッとする美味しいランチを求める人々に愛されています。"
+        },
+        {
+            question: "秋葉原の食べ歩きグルメとして人気の「スターケバブ・テイクアウェイ」で、お客様が自分好みのケバブをカスタマイズする際に選べるソースは何種類ありますか？",
+            choices: ["A. 3種類", "B. 5種類", "C. 7種類", "D. 10種類"],
+            correct: "D. 10種類",
+            explanation: "<strong>正解: D. 10種類</strong><br><br><strong>解説:</strong> 「スターケバブ・テイクアウェイ」は、秋葉原の食べ歩きグルメとして欠かせないケバブの人気店です。お肉はビーフとチキンの2種類から選べ、そして、ソースはなんと10種類も用意されています。さらにパンの種類も選べるため、自分好みのケバブをカスタマイズする楽しみがあります。定番は「スタードネルサンド」（500円）です。<br><strong>豆知識:</strong> ケバブ自体にもしっかりと下味が付いているため、あえてソースなしの「オリジナル」で肉本来の味をシンプルに楽しむのもおすすめです。"
+        },
+        {
+            question: "「おむすびのGABA」で提供されるおむすびの米は、どのような特徴を持っていますか？",
+            choices: ["A. 玄米を100%使用している", "B. 低GIで血糖値の上昇を抑える", "C. ストレス軽減効果が期待されるGABAを豊富に含む「GABAライス」を使用している", "D. 無農薬で育てられた希少品種の米である"],
+            correct: "C. ストレス軽減効果が期待されるGABAを豊富に含む「GABAライス」を使用している",
+            explanation: "<strong>正解: C. ストレス軽減効果が期待されるGABAを豊富に含む「GABAライス」を使用している</strong><br><br><strong>解説:</strong> 「おむすびのGABA」は、精米機メーカーのサタケが運営するお店で、ストレス軽減効果などが期待されるアミノ酸の一種「GABA（ギャバ）」を豊富に含んだ「GABAライス」を使用したおむすびを提供しています。このGABAライスは、白米の約10倍ものGABAを含んでいるとされています。<br><strong>豆知識:</strong> おむすびの具材は定番から、「納豆オリーブオイル和え」や「スパム」、特におすすめの「おかかクリームチーズ」（220円）といった変わり種まで充実しています。GABAライスは噛むほどにほんのりとした甘みを感じる優しい味わいで、冷めても美味しいのが特徴です。"
+        },
+        {
+            question: "秋葉原名物「おでん缶」をかつて販売していた老舗電気店「チチブデンキ」は閉店しましたが、現在もその跡地近くで「おでん缶」が購入できる自動販売機では、主に何種類の味がありますか？",
+            choices: ["A. 1種類", "B. 2種類", "C. 3種類", "D. 4種類"],
+            correct: "B. 2種類",
+            explanation: "<strong>正解: B. 2種類</strong><br><br><strong>解説:</strong> 秋葉原名物として有名な「おでん缶」は、かつて秋葉原の老舗電気店「チチブデンキ」の前に設置された自動販売機で販売され、一世を風靡しました。チチブデンキは閉店しましたが、その跡地近く（現：チチブデンキ会館ビル周辺）には今も自動販売機が設置されており、「牛すじ入り」と「つみれ入り」の2種類（各320円）が購入できます。<br><strong>豆知識:</strong> 缶詰とは思えない本格的な味わいで、特に寒い季節にはアツアツのおでん缶が心身を温めてくれる存在です。秋葉原ならではのレトロな雰囲気を手軽に味わえる、貴重なB級グルメ体験とされています。"
+        },
+        {
+            question: "秋葉原でインバウンド観光客に「今」最も人気のある飲食店として、2024年4月2日～6月5日の調査期間で最も多くの外国語口コミが寄せられたのはどの飲食店でしょう？",
+            choices: ["A. めいどりーみん 秋葉原 LIVE RESTAURANT Heaven's Gate", "B. 牛かつ壱弐参", "C. フクロウカフェ 東京 アキバフクロウ", "D. 牛カツ京都勝牛 ヨドバシAkiba店"],
+            correct: "B. 牛かつ壱弐参",
+            explanation: "<strong>正解: B. 牛かつ壱弐参</strong><br><br><strong>解説:</strong> 株式会社movの独自調査による「インバウンド人気飲食店ランキング［秋葉原編］」において、「牛かつ壱弐参」がインバウンドに最も人気のある飲食店として1位に輝きました。同スポットには2ヶ月間で500件以上の外国語口コミが寄せられています。<br><strong>豆知識:</strong> ランキング上位には、「めいどりーみん」の複数の店舗（Heaven's Gate, 本店, 中央通り店, 電気街口駅前店, 外神田一丁目店）や「牛カツ京都勝牛 ヨドバシAkiba店」、「牛かつ もと村 秋葉原店」といった牛カツ店も多くランクインしており、牛カツが外国人観光客に非常に人気があることがうかがえます。また、「フクロウカフェ 東京 アキバフクロウ」のような体験型カフェも人気です。"
+        },
+        {
+            question: "秋葉原でWi-Fiと電源を完備しており、一人で作業や勉強をするのに適した静かな雰囲気のカフェはどれでしょう？",
+            choices: ["A. Cafe MOCO", "B. ダミアーノ", "C. VAULT COFFEE", "D. みつばちcoffee"],
+            correct: "C. VAULT COFFEE",
+            explanation: "<strong>正解: C. VAULT COFFEE</strong><br><br><strong>解説:</strong> VAULT COFFEE（ボルトコーヒー）は秋葉原駅から徒歩5分、ビルの3階にある隠れ家的なカフェです。店内はカウンター席が中心で、一人での利用に適しています。Wi-Fiと電源が完備されており、仕事や勉強をしているお客様が多く、静かな空気が流れていると評判です。<br><strong>豆知識:</strong> VAULT COFFEEでは、国際的な厳しい審査に合格した本格コーヒーをリーズナブルな価格で楽しめます。小腹を満たすフードメニューとして、カリカリの耳とふわふわの生地が楽しめるトースト類も人気で、「ハニー＆ゴルゴンゾーラトースト」などがおすすめです。"
+        },
+        {
+            question: "食べログの「秋葉原 ラーメン・つけ麺 人気ランキングTOP20」（2025年8月1日更新）で、1位を獲得しているお店は何でしょう？",
+            choices: ["A. 麺処 ほん田 秋葉原本店", "B. 青島食堂 秋葉原店", "C. らーめん天神下 大喜", "D. Tokyo Style Noodle ほたて日和"],
+            correct: "D. Tokyo Style Noodle ほたて日和",
+            explanation: "<strong>正解: D. Tokyo Style Noodle ほたて日和</strong><br><br><strong>解説:</strong> 食べログの「秋葉原 ラーメン・つけ麺 人気ランキングTOP20」（2025年8月1日更新）において、「Tokyo Style Noodle ほたて日和」が1位に選出されています。このお店はつけ麺を提供しており、「特製」帆立の昆布水つけ麺 白【塩】などが人気です。<br><strong>豆知識:</strong> 秋葉原には「麺処 ほん田 秋葉原本店」（2位）、「青島食堂 秋葉原店」（3位）、「らーめん天神下 大喜」（4位）、「粋な一生」（5位）など、多数の人気ラーメン店やつけ麺店がひしめく激戦区となっています。"
+        }
+    ];
+
+    // DOM要素の取得
+    const questionHeaderEl = document.getElementById('question-header');
+    const questionEl = document.getElementById('question');
+    const choicesEl = document.getElementById('choices');
+    const resultContainerEl = document.getElementById('result-container');
+    const resultEl = document.getElementById('result');
+    const explanationEl = document.getElementById('explanation');
+    const nextBtn = document.getElementById('next-btn');
+    const finalScoreEl = document.getElementById('final-score');
+    const scoreTextEl = document.getElementById('score-text');
+    const quizContainerEl = document.getElementById('quiz-container');
+
+    // クイズの状態を管理する変数
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let answered = false;
+
+    // 問題を読み込んで表示する関数
+    function loadQuestion() {
+        answered = false;
+        resultContainerEl.style.display = 'none';
+        nextBtn.style.display = 'none';
+
+        const currentQuestion = quizData[currentQuestionIndex];
+        
+        questionHeaderEl.textContent = `第${currentQuestionIndex + 1}問 / ${quizData.length}問`;
+        questionEl.innerHTML = currentQuestion.question; // innerHTMLでHTMLタグを許容
+        
+        choicesEl.innerHTML = ''; // 選択肢をクリア
+        currentQuestion.choices.forEach(choice => {
+            const button = document.createElement('button');
+            button.innerHTML = choice; // innerHTMLでHTMLタグを許容
+            button.classList.add('choice-btn');
+            button.addEventListener('click', () => selectAnswer(button, choice, currentQuestion.correct));
+            choicesEl.appendChild(button);
+        });
+    }
+
+    // 回答を選択したときの処理
+    function selectAnswer(button, selectedChoice, correctChoice) {
+        if (answered) return;
+        answered = true;
+
+        const isCorrect = selectedChoice === correctChoice;
+
+        if (isCorrect) {
+            score++;
+            resultEl.textContent = '正解！';
+            resultEl.className = 'correct';
+            resultContainerEl.className = 'result-container correct';
+        } else {
+            resultEl.textContent = '不正解…';
+            resultEl.className = 'incorrect';
+            resultContainerEl.className = 'result-container incorrect';
+        }
+
+        explanationEl.innerHTML = quizData[currentQuestionIndex].explanation;
+        resultContainerEl.style.display = 'block';
+
+        Array.from(choicesEl.children).forEach(btn => {
+            if (btn.innerHTML === correctChoice) {
+                btn.classList.add('correct');
+            } else if (btn === button && !isCorrect) {
+                btn.classList.add('incorrect');
+            }
+            btn.disabled = true;
+        });
+        
+        if (currentQuestionIndex < quizData.length - 1) {
+            nextBtn.textContent = '次の問題へ';
+        } else {
+            nextBtn.textContent = '結果を見る';
+        }
+        nextBtn.style.display = 'block';
+    }
+
+    // 「次の問題へ」ボタンの処理
+    nextBtn.addEventListener('click', () => {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < quizData.length) {
+            loadQuestion();
+        } else {
+            showFinalScore();
+        }
+    });
+
+    // 最終スコアを表示する関数
+    function showFinalScore() {
+        quizContainerEl.innerHTML = ''; // クイズの中身を消去
+        finalScoreEl.style.display = 'block';
+        scoreTextEl.textContent = `${quizData.length}問中 ${score}問 正解しました！`;
+        quizContainerEl.appendChild(finalScoreEl);
+    }
+
+    // 最初の問題を読み込む
+    loadQuestion();
+</script>
+
+</body>
+</html>

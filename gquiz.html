@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>秋葉原グルメマスタークイズ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff3c78;
+            --secondary-color: #3cddff;
+            --background-color: #1a1a2e;
+            --card-background: #1f1f3a;
+            --text-color: #e0e0e0;
+            --correct-color: #39ff14;
+            --incorrect-color: #ff3131;
+            --font-main: 'Noto Sans JP', sans-serif;
+            --font-display: 'M PLUS Rounded 1c', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            background-image: linear-gradient(45deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+        }
+
+        .game-container {
+            background: var(--card-background);
+            padding: 2em 3em;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            border: 3px solid var(--secondary-color);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        h1, h2 {
+            font-family: var(--font-display);
+            font-weight: 800;
+            margin-bottom: 0.5em;
+            text-shadow: 0 0 10px var(--primary-color);
+        }
+        
+        h1 {
+             color: var(--primary-color);
+             font-size: 2.8em;
+        }
+
+        #start-screen p {
+            font-size: 1.2em;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 1em auto 2em;
+        }
+
+        .btn {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.5em;
+            padding: 12px 30px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .start-btn, .retry-btn {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            box-shadow: 0 4px 15px rgba(255, 60, 120, 0.4);
+        }
+        .start-btn:hover, .retry-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(60, 221, 255, 0.5);
+        }
+        
+        #progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background-color: rgba(0,0,0,0.3);
+            border-radius: 5px;
+            margin-bottom: 1.5em;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+        
+        #question-header {
+             font-family: var(--font-display);
+             font-size: 1.2em;
+             color: var(--secondary-color);
+             margin-bottom: 1em;
+        }
+
+        #question {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 1.5em;
+            line-height: 1.6;
+        }
+
+        #choices {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 2em;
+        }
+        .choice-btn {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid var(--secondary-color);
+            color: var(--text-color);
+            padding: 15px;
+            font-size: 1.1em;
+            border-radius: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .choice-btn:hover:not(.disabled) {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--primary-color);
+        }
+        .choice-btn.correct {
+            background: var(--correct-color);
+            border-color: var(--correct-color);
+            color: var(--background-color);
+            font-weight: 700;
+        }
+        .choice-btn.incorrect {
+            background: var(--incorrect-color);
+            border-color: var(--incorrect-color);
+            color: var(--text-color);
+            font-weight: 700;
+        }
+        .choice-btn.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        #explanation-box {
+            display: none;
+            margin-top: 1.5em;
+            padding: 1.5em;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            text-align: left;
+            border-left: 5px solid var(--primary-color);
+            animation: slideIn 0.5s;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #explanation-box h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        #results-screen h2 {
+            font-size: 2.5em;
+            color: var(--primary-color);
+        }
+
+        #score-text {
+            font-size: 1.8em;
+            margin: 0.5em 0;
+            font-family: var(--font-display);
+        }
+        
+        #akiba-level {
+            font-size: 3.5em;
+            font-weight: 800;
+            color: var(--secondary-color);
+            text-shadow: 0 0 15px var(--secondary-color);
+            margin: 0.5em 0 1em 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <div id="start-screen" class="screen active">
+            <h1>秋葉原グルメマスタークイズ</h1>
+            <p>AKIBA GOURMET MASTER QUIZ</p>
+            <p>君はアキバ飯をどれだけ知っているか？<br>全20店舗からランダムで5問が出題されるぞ。目指せ、全問正解！</p>
+            <button id="start-btn" class="btn">ゲームスタート！</button>
+        </div>
+
+        <div id="quiz-screen" class="screen">
+            <div id="progress-bar-container">
+                <div id="progress-bar"></div>
+            </div>
+            <div id="question-header"></div>
+            <div id="question"></div>
+            <div id="choices"></div>
+            <div id="explanation-box">
+                 <h3></h3>
+                 <p></p>
+            </div>
+        </div>
+
+        <div id="results-screen" class="screen">
+            <h2>結果発表</h2>
+            <p id="score-text"></p>
+            <p>あなたの秋葉原通レベルは…</p>
+            <div id="akiba-level"></div>
+            <button id="retry-btn" class="btn">もう一度挑戦する</button>
+        </div>
+    </div>
+
+<script>
+    const allQuizData = [
+        // ... (ここに前回の20問のデータが全て入ります) ...
+        { question: "秋葉原に位置し、日本最古のメイドカフェとして知られるお店はどれでしょう？", choices: ["A. めいどり～みん", "B. あっとほぉ～むカフェ", "C. Cure Maid Cafe", "D. マジカルロリポップ"], correct: "C. Cure Maid Cafe", explanation: "<strong>解説:</strong> Cure Maid Cafe（キュアメイドカフェ）は、2001年にオープンした日本最古のメイドカフェです。ヨーロッパの喫茶店のような落ち着いた雰囲気で、純粋にカフェとして食事を楽しめるのが最大の特徴です。<br><strong>豆知識:</strong> TVアニメ「ラブライブ！」で南ことりがアルバイトをしていたカフェのモデルにもなりました。" },
+        { question: "「大人なのに女児服着てるカフェ」でお客様を呼ぶ際に使う特別な呼称は何でしょう？", choices: ["A. ご主人さま、お嬢さま", "B. お兄ちゃん、お姉ちゃん", "C. 閣下、姫様", "D. 勇者さま、魔法使いさま"], correct: "B. お兄ちゃん、お姉ちゃん", explanation: "<strong>解説:</strong> このカフェでは、メイドさん（女児）がお客様を「お兄ちゃん」「お姉ちゃん」と呼んでくれます。妹系が好きな方におすすめの空間です。<br><strong>豆知識:</strong> このカフェは「勇者系列」と呼ばれる系列店の一つで、定期的にコスプレイベントなどが開催されています。" },
+        { question: "「鉄道居酒屋 LittleTGV」で「乗車代」と呼ばれる席料は、小学生以下のお子様の場合どうなりますか？", choices: ["A. 半額になる", "B. 無料になる", "C. 通常料金の2割引きになる", "D. 親と同額になる"], correct: "B. 無料になる", explanation: "<strong>解説:</strong> 鉄道がコンセプトのこの居酒屋では、席料を「乗車代」と呼びますが、小学生以下のお子様は無料になります。家族での利用にも優しいお店です。<br><strong>豆知識:</strong> メニューも「密着連結たまご」や「新幹線おにぎり」など、鉄道にちなんだものが豊富です。" },
+        { question: "「ルナパラドックス -猫虎東狂-」の最大の特徴である料金システムは何でしょう？", choices: ["A. 時間制で自動的にチャージが発生する", "B. メイドさん指名料が必須である", "C. チャージ代または席料が一切ない", "D. ドリンクが全て飲み放題である"], correct: "C. チャージ代または席料が一切ない", explanation: "<strong>解説:</strong> このお店の大きな特徴は、メイドカフェでは珍しくチャージ代やお席代が一切かからないことです。気軽に食事を楽しめるシステムになっています。<br><strong>豆知識:</strong> 元々が肉料理の飲食店だったため、料理の味が非常に美味しいと評判です。" },
+        { question: "「MeltTune」の店内にある、人気配信者ゆゆうた氏のYouTubeチャンネル登録者数100万人突破を記念した特別な展示物は何でしょう？", choices: ["A. ゆゆうた氏のサイン入りギター", "B. ゆゆうた氏の等身大パネル", "C. YouTube公式から贈呈された「金の盾」", "D. ゆゆうた氏が使用していたPC"], correct: "C. YouTube公式から贈呈された「金の盾」", explanation: "<strong>解説:</strong> 人気配信者ゆゆうた氏プロデュースのこのカフェでは、カウンター席にYouTubeから贈られた本物の「金の盾」が埋め込まれています。<br><strong>豆知識:</strong> 日によってはゆゆうた氏本人が登場し、ゲリラで演奏会が開催されることもあるそうです。" },
+        { question: "秋葉原に210店舗以上存在すると言われる「コンセプトカフェ」の多くは、何を元に作られていますか？", choices: ["A. 特定の地域文化", "B. 数々のコンセプト", "C. 伝統的な喫茶店の様式", "D. 海外のカフェチェーン"], correct: "B. 数々のコンセプト", explanation: "<strong>解説:</strong> 現在の秋葉原のカフェの多くは、特定のテーマ（コンセプト）に基づいて作られた「コンセプトカフェ」です。これにより、多様なテーマのお店を楽しむことができます。<br><strong>豆知識:</strong> 「メイド」だけでなく、「鉄道」「戦国」「魔法」など様々なコンセプトのお店が存在します。" },
+        { question: "「ブラックロンド」の他のメイドカフェでは珍しい特別なチェキ撮影サービスは何でしょう？", choices: ["A. 演出チェキ", "B. 接触チェキ", "C. アイテムチェキ", "D. ロケーションチェキ"], correct: "B. 接触チェキ", explanation: "<strong>解説:</strong> 死神がコンセプトのこのお店では、メイドさんがお客様の肌に直接触れてくれる「接触チェキ」が常設メニューとして用意されています。<br><strong>豆知識:</strong> 店内や衣装がほぼ全て黒で統一されており、独特の世界観が魅力です。" },
+        { question: "「マジカルロリポップ」は、「勇者系列」のどの店舗に当たりますか？", choices: ["A. 最新店舗", "B. 郊外店", "C. 本店", "D. テイクアウト専門"], correct: "C. 本店", explanation: "<strong>解説:</strong> 「マジカルロリポップ」は、「大人なのに女児服着てるカフェ」などが所属する「勇者系列」の本店です。「魔女見習い」がコンセプトです。<br><strong>豆知識:</strong> YouTubeチャンネルも運営しており、メイドさんの普段見られない一面を知ることができます。" },
+        { question: "「牛丼専門サンボ」で、常連がすき焼き風に楽しむメニューは何でしょう？", choices: ["A. 牛丼（大盛）", "B. お皿", "C. 牛皿", "D. 味噌汁セット"], correct: "C. 牛皿", explanation: "<strong>解説:</strong> 「牛皿」は、牛丼の具に豆腐と白滝が加わったメニュー。これに玉子を付けてすき焼き風に食べるのが常連の楽しみ方です。<br><strong>豆知識:</strong> かつては「店内での携帯電話使用禁止」など厳しいルールで知られていましたが、近年は緩和されています。" },
+        { question: "「ごはん処あだち」の名物「あだちランチ」の「普通盛り」のご飯の量はどのくらいでしょう？", choices: ["A. 茶碗1杯分", "B. ご飯一升", "C. ご飯二升", "D. ご飯500g"], correct: "B. ご飯一升", explanation: "<strong>解説:</strong> 秋葉原を代表するデカ盛り店「ごはん処あだち」の「あだちランチ」は、普通盛りでなんとご飯一升（約1.5kg）という驚異的な量です。<br><strong>豆知識:</strong> 大食いに自信がない方向けに、「少なめ（8合）」や「擦り切れ1軽（約600g）」といったサイズも用意されています。" },
+        { question: "「たん清」で不定期に提供される、行列必至の「幻のランチ」メニューは何でしょう？", choices: ["A. 特製豚骨ラーメン", "B. 炭火焼き鳥定食", "C. 牛タンシチュー", "D. 刺身定食"], correct: "C. 牛タンシチュー", explanation: "<strong>解説:</strong> 月に1～2度、不定期で提供されるランチ限定の「牛タンシチュー」は、開店前から行列ができるほどの人気です。大きな牛タンの塊がゴロゴロ入っています。<br><strong>豆知識:</strong> 提供日は公式ホームページで告知されるため、訪問前のチェックが必須です。" },
+        { question: "「らーめん影武者」の厚切りチャーシューを美味しく食べる「通の食べ方」はどれ？", choices: ["A. 最初に全て食べてしまう", "B. スープに浸さずに食べる", "C. スープに浸しておき、味が染み込んだ後半にいただく", "D. 麺と一緒に一口で食べる"], correct: "C. スープに浸しておき、味が染み込んだ後半にいただく", explanation: "<strong>解説:</strong> このお店のチャーシューは、すぐに食べずにスープに浸しておくのが通の食べ方。味が染み込み、より一層美味しくいただけます。<br><strong>豆知識:</strong> スープはオープン以来つぎ足しで作られており、深いコクと旨味が特徴です。" },
+        { question: "「あたりや食堂」で味わえる宮崎県都城市発祥のご当地B級グルメは何でしょう？", choices: ["A. 油そば", "B. ちゃんぽん麺", "C. 雷々麺（らいらいめん）", "D. 担々麺"], correct: "C. 雷々麺（らいらいめん）", explanation: "<strong>解説:</strong> 「雷々麺」は、ちゃんぽん麺のような太麺の上にピリ辛の特製あんがかかった「あんかけまぜそば」です。<br><strong>豆知識:</strong> 麺を食べ終わった後に、残ったあんに白ご飯を投入して「追い飯」で〆るのがおすすめです。" },
+        { question: "「とんかつ ふくよし」で推奨されている「カツカレー」が土曜日に割引されますが、その割引額はいくらでしょう？", choices: ["A. 50円引き", "B. 100円引き", "C. 150円引き", "D. 200円引き"], correct: "D. 200円引き", explanation: "<strong>解説:</strong> とんかつ専門店ながら人気の「カツカレー」（850円）は、土曜日のサービスデーに200円引きの650円でいただけます。<br><strong>豆知識:</strong> お店の場所が細い路地裏にあり、「知る人ぞ知る」雰囲気を醸し出しています。" },
+        { question: "食べ歩きグルメ「スターケバブ」で、自分好みにカスタマイズする際に選べるソースは何種類？", choices: ["A. 3種類", "B. 5種類", "C. 7種類", "D. 10種類"], correct: "D. 10種類", explanation: "<strong>解説:</strong> 秋葉原の食べ歩きの定番ケバブ。お肉やパンの種類だけでなく、ソースも10種類から選んで自分好みの味を作れます。<br><strong>豆知識:</strong> あえてソースなしの「オリジナル」で注文し、肉本来の味を楽しむのも通な食べ方です。" },
+        { question: "「おむすびのGABA」で使われている「GABAライス」の主な特徴は何でしょう？", choices: ["A. 玄米を100%使用", "B. 低GIである", "C. ストレス軽減効果が期待されるGABAが豊富", "D. 無農薬の希少品種"], correct: "C. ストレス軽減効果が期待されるGABAが豊富", explanation: "<strong>解説:</strong> 精米機メーカーが運営するこのお店では、ストレス軽減効果などが期待されるアミノ酸「GABA」を白米の約10倍含んだ「GABAライス」を使用しています。<br><strong>豆知識:</strong> おすすめの具材は「おかかクリームチーズ」。意外な組み合わせがクセになります。" },
+        { question: "秋葉原名物「おでん缶」の自動販売機で現在主に購入できる味は何種類でしょう？", choices: ["A. 1種類", "B. 2種類", "C. 3種類", "D. 4種類"], correct: "B. 2種類", explanation: "<strong>解説:</strong> かつて「チチブデンキ」前で一世を風靡したおでん缶は、今も近くの自販機で「牛すじ入り」と「つみれ入り」の2種類が購入できます。<br><strong>豆知識:</strong> 缶詰とは思えない本格的な味わいで、特に寒い季節の食べ歩きに最適です。" },
+        { question: "2024年の調査で、秋葉原のインバウンド観光客に最も人気だった飲食店はどこでしょう？", choices: ["A. めいどりーみん Heaven's Gate", "B. 牛かつ壱弐参", "C. アキバフクロウ", "D. 牛カツ京都勝牛"], correct: "B. 牛かつ壱弐参", explanation: "<strong>解説:</strong> 調査期間中、最も多くの外国語口コミが寄せられたのは「牛かつ壱弐参」でした。日本の牛カツ文化は海外観光客に大人気です。<br><strong>豆知識:</strong> ランキング上位には牛カツ店が複数入っており、秋葉原グルメの新定番となりつつあります。" },
+        { question: "秋葉原でWi-Fiと電源を完備し、一人で作業するのに適した隠れ家的なカフェはどれでしょう？", choices: ["A. Cafe MOCO", "B. ダミアーノ", "C. VAULT COFFEE", "D. みつばちcoffee"], correct: "C. VAULT COFFEE", explanation: "<strong>解説:</strong> VAULT COFFEEはビルの3階にある隠れ家的なカフェ。Wi-Fi・電源完備で静かな雰囲気のため、一人での作業や勉強に最適です。<br><strong>豆知識:</strong> 本格的なスペシャルティコーヒーをリーズナブルな価格で楽しめます。" },
+        { question: "食べログの秋葉原ラーメンランキングで1位を獲得している、帆立を使ったつけ麺が人気のお店は何でしょう？（2025年8月時点）", choices: ["A. 麺処 ほん田", "B. 青島食堂", "C. らーめん天神下 大喜", "D. Tokyo Style Noodle ほたて日和"], correct: "D. Tokyo Style Noodle ほたて日和", explanation: "<strong>解説:</strong> 「Tokyo Style Noodle ほたて日和」は、帆立の旨味が凝縮された昆布水つけ麺で絶大な人気を誇り、激戦区秋葉原のランキングで1位に輝いています。<br><strong>豆知識:</strong> 秋葉原は都内でも有数のラーメン激戦区であり、常に新しい人気店が生まれています。" }
+    ];
+
+    // DOM要素
+    const startScreen = document.getElementById('start-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultsScreen = document.getElementById('results-screen');
+    const startBtn = document.getElementById('start-btn');
+    const retryBtn = document.getElementById('retry-btn');
+    
+    const questionHeaderEl = document.getElementById('question-header');
+    const questionEl = document.getElementById('question');
+    const choicesEl = document.getElementById('choices');
+    const progressBar = document.getElementById('progress-bar');
+    
+    const explanationBox = document.getElementById('explanation-box');
+    const explanationHeader = explanationBox.querySelector('h3');
+    const explanationText = explanationBox.querySelector('p');
+
+    const scoreTextEl = document.getElementById('score-text');
+    const akibaLevelEl = document.getElementById('akiba-level');
+
+    // ゲームの状態
+    let currentQuiz = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    // イベントリスナー
+    startBtn.addEventListener('click', startGame);
+    retryBtn.addEventListener('click', startGame);
+
+    // Fisher-Yates shuffle
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function startGame() {
+        // データをシャッフルして5問選ぶ
+        currentQuiz = shuffleArray([...allQuizData]).slice(0, 5);
+        currentQuestionIndex = 0;
+        score = 0;
+
+        // 画面切り替え
+        startScreen.classList.remove('active');
+        resultsScreen.classList.remove('active');
+        quizScreen.classList.add('active');
+
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        // UIリセット
+        explanationBox.style.display = 'none';
+
+        const questionData = currentQuiz[currentQuestionIndex];
+        
+        // プログレスバー更新
+        const progress = ((currentQuestionIndex) / currentQuiz.length) * 100;
+        progressBar.style.width = `${progress}%`;
+
+        questionHeaderEl.textContent = `第 ${currentQuestionIndex + 1} 問`;
+        questionEl.textContent = questionData.question;
+        
+        choicesEl.innerHTML = '';
+        questionData.choices.forEach(choice => {
+            const button = document.createElement('button');
+            button.innerHTML = choice.substring(3); // "A. "などを削除
+            button.dataset.choice = choice;
+            button.classList.add('choice-btn');
+            button.addEventListener('click', selectAnswer);
+            choicesEl.appendChild(button);
+        });
+    }
+
+    function selectAnswer(e) {
+        const selectedBtn = e.target;
+        const selectedAnswer = selectedBtn.dataset.choice;
+        const correctAnswer = currentQuiz[currentQuestionIndex].correct;
+
+        // 全てのボタンを無効化
+        Array.from(choicesEl.children).forEach(btn => {
+            btn.classList.add('disabled');
+            // 正解のボタンをハイライト
+            if(btn.dataset.choice === correctAnswer) {
+                btn.classList.add('correct');
+            }
+        });
+        
+        if (selectedAnswer === correctAnswer) {
+            score++;
+            explanationHeader.textContent = "🎉 正解！ 🎉";
+        } else {
+            selectedBtn.classList.add('incorrect');
+            explanationHeader.textContent = "😭 不正解… 😭";
+        }
+
+        explanationText.innerHTML = currentQuiz[currentQuestionIndex].explanation;
+        explanationBox.style.display = 'block';
+        
+        // プログレスバーを1問分進める
+        const progress = ((currentQuestionIndex + 1) / currentQuiz.length) * 100;
+        progressBar.style.width = `${progress}%`;
+
+        // 次の問題へ
+        setTimeout(() => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuiz.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }, 3000); // 3秒後に次の問題へ
+    }
+
+    function getAkibaLevel(finalScore) {
+        switch(finalScore) {
+            case 5: return "【神】アキバの神";
+            case 4: return "【達人】アキバマスター";
+            case 3: return "【常連】アキバ通";
+            case 2: return "【見習い】アキバニア";
+            case 1: return "【初心者】アキバビギナー";
+            default: return "【観光客】ようこそアキバへ！";
+        }
+    }
+
+    function showResults() {
+        quizScreen.classList.remove('active');
+        resultsScreen.classList.add('active');
+
+        scoreTextEl.textContent = `${currentQuiz.length}問中 ${score}問 正解！`;
+        akibaLevelEl.textContent = getAkibaLevel(score);
+    }
+
+</script>
+</body>
+</html>
