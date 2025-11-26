@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金属加工業の未来 2035: Industry Prediction Infographic</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;500;700;900&display=swap" rel="stylesheet">
+
+    <!-- Palette Definition & Custom Styles -->
+    <style>
+        :root {
+            --color-bg: #F8FAFC;
+            --color-card: #FFFFFF;
+            --color-text-main: #0F172A;
+            --color-text-sub: #475569;
+            --color-primary: #0EA5E9; /* Sky 500 */
+            --color-secondary: #F97316; /* Orange 500 */
+            --color-accent: #14B8A6; /* Teal 500 */
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text-main);
+        }
+
+        /* Chart Container Strict Rules */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px; /* Max width constraint */
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px; /* Base height */
+            max-height: 400px;
+        }
+
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+
+        /* Utility for Cards */
+        .info-card {
+            background-color: var(--color-card);
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-top: 4px solid var(--color-primary);
+            transition: transform 0.2s;
+        }
+
+        .info-card:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Timeline Styling (No SVG) */
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+            padding-bottom: 2rem;
+            border-left: 4px solid var(--color-primary);
+        }
+        
+        .timeline-item:last-child {
+            border-left: 4px solid transparent;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -0.65rem; /* Adjust to center on border */
+            top: 0;
+            width: 1.25rem;
+            height: 1.25rem;
+            background-color: var(--color-secondary);
+            border-radius: 50%;
+            border: 3px solid #fff;
+        }
+    </style>
+
+    <!-- 
+    Source Material Integration Summary:
+    1. Narrative: Starts with the 2035 vision, breaks down drivers (Materials, Labor, Environment), and concludes with a backcasted roadmap.
+    2. Data Points: 
+       - EV shift causes steel decline vs aluminum rise (Compare -> Donut).
+       - Population drop forces automation (Relationship/Change -> Combo Bar/Line).
+       - Energy efficiency vs Cost (3D/Multi-variable -> Plotly Bubble).
+       - Risk Factors (Multivariate -> Radar).
+    3. Palette: "Energetic Tech" (Blue/Orange/White) to convey innovation and urgency.
+    -->
+</head>
+<body class="antialiased">
+
+    <!-- Header / Hook Section -->
+    <header class="bg-slate-900 text-white py-12 px-4 shadow-lg">
+        <div class="max-w-6xl mx-auto text-center">
+            <h2 class="text-sky-400 font-bold tracking-widest uppercase mb-2">Infographic Report</h2>
+            <h1 class="text-4xl md:text-5xl font-black mb-6 leading-tight">金属加工業 2035年の未来予測</h1>
+            <p class="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto">
+                「デジタルツイン」と「グリーントランスフォーメーション (GX)」が交差する未来。
+                技術、規制、市場、人口動態の複合的要因から導き出された10年後の産業地図と、そこへ至るロードマップ。
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+
+        <!-- Section 1: Introduction & Vision -->
+        <div class="md:col-span-2 info-card border-t-orange-500">
+            <h3 class="text-2xl font-bold mb-4 text-slate-800">🔮 2035年の産業ビジョン：自律型分散生産</h3>
+            <p class="text-slate-600 mb-6 leading-relaxed">
+                2035年の金属加工現場は、現在の「大量生産・集約型」から「多品種変量・自律分散型」へと完全にシフトします。
+                AIがサプライチェーン全体を最適化し、熟練工の技術はデジタル化され、ロボットが実行を担います。
+                最大のドライバーは<span class="font-bold text-sky-600">EV化による素材革命</span>と<span class="font-bold text-orange-500">労働人口の激減</span>です。
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                <div class="bg-slate-50 p-4 rounded-lg">
+                    <div class="text-4xl mb-2">📉 30%</div>
+                    <div class="text-sm font-bold text-slate-500">労働力減少予測</div>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-lg">
+                    <div class="text-4xl mb-2">🤖 85%</div>
+                    <div class="text-sm font-bold text-slate-500">工程自動化率</div>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-lg">
+                    <div class="text-4xl mb-2">♻️ Net 0</div>
+                    <div class="text-sm font-bold text-slate-500">カーボンニュートラル</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Material Market Shift -->
+        <div class="info-card">
+            <h3 class="text-xl font-bold mb-2 flex items-center">
+                <span class="bg-sky-500 text-white w-8 h-8 rounded-full flex items-center justify-center mr-2 text-sm">1</span>
+                EVシフトと素材革命
+            </h3>
+            <p class="text-sm text-slate-500 mb-4">
+                自動車産業のEV化に伴い、重い鉄鋼部品から、アルミ、CFRP（炭素繊維強化プラスチック）、ハイテン（超高張力鋼板）への転換が加速します。従来の切削加工のみならず、積層造形（3Dプリンタ）とのハイブリッド加工が標準化します。
+            </p>
+            <!-- Chart Container -->
+            <div class="chart-container">
+                <canvas id="materialChart"></canvas>
+            </div>
+            <p class="text-xs text-center text-slate-400 mt-2">※加工素材の構成比率変化（予測）</p>
+        </div>
+
+        <!-- Section 3: Workforce vs Automation -->
+        <div class="info-card">
+            <h3 class="text-xl font-bold mb-2 flex items-center">
+                <span class="bg-orange-500 text-white w-8 h-8 rounded-full flex items-center justify-center mr-2 text-sm">2</span>
+                「2024年問題」のその先へ
+            </h3>
+            <p class="text-sm text-slate-500 mb-4">
+                熟練工の大量引退と少子化により、人手不足は深刻化します。これを補うため、協働ロボット（Cobots）とAIによる自動見積もり・自動CAM生成の導入が指数関数的に増加します。もはや「自動化」は選択肢ではなく生存条件です。
+            </p>
+            <!-- Chart Container -->
+            <div class="chart-container">
+                <canvas id="laborChart"></canvas>
+            </div>
+            <p class="text-xs text-center text-slate-400 mt-2">※労働人口指数 vs ロボット導入密度</p>
+        </div>
+
+        <!-- Section 4: Decarbonization & Efficiency (Plotly) -->
+        <div class="md:col-span-2 info-card">
+            <h3 class="text-xl font-bold mb-2 flex items-center">
+                <span class="bg-teal-500 text-white w-8 h-8 rounded-full flex items-center justify-center mr-2 text-sm">3</span>
+                環境規制とエネルギー効率の相関
+            </h3>
+            <p class="text-sm text-slate-500 mb-4">
+                Scope 3（サプライチェーン排出量）の規制強化により、CO2排出量の多い企業は取引から排除されるリスクが高まります。
+                以下の図は、エネルギーコストの上昇、炭素税の導入、そして高効率設備（GX投資）の関係性を示しています。
+                高効率設備への投資（右に行くほど）が進むほど、運用コスト（Y軸）は長期的には低下する傾向にあります。
+            </p>
+            <!-- Chart Container for Plotly -->
+            <div id="bubbleChart" class="chart-container" style="max-width: 100%;"></div>
+            <p class="text-xs text-center text-slate-400 mt-2">※バブルサイズ＝炭素税によるペナルティコスト規模</p>
+        </div>
+
+        <!-- Section 5: Risk Analysis -->
+        <div class="info-card">
+            <h3 class="text-xl font-bold mb-2 flex items-center">
+                <span class="bg-rose-500 text-white w-8 h-8 rounded-full flex items-center justify-center mr-2 text-sm">4</span>
+                外部環境リスク評価
+            </h3>
+            <p class="text-sm text-slate-500 mb-4">
+                地政学的リスクによるサプライチェーン分断、レアメタルの資源枯渇、そしてサイバー攻撃。
+                技術革新だけでなく、これらの「守り」の要素が経営の安定性を左右します。
+            </p>
+            <!-- Chart Container -->
+            <div class="chart-container">
+                <canvas id="riskChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Section 6: The Roadmap (Backcasting) -->
+        <div class="info-card bg-slate-50 border-none">
+            <h3 class="text-xl font-bold mb-6 text-slate-800">📍 未来からの逆算ロードマップ (Backcasting)</h3>
+            
+            <div class="pl-2">
+                <!-- 10 Years (Goal) -->
+                <div class="timeline-item">
+                    <div class="timeline-dot bg-sky-600"></div>
+                    <h4 class="text-lg font-bold text-sky-700">2035年 (10年後): 完全自律エコシステム</h4>
+                    <p class="text-sm text-slate-600 mt-1">
+                        <strong>【ありたい姿】</strong> 工場は無人化が進み、AIが需要予測から物流までを自律制御。<br>
+                        <strong>達成指標:</strong> 再エネ比率100%、AI管理比率90%。
+                    </p>
+                </div>
+
+                <!-- 6 Years (Transition) -->
+                <div class="timeline-item">
+                    <div class="timeline-dot bg-orange-500"></div>
+                    <h4 class="text-lg font-bold text-orange-600">2031年 (6年後): 協働と標準化の時代</h4>
+                    <p class="text-sm text-slate-600 mt-1">
+                        <strong>【変革期】</strong> 人とロボットが同じラインで働く「協働」が定着。炭素排出データの開示が完全義務化。<br>
+                        <strong>アクション:</strong> レガシー設備の撤廃、デジタルツイン上での生産シミュレーション運用開始。
+                    </p>
+                </div>
+
+                <!-- 3 Years (Foundation) -->
+                <div class="timeline-item border-l-0"> <!-- Remove border for last item -->
+                    <div class="timeline-dot bg-teal-500"></div>
+                    <h4 class="text-lg font-bold text-teal-600">2028年 (3年後): デジタル基盤の構築</h4>
+                    <p class="text-sm text-slate-600 mt-1">
+                        <strong>【足場固め】</strong> 紙図面の完全撤廃とIoTセンサーの全設備導入。<br>
+                        <strong>アクション:</strong> 電力消費の可視化、クラウドERPへの移行、多能工化教育の開始。
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-8 text-center text-sm">
+        <p>© 2025 Metal Industry Future Insights. Data simulated for projection purposes.</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- 1. Helper Functions ---
+
+        /**
+         * Splits a long string into an array of shorter strings for Chart.js labels.
+         * Limit ~16 characters per line.
+         */
+        function splitLabel(label) {
+            const limit = 16;
+            if (label.length <= limit) return label;
+            
+            const words = label.split(''); // Splitting by char for Japanese precision
+            const lines = [];
+            let currentLine = '';
+
+            words.forEach(char => {
+                if ((currentLine + char).length > limit) {
+                    lines.push(currentLine);
+                    currentLine = char;
+                } else {
+                    currentLine += char;
+                }
+            });
+            if (currentLine) lines.push(currentLine);
+            return lines;
+        }
+
+        /**
+         * Process an array of labels using splitLabel
+         */
+        function processLabels(labels) {
+            return labels.map(l => splitLabel(l));
+        }
+
+        /**
+         * Standard Tooltip Config for Multiline Labels
+         */
+        const tooltipConfig = {
+            callbacks: {
+                title: function(tooltipItems) {
+                    const item = tooltipItems[0];
+                    let label = item.chart.data.labels[item.dataIndex];
+                    if (Array.isArray(label)) {
+                        return label.join(''); // Join without space for Japanese
+                    } else {
+                        return label;
+                    }
+                }
+            }
+        };
+
+        // --- 2. Chart.js Implementations ---
+
+        // Chart 1: Material Market Shift (Doughnut)
+        const ctxMaterial = document.getElementById('materialChart').getContext('2d');
+        const materialLabels = ['従来鋼鉄 (Steel)', 'アルミニウム合金', 'CFRP (炭素繊維)', 'チタン・新合金'];
+        
+        new Chart(ctxMaterial, {
+            type: 'doughnut',
+            data: {
+                labels: processLabels(materialLabels),
+                datasets: [{
+                    label: '2025年',
+                    data: [70, 20, 5, 5],
+                    backgroundColor: ['#cbd5e1', '#0ea5e9', '#f97316', '#14b8a6'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                },
+                {
+                    label: '2035年予測',
+                    data: [40, 35, 15, 10],
+                    backgroundColor: ['#cbd5e1', '#0ea5e9', '#f97316', '#14b8a6'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff',
+                    weight: 2 // Outer ring is thicker
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 12, padding: 20 } },
+                    tooltip: tooltipConfig,
+                    title: { display: true, text: '内側:2025年 / 外側:2035年 の素材構成比' }
+                }
+            }
+        });
+
+        // Chart 2: Labor vs Automation (Bar + Line)
+        const ctxLabor = document.getElementById('laborChart').getContext('2d');
+        const laborLabels = ['2024', '2026', '2028', '2030', '2032', '2034', '2035'];
+
+        new Chart(ctxLabor, {
+            type: 'bar',
+            data: {
+                labels: processLabels(laborLabels),
+                datasets: [
+                    {
+                        type: 'line',
+                        label: '熟練労働者人口指数 (基準100)',
+                        data: [100, 92, 85, 78, 72, 68, 65],
+                        borderColor: '#ef4444', // Red for danger
+                        borderWidth: 3,
+                        tension: 0.4,
+                        yAxisID: 'y'
+                    },
+                    {
+                        type: 'bar',
+                        label: '産業ロボット導入密度 (台/100人)',
+                        data: [15, 25, 40, 65, 90, 110, 125],
+                        backgroundColor: '#0ea5e9',
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: tooltipConfig
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: { display: true, text: '労働人口指数' }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        grid: { drawOnChartArea: false },
+                        title: { display: true, text: 'ロボット密度' }
+                    }
+                }
+            }
+        });
+
+        // Chart 4: Risk Analysis (Radar)
+        const ctxRisk = document.getElementById('riskChart').getContext('2d');
+        const riskLabels = ['地政学リスク', '資源価格高騰', '環境規制強化', 'サイバー攻撃', '技術陳腐化', '後継者不足', '電力供給不安定'];
+
+        new Chart(ctxRisk, {
+            type: 'radar',
+            data: {
+                labels: processLabels(riskLabels),
+                datasets: [{
+                    label: '2025年 現在のリスク',
+                    data: [60, 70, 50, 40, 30, 90, 40],
+                    fill: true,
+                    backgroundColor: 'rgba(148, 163, 184, 0.2)',
+                    borderColor: '#94a3b8',
+                    pointBackgroundColor: '#94a3b8'
+                }, {
+                    label: '2035年 予測リスク',
+                    data: [85, 90, 95, 80, 20, 40, 70], // Automation lowers succession risk, but cyber/resource risk goes up
+                    fill: true,
+                    backgroundColor: 'rgba(249, 115, 22, 0.2)',
+                    borderColor: '#f97316',
+                    pointBackgroundColor: '#f97316'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: { color: '#e2e8f0' },
+                        grid: { color: '#e2e8f0' },
+                        pointLabels: { font: { size: 10 } },
+                        suggestedMin: 0,
+                        suggestedMax: 100
+                    }
+                },
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: tooltipConfig
+                }
+            }
+        });
+
+        // --- 3. Plotly.js Implementation (Canvas) ---
+        
+        // Chart 3: Energy/Cost/Efficiency (Bubble)
+        // X: GX Investment (Efficiency), Y: Energy Cost Index, Size: Carbon Tax Penalty
+        const trace1 = {
+            x: [20, 35, 55, 80, 95], // Investment/Efficiency Level
+            y: [120, 135, 145, 130, 110], // Ops Cost (rises then falls due to efficiency)
+            text: ['2025', '2028', '2031', '2034', '2035'],
+            mode: 'markers',
+            marker: {
+                size: [80, 70, 50, 30, 10], // Tax penalty shrinks as we get efficient
+                color: ['#ef4444', '#f97316', '#eab308', '#0ea5e9', '#14b8a6'], // Red to Green transition
+                opacity: 0.7,
+            },
+            name: 'Industry Trend',
+            type: 'scatter'
+        };
+
+        const layoutPlotly = {
+            title: { text: 'GX投資と運用コストの推移 (2025-2035)', font: { size: 14 } },
+            showlegend: false,
+            margin: { t: 40, b: 40, l: 50, r: 20 },
+            xaxis: { title: '省エネ・自動化設備への投資度合い →' },
+            yaxis: { title: 'エネルギー・運用コスト指数' },
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { family: 'Noto Sans JP' }
+        };
+
+        const configPlotly = {
+            responsive: true,
+            displayModeBar: false,
+            renderer: 'canvas' // Force Canvas rendering implies WebGL preference where applicable or standard canvas fallback
+        };
+
+        Plotly.newPlot('bubbleChart', [trace1], layoutPlotly, configPlotly);
+
+    </script>
+</body>
+</html>
