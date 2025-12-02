@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>秋葉原グルメ検定</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel (JSX compilation in browser) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts (Optional for better aesthetics) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-white">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- アイコンコンポーネント (Lucide-reactの代わり) ---
+        const Trophy = (props) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+        );
+        const AlertCircle = (props) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+        );
+        const CheckCircle2 = (props) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+        );
+        const XCircle = (props) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+        );
+        const Utensils = (props) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+        );
+        const Zap = (props) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        );
+        const RefreshCw = (props) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+        );
+        const BookOpen = (props) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        );
+
+        // --- データ定義 ---
+        const INITIAL_QUIZ_DATA = [
+            {
+                id: 1,
+                category: "B級グルメのルール",
+                question: "秋葉原のB級グルメの象徴的な存在である牛丼専門「サンボ」には、独自のメニュー呼称が存在します。「お皿」（ご飯付き）と「牛皿」（ご飯付き）の違いを最も正確に説明しているのはどれか。",
+                options: [
+                "「お皿」は牛丼の具に豆腐としらたきが入っており、「牛皿」は具材が牛肉のみである。",
+                "「お皿」はご飯の上に具が乗った牛丼で、「牛皿」は具とご飯が別々になった定食スタイルである。",
+                "「牛皿」は「お皿」と比べてお肉の量が多くなっているセットである。",
+                "「お皿」は並盛りの牛丼の具、「牛皿」は大盛りの牛丼の具である。"
+                ],
+                correctIndex: 2,
+                explanation: "「お皿」（ご飯付き）はご飯と牛肉（豆腐としらたきも含む）が別盛で提供される定食スタイル。これに対して「牛皿」（ご飯付き）は、「お皿」の肉増しバージョンです。",
+                trivia: "サンボのメニューは「牛丼」「お皿」「牛皿」の3本柱。牛丼（並）でも大手チェーンの「大盛」や「特盛」に近い量があるため、自信がない方は「並」から挑戦推奨です。"
+            },
+            {
+                id: 2,
+                category: "B級グルメのルール",
+                question: "牛丼専門サンボは、その硬派な佇まいから、日本のポップカルチャー作品の舞台としても知られています。この店舗がモデルになった、あるいは作中に登場することで有名なSFアドベンチャーゲームは何か。",
+                options: [
+                "『ペルソナ5』",
+                "『STEINS;GATE（シュタインズ・ゲート）』",
+                "『ラブライブ！』",
+                "『ポケットモンスター』"
+                ],
+                correctIndex: 1,
+                explanation: "サンボは、秋葉原を舞台にした『STEINS;GATE』の作中に登場する牛丼屋のモデルとして知られています。主人公の岡部倫太郎やダルが通うお店として描かれています。",
+                trivia: "かつては「ヘッドホン着用禁止」「携帯電源オフ」など厳格なルールがありましたが、2025年現在は緩和されています。ただし「静かに早く食べて帰る」スタイルは健在です。"
+            },
+            {
+                id: 3,
+                category: "B級グルメのルール",
+                question: "末広町駅からも近く、コスパ最強のステーキ酒場として知られる「ビーフキッチンスタンド 秋葉原電気街口店」の夕食時間帯（夜）の価格帯として、情報サイトで紹介されていたのはどのレンジか。",
+                options: [
+                "〜5,000円",
+                "〜3,000円",
+                "〜2,000円",
+                "〜1,000円"
+                ],
+                correctIndex: 2,
+                explanation: "夜の予算が「〜2000円」、昼の予算が「〜1000円」と紹介されており、コスパ最強の肉バルとして知られています。",
+                trivia: "秋葉原駅周辺の居酒屋は、高単価な接待向け店舗と、ビーフキッチンスタンドのような低価格で手軽な超カジュアル店へと二極化が進んでいます。"
+            },
+            {
+                id: 4,
+                category: "専門料理",
+                question: "秋葉原から至近距離にある神田エリアに位置し、非常に高評価（4.58）を得ている高級店「神田 雲林」が提供する専門料理のジャンルは何か。",
+                options: [
+                "寿司・日本料理",
+                "中国料理",
+                "フランス料理",
+                "イタリア料理"
+                ],
+                correctIndex: 1,
+                explanation: "「神田 雲林」は、評価点4.58を持つ中国料理店として、秋葉原・神田周辺のランキングでトップクラスの評価を得ています。",
+                trivia: "秋葉原グルメの定義は神田エリアへも拡張しており、高単価で質の高い需要を満たす名店も多く存在します。"
+            },
+            {
+                id: 5,
+                category: "専門料理",
+                question: "秋葉原駅より徒歩3分に位置する超人気店の姉妹店である「やきとん 元気」が提供する料理ジャンルと、その価格帯はどれか。",
+                options: [
+                "和牛ステーキ、〜5,000円",
+                "海鮮丼、〜2,000円",
+                "やきとん（串焼き）、〜3,000円",
+                "カレーライス、〜1,500円"
+                ],
+                correctIndex: 2,
+                explanation: "「やきとん 元気」は、素材にこだわる「名物やきとん」を提供する串焼き店であり、夜の価格帯は「〜3000円」です。",
+                trivia: "秋葉原のカジュアル店では「専門性のガチ勢化」が進んでおり、特定の食材や調理法にこだわる店舗が情報感度の高い層に支持されています。"
+            },
+            {
+                id: 6,
+                category: "再現食の執念",
+                question: "2022年の「GUNDAM Café ありがとうproject」で提供されたメモリアルメニュー「なりきり究極再現バーガー」（ブライト・ノアが食べたハンバーガーの再現）の当時の価格（税込）はいくらだったか。",
+                options: [
+                "990円",
+                "1,320円",
+                "1,760円",
+                "2,090円"
+                ],
+                correctIndex: 2,
+                explanation: "公式情報には、「なりきり究極再現バーガー」の価格が1,760円（税込）と明確に記載されています。",
+                trivia: "この価格は、ブライトの等身から割り出したバンズや形状などを徹底的に研究したR&Dコストや、体験価値の対価として設定されています。"
+            },
+            {
+                id: 7,
+                category: "再現食の執念",
+                question: "「なりきり究極再現バーガー」の再現において、その存在感と食べ応えを際立たせるために特にこだわったパティに関するスペックは何か。",
+                options: [
+                "和牛と豚肉の合い挽き肉を使用し、厚さ1cmに均一化した。",
+                "お店仕込みの牛100%の挽肉を使用し、約200gのビッグサイズで提供した。",
+                "牛肉と豆腐を混ぜ、低カロリーでヘルシーに仕上げた。",
+                "宇宙食をイメージし、乾燥ミートを再水和して使用した。"
+                ],
+                correctIndex: 1,
+                explanation: "任務中のブライト・ノアが「しっかり栄養が補給できる」ようにという考察に基づき、牛100%・約200gのビッグサイズで提供されました。",
+                trivia: "バンズは、ブライトが頬張った時に寄った「しわ」まで再現されています。「食材のサイズ感」「量」「レイアウト」まで徹底されています。"
+            },
+            {
+                id: 8,
+                category: "再現食の執念",
+                question: "GUNDAM Caféのメニューで、『機動武闘伝Gガンダム』1話に登場する、ベルチーノ警部がドモン・カッシュと約束した料理を再現したメニューはどれか。",
+                options: [
+                "月面ピザ",
+                "あのパン～砂漠のレストランにて～",
+                "刹那専用パイロットランチ",
+                "約束のピザ"
+                ],
+                correctIndex: 3,
+                explanation: "「約束のピザ」は、ベルチーノ警部がドモンと約束したピザを再現したものです。サラミ、ピーマン、イカなどがトッピングされていました。",
+                trivia: "作中と同じく赤いラインが入ったピザ箱で提供されるなど、細部にまでこだわりが見られました。"
+            },
+            {
+                id: 9,
+                category: "再現食の執念",
+                question: "『機動戦士ガンダム00』3話において、ロックオン・ストラトスが遅れて登場した刹那・F・セイエイに対して「俺のおごりだ！」と一言放ち、ウェイターが運んだドリンクを再現したメニューはどれか。",
+                options: [
+                "刹那のカフェラテ",
+                "俺のおごりだミルク",
+                "ティエリアの理性水",
+                "マイスターズコーヒー"
+                ],
+                correctIndex: 1,
+                explanation: "作中で刹那の前に運ばれた「ミルク」を再現したもので、ロックオンのセリフにちなんで「俺のおごりだミルク」と命名されました。",
+                trivia: "「ミルク」というシンプルなドリンクに名台詞を組み合わせて商品化することで、ファンがシーンを追体験できる工夫がされていました。"
+            },
+            {
+                id: 10,
+                category: "再現食の執念",
+                question: "2022年をもってその歴史に幕を閉じた「GUNDAM Café」は、秋葉原店開店以来、およそ何年間にわたって営業を続け、ファンに愛されたか。",
+                options: [
+                "約5年間",
+                "約8年間",
+                "約12年間",
+                "約15年間"
+                ],
+                correctIndex: 2,
+                explanation: "2010年4月の秋葉原店開店以来、約12年間にわたって営業を続けました。",
+                trivia: "閉店直前の「再現食祭」では新旧合わせ45種の再現食が登場。「ジャブローコーヒープリン」などのメモリアルメニューも提供されました。"
+            },
+            {
+                id: 11,
+                category: "麺類・カレー激戦区",
+                question: "秋葉原のラーメンランキングで高評価を得ている「Tokyo Style Noodle ほたて日和」が、店名にも冠し、その出汁に特化している海産物系の食材は何か。",
+                options: [
+                "伊勢海老",
+                "牡蠣",
+                "鰹節",
+                "ほたて（帆立）"
+                ],
+                correctIndex: 3,
+                explanation: "店名の通り「帆立」の出汁や風味を活かしたつけ麺やラーメンを提供しており、食べログでの評価点も3.87と非常に高い水準です。",
+                trivia: "秋葉原・神田エリアでは、伝統的なスープだけでなく、ニッチで高級な食材に特化することで差別化を図る専門店が増えています。"
+            },
+            {
+                id: 12,
+                category: "麺類・カレー激戦区",
+                question: "Tokyo Style Noodle ほたて日和と並び、秋葉原のラーメンランキングでトップクラスの評価を得ている有名店で、本店が秋葉原に位置しているのはどの店舗か。",
+                options: [
+                "青島食堂",
+                "粋な一生",
+                "麺処 ほん田",
+                "らーめん天神下 大喜"
+                ],
+                correctIndex: 2,
+                explanation: "ラーメンランキングでは「麺処 ほん田 秋葉原本店」が、高評価店（3.81）の一つとしてリストアップされています。",
+                trivia: "秋葉原は多くの有名ラーメン店が本店を構えたり、支店を出したりする戦略的な立地であり、食の競争が激しく品質が高いエリアです。"
+            },
+            {
+                id: 13,
+                category: "麺類・カレー激戦区",
+                question: "ある口コミ情報によると、「らーめん 紬麦」において、昼時を回ったにもかかわらず、通常以上の行列が発生していた主な外的要因として挙げられていたものは何か。",
+                options: [
+                "SNSインフルエンサーによる紹介",
+                "近隣のイベント開催",
+                "テレビで紹介されたこと",
+                "限定メニューの提供"
+                ],
+                correctIndex: 2,
+                explanation: "2012年1月の口コミで、「昼時を回っていたにもかかわらず、テレビで紹介されたためか行列が出来ていた」という記述がありました。",
+                trivia: "「らーめん 紬麦」は秋葉原駅から近く、塩ラーメンの評価も高い人気店です。"
+            },
+            {
+                id: 14,
+                category: "麺類・カレー激戦区",
+                question: "長崎のご当地B級グルメを提供する「長崎トルコライス食堂」（秋葉原駅徒歩2分）の昼（ランチ）の価格帯として最も近いのはどれか。",
+                options: [
+                "〜999円",
+                "1,000円〜1,999円",
+                "2,000円〜2,999円",
+                "3,000円〜3,999円"
+                ],
+                correctIndex: 1,
+                explanation: "昼夜ともに価格帯が「1,000円～1,999円」と設定されています。トルコライスは「大人のお子様プレート」とも評されます。",
+                trivia: "秋葉原では、地方のご当地B級グルメをフレンチ出身のシェフなどが丁寧に手掛けて提供する店舗も存在します。"
+            },
+            {
+                id: 15,
+                category: "麺類・カレー激戦区",
+                question: "秋葉原駅周辺で高評価（3.77）を得ている「ヒナタ屋」が提供している主要なグルメジャンルの組み合わせとして、食べログで登録されていたのはどれか。",
+                options: [
+                "ラーメン、つけ麺、餃子",
+                "洋食、ハンバーグ、ワイン",
+                "カレー、アジア・エスニック、カフェ",
+                "寿司、天ぷら、日本料理"
+                ],
+                correctIndex: 2,
+                explanation: "「ヒナタ屋」は、カレーとアジア・エスニック、カフェの3つのジャンルで登録されています。",
+                trivia: "秋葉原はカレー激戦区。ヒナタ屋のように、カレーにエスニック料理とカフェの要素を組み合わせた業態も人気です。"
+            },
+            {
+                id: 16,
+                category: "ハイクラスと新興勢力",
+                question: "食べログで4.67という都内トップクラスの評価を得ている焼肉の名店「生粋 by YORONIKU.」の最寄り駅として挙げられているのはどこか。",
+                options: [
+                "秋葉原駅",
+                "神田駅",
+                "御徒町駅",
+                "末広町駅"
+                ],
+                correctIndex: 3,
+                explanation: "「生粋 by YORONIKU.」の最寄り駅は末広町駅（徒歩1分）です。秋葉原駅からは徒歩5分程度です。",
+                trivia: "最高峰の評価を持つ店が電気街の中心部ではなく末広町にあるのは、静かで落ち着いた環境でサービスを提供するためと考えられます。"
+            },
+            {
+                id: 17,
+                category: "ハイクラスと新興勢力",
+                question: "秋葉原駅徒歩2分の居酒屋「鶏喜鶏喜」が、店名に「鶏」と冠しながらも、特徴的な組み合わせで提供し、客を「喜ばせる」としているメニューの組み合わせは何か。",
+                options: [
+                "鶏とマグロの刺身",
+                "鶏と馬刺し",
+                "鶏と鹿肉のジビエ",
+                "鶏と豚のしゃぶしゃぶ"
+                ],
+                correctIndex: 1,
+                explanation: "「鶏喜鶏喜」は、「鶏と馬刺しで喜べるお店」と明確に記載されています。",
+                trivia: "人気の鶏料理に、熊本由来の馬刺しを組み合わせるなど、単一ジャンルに固執しない柔軟なメニュー構成が秋葉原の居酒屋の特徴です。"
+            },
+            {
+                id: 18,
+                category: "再現食の執念",
+                question: "『機動戦士ガンダム』19話にて、アムロ・レイが砂漠の店で頼んだパンとうまい水を究極再現したとされるメニューはどれか。",
+                options: [
+                "なりきり究極再現バーガー",
+                "あのパン～砂漠のレストランにて～",
+                "約束のピザ",
+                "月面都市グラナダ名物 月面ピザ"
+                ],
+                correctIndex: 1,
+                explanation: "「あのパン～砂漠のレストランにて～」は、アムロ・レイが砂漠の店で頼んだパンとうまい水を究極再現したメニューです。",
+                trivia: "砂漠で食べるには難儀であろう「硬さ」やクープまで再現。頭を左右にふって噛み切れば気分はアムロそのものです。"
+            },
+            {
+                id: 19,
+                category: "B級グルメのルール",
+                question: "食べログにおいて、秋葉原エリアのグルメを検索する際に、カジュアルで安価な食事を指す検索キーワードの一つとして、独立したカテゴリとして設定されているものは何か。",
+                options: [
+                "家庭料理",
+                "ジャンクフード",
+                "B級グルメ",
+                "庶民派料理"
+                ],
+                correctIndex: 2,
+                explanation: "「秋葉原 B級グルメ」というキーワードが独立したカテゴリとして存在しており、多くの店舗情報や口コミが集まっています。",
+                trivia: "秋葉原のB級グルメは「安くて多い」だけでなく、「手頃な価格で専門性の高いカジュアル食」へと定義が進化しています。"
+            },
+            {
+                id: 20,
+                category: "再現食の執念",
+                question: "GUNDAM Caféの「再現食祭 第2弾」で登場した、『機動戦士ガンダムZZ』第20話に登場する、月と同じまん丸な形がポイントのグラナダ名物ピザは何か。",
+                options: [
+                "約束のピザ",
+                "月面都市グラナダ名物 月面ピザ",
+                "ダバオ空軍基地士官食堂のピザ",
+                "ホワイトベース艦内ピザ"
+                ],
+                correctIndex: 1,
+                explanation: "「月面都市グラナダ名物 月面ピザ」は、月と同じまん丸な形がポイントとされ、見た目も味も忠実に再現されました。",
+                trivia: "再現食祭では『Vガンダム』のパフェや『閃光のハサウェイ』の「アンダルシア」など、幅広い作品のメニューが提供されました。"
+            },
+            {
+                id: 21,
+                category: "再現食の執念",
+                question: "「GUNDAM Café」を象徴するメニューの一つであり、「アキバ名物」と名高い「ガンプラ焼」に関する記述として正しいものはどれか。",
+                options: [
+                "秋葉原店限定で、ガンダムの顔の形を再現している。",
+                "ダイバーシティ東京 プラザ店（お台場店）限定で販売され、初代ガンプラを忠実に再現した焼型が人気だった。",
+                "200〜250円（税込）で販売され、ベーコンマヨネーズ味はなかった。",
+                "約12年の歴史の中で、一度も販売が途切れることのなかったメニューである。"
+                ],
+                correctIndex: 1,
+                explanation: "ラストプロジェクトではお台場店限定で販売。焼型は初代ガンプラ「1/144ガンダム」「1/144シャア専用ザク」を忠実に再現していました。",
+                trivia: "ガンプラ焼は15万食以上提供されたヒット作。ワンハンドで食べられるカジュアルさが秋葉原の象徴的フードとなりました。"
+            },
+            {
+                id: 22,
+                category: "再現食の執念",
+                question: "「再現食祭 第2弾」で登場した、『機動戦士ガンダム 逆襲のシャア』より、シャア総帥が飲んでいた飲み物とおつまみを再現したメニューは何か。",
+                options: [
+                "アンダルシア",
+                "総帥の孤独",
+                "俺のおごりだミルク",
+                "シャアザク・ライス"
+                ],
+                correctIndex: 1,
+                explanation: "「総帥の孤独」は、シャア総帥が作中で飲んでいたウイスキーとカシューナッツの鉄板コンビを再現したものです。",
+                trivia: "アクシズ落とし決行前夜、シャアが何を思ったのか思いを馳せることができるメニューでした。"
+            },
+            {
+                id: 23,
+                category: "再現食の執念",
+                question: "約12年の時を経て復活した「ジオン公国軍 階級キャンペーン」において、総帥専用メニューを注文した際に提供されたメインディッシュは何か。",
+                options: [
+                "シャア専用ザク・ライス",
+                "伝統を作る肉盛り",
+                "牛もも肉のステーキ",
+                "抹茶とトマトのパスタ"
+                ],
+                correctIndex: 2,
+                explanation: "総帥専用メニューのメインは、肉のうまみを味わえる「牛もも肉のステーキ」でした。階級が上がるごとにより高級な食材に変化します。",
+                trivia: "このキャンペーンでは、退店まで階級名で呼ばれ、敬礼をもって見送られるという徹底した演出が施されました。"
+            },
+            {
+                id: 24,
+                category: "再現食の執念",
+                question: "「ジオン公国軍 階級キャンペーン」の「少佐専用メニュー」で提供された、2010年当時のメニューをアレンジし復刻した料理は何か。",
+                options: [
+                "月面ピザ",
+                "牛もも肉のステーキ",
+                "大気圏突入",
+                "ガルマ専用パイロットランチ"
+                ],
+                correctIndex: 2,
+                explanation: "少佐専用メニューとして、2010年当時に登場したメニュー「大気圏突入」（抹茶とトマトのパスタ）が復刻しました。",
+                trivia: "提供時にスタッフから「少佐助けてください。」と声をかけられ、「無駄死にではないぞ！」と返す演出などがありました。"
+            },
+            {
+                id: 25,
+                category: "ハイクラスと新興勢力",
+                question: "都内トップクラスの評価（4.67）を得ている焼肉の名店「生粋 by YORONIKU.」が、末広町駅に位置しているのは、秋葉原グルメのどのようなトレンドを反映しているか。",
+                options: [
+                "観光客向けの低価格店を誘致するトレンド",
+                "高単価な需要が、電気街の喧騒から離れた静かで落ち着いた立地を求めている二極化トレンド",
+                "ポップカルチャーとのコラボレーションを重視するトレンド",
+                "郊外化が進み、駅周辺の店舗が減っているトレンド"
+                ],
+                correctIndex: 1,
+                explanation: "高単価店が電気街の中心部ではなく末広町に位置していることは、秋葉原グルメが「低価格大衆食」と「高価格専門食」に二極化していることを示します。",
+                trivia: "「生粋 by YORONIKU.」は新宿「よろにく」のDNAを継承し、最高級A5ランク和牛とスタッフによる絶妙な焼き加減を提供しています。"
+            },
+            {
+                id: 26,
+                category: "ハイクラスと新興勢力",
+                question: "神田新八 本店（魚介料理・海鮮料理・鍋）が、提供する料理ジャンルと並んで、特に注力しているアルコールカテゴリとして明記されているものは何か。",
+                options: [
+                "ワイン",
+                "ビール",
+                "カクテル",
+                "日本酒"
+                ],
+                correctIndex: 3,
+                explanation: "「魚介料理・海鮮料理・鍋・日本酒」と明記されており、日本酒を料理と並ぶ一つの専門ジャンルとして位置づけています。",
+                trivia: "日本酒をジャンルに掲げる店は、ビジネス層や美食家に対して、料理とアルコールの洗練されたペアリング体験を提供しています。"
+            },
+            {
+                id: 27,
+                category: "ハイクラスと新興勢力",
+                question: "末広町駅徒歩5分に位置する高級天ぷら店「神田明神下 みやび 本店」の夜の価格帯はどれか。",
+                options: [
+                "〜5,000円",
+                "〜10,000円",
+                "〜15,000円",
+                "〜20,000円"
+                ],
+                correctIndex: 2,
+                explanation: "夜の予算は「〜15000円」、昼の予算は「〜2000円」と設定されています。",
+                trivia: "末広町周辺には、高価格帯の天ぷらや寿司（例：鮨 麻生）の専門店が点在しており、電気街のイメージとは異なる成熟した食の側面を担っています。"
+            },
+            {
+                id: 28,
+                category: "ハイクラスと新興勢力",
+                question: "秋葉原駅徒歩3分に位置し、高い評価を得ている「ローストビーフ大野 秋葉原店」（丼もの）に関して、口コミで言及されているその特徴は何か。",
+                options: [
+                "ローストビーフは低温調理ではなく、炭火で焼いている。",
+                "高級なローストビーフをB級グルメとして食す悦びがある。",
+                "付け合わせのスープが非常に濃厚で、メインを食す前に飲み干すべき。",
+                "提供されているローストビーフは和牛のみである。"
+                ],
+                correctIndex: 1,
+                explanation: "口コミでは、高級なローストビーフをB級グルメとして食す悦びがある、と評されています。",
+                trivia: "比較的高級な食材を手頃な価格でカジュアルに提供するという、秋葉原のB級グルメの新しいトレンドを体現しています。"
+            },
+            {
+                id: 29,
+                category: "ハイクラスと新興勢力",
+                question: "神田明神通りの一本南側の裏通りに位置し、「ジャパニーズ仕様のチャイナコンセプトカフェ」として2018年6月にオープンした店舗はどこか。（現在、掲載保留）",
+                options: [
+                "創作アジアン 琥珀",
+                "BANH MI DALAT",
+                "娘娘美苑（ニャンニャンメイエン）",
+                "香福味坊"
+                ],
+                correctIndex: 2,
+                explanation: "娘娘美苑は、秋葉原センタービル3Fにオープンし、「ジャパニーズ仕様のチャイナコンセプトカフェ」として紹介されていました。",
+                trivia: "名前からはチャイナパブを連想させますが、実際は「中国っぽい雰囲気の純日本的なカフェバー」でした。"
+            },
+            {
+                id: 30,
+                category: "B級グルメのルール",
+                question: "以下の秋葉原の飲食店のうち、「休憩目的や誰かと話し込みたい場合の利用は完全不向き」であり、「撮るもん撮ったら長居は無用、一気に完食！」というスタイルが推奨される店はどれか。",
+                options: [
+                "GUNDAM Café TOKYO BRAND CORE",
+                "らーめん 紬麦",
+                "牛丼専門 サンボ",
+                "ビーフキッチンスタンド 秋葉原電気街口店"
+                ],
+                correctIndex: 2,
+                explanation: "牛丼専門サンボは、「静かに早く食べて帰る」スタイルが健在で、休憩目的での利用は不向きとされています。",
+                trivia: "このスタイルは回転率を上げ効率性を極めた伝統であり、コアなファンにとってはアイデンティティを保つための「通過儀礼」でもあります。"
+            }
+        ];
+
+        // --- ユーティリティ関数 ---
+
+        // 配列をシャッフルして指定数を取得
+        const getRandomQuestions = (allQuestions, count) => {
+            const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count);
+        };
+
+        // スコアに基づくランク判定
+        const getRank = (score) => {
+            if (score === 5) return { title: "秋葉原グルメ神", desc: "もはや秋葉原の主！すべての味があなたにひれ伏します。", color: "text-yellow-400" };
+            if (score === 4) return { title: "秋葉原グルメマニア", desc: "素晴らしい！ディープな名店も知り尽くしていますね。", color: "text-purple-400" };
+            if (score === 3) return { title: "秋葉原グルメ通", desc: "なかなかの知識量。秋葉原での食事には困らないでしょう。", color: "text-blue-400" };
+            if (score >= 1) return { title: "秋葉原グルメ見習い", desc: "これからが本番！もっと秋葉原を食べ歩きましょう。", color: "text-green-400" };
+            return { title: "秋葉原グルメ初心者", desc: "まずは駅前のケバブから始めてみませんか？", color: "text-gray-400" };
+        };
+
+        // --- コンポーネント ---
+
+        const AkibaGourmetQuiz = () => {
+            const [gameState, setGameState] = useState('start');
+            const [currentQuestions, setCurrentQuestions] = useState([]);
+            const [currentIndex, setCurrentIndex] = useState(0);
+            const [score, setScore] = useState(0);
+            const [selectedAnswerIndex, setSelectedAnswerIndex] = useState(null);
+            
+            const currentQ = currentQuestions[currentIndex];
+
+            const startGame = () => {
+                setCurrentQuestions(getRandomQuestions(INITIAL_QUIZ_DATA, 5));
+                setCurrentIndex(0);
+                setScore(0);
+                setGameState('playing');
+                setSelectedAnswerIndex(null);
+            };
+
+            const handleAnswer = (index) => {
+                setSelectedAnswerIndex(index);
+                if (index === currentQ.correctIndex) {
+                    setScore(s => s + 1);
+                }
+                setGameState('feedback');
+            };
+
+            const nextQuestion = () => {
+                if (currentIndex < 4) {
+                    setCurrentIndex(i => i + 1);
+                    setGameState('playing');
+                    setSelectedAnswerIndex(null);
+                } else {
+                    setGameState('result');
+                }
+            };
+
+            // --- 各画面のレンダリング ---
+
+            if (gameState === 'start') {
+                return (
+                <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-4 font-sans">
+                    <div className="max-w-md w-full bg-slate-800 rounded-2xl p-8 shadow-2xl border-4 border-yellow-400 text-center">
+                    <div className="flex justify-center mb-6">
+                        <Utensils className="w-20 h-20 text-yellow-400" />
+                    </div>
+                    <h1 className="text-4xl font-black mb-4 tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-pink-500">
+                        2025年12月版<br/>秋葉原<br/>グルメ検定
+                    </h1>
+                    <p className="text-slate-300 mb-6 leading-relaxed">
+                        電気街のB級グルメから、<br/>
+                        知る人ぞ知る名店まで。<br/>
+                        あなたの「アキバ飯」知識を試します。
+                    </p>
+                    
+                    <button 
+                        onClick={startGame}
+                        className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold py-4 px-8 rounded-full shadow-lg transform transition hover:scale-105 flex items-center justify-center text-xl"
+                    >
+                        <Zap className="mr-2 fill-current" />
+                        検定を開始する
+                    </button>
+                    </div>
+                </div>
+                );
+            }
+
+            if (gameState === 'result') {
+                const rank = getRank(score);
+                return (
+                <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-4">
+                    <div className="max-w-md w-full bg-slate-800 rounded-2xl p-8 shadow-2xl border-2 border-slate-600 text-center relative overflow-hidden">
+                    {score === 5 && <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-yellow-400 via-pink-500 to-yellow-400 animate-pulse"></div>}
+                    
+                    <h2 className="text-xl text-slate-400 mb-2 uppercase tracking-widest">Result</h2>
+                    <div className="text-6xl font-black mb-4">{score} <span className="text-2xl text-slate-500">/ 5</span></div>
+                    
+                    <div className="mb-6">
+                        <Trophy className={`w-16 h-16 mx-auto mb-4 ${rank.color}`} />
+                        <h3 className={`text-2xl font-bold mb-2 ${rank.color}`}>{rank.title}</h3>
+                        <p className="text-slate-300 text-sm">{rank.desc}</p>
+                    </div>
+
+                    <button 
+                        onClick={startGame}
+                        className="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center transition-colors"
+                    >
+                        <RefreshCw className="mr-2 w-5 h-5" />
+                        トップに戻る
+                    </button>
+                    </div>
+                </div>
+                );
+            }
+
+            // Playing or Feedback State
+            const isFeedback = gameState === 'feedback';
+            const isCorrect = selectedAnswerIndex === currentQ.correctIndex;
+
+            return (
+                <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-start pt-10 p-4 font-sans">
+                <div className="max-w-lg w-full">
+                    {/* Header / Progress */}
+                    <div className="flex justify-between items-end mb-4 px-2">
+                    <span className="text-yellow-400 font-bold text-sm tracking-widest">QUESTION {currentIndex + 1}/5</span>
+                    <span className="text-slate-500 text-xs bg-slate-800 px-2 py-1 rounded border border-slate-700">
+                        {currentQ.category}
+                    </span>
+                    </div>
+                    
+                    {/* Question Card */}
+                    <div className="bg-slate-800 rounded-2xl p-6 shadow-xl mb-6 border border-slate-700">
+                    <h2 className="text-lg md:text-xl font-bold leading-relaxed mb-6">
+                        {currentQ.question}
+                    </h2>
+
+                    <div className="grid grid-cols-2 gap-3">
+                        {currentQ.options.map((option, idx) => {
+                        // スタイル決定ロジック
+                        let btnClass = "w-full text-left p-4 rounded-xl border-2 transition-all duration-200 relative ";
+                        
+                        if (!isFeedback) {
+                            // 回答前
+                            btnClass += "bg-slate-700 border-slate-700 hover:bg-slate-600 hover:border-slate-500";
+                        } else {
+                            // 回答後
+                            if (idx === currentQ.correctIndex) {
+                            // 正解の選択肢
+                            btnClass += "bg-green-900/50 border-green-500 text-green-100";
+                            } else if (idx === selectedAnswerIndex) {
+                            // 間違って選んだ選択肢
+                            btnClass += "bg-red-900/50 border-red-500 text-red-100 opacity-60";
+                            } else {
+                            // その他の選択肢
+                            btnClass += "bg-slate-800 border-slate-800 opacity-40";
+                            }
+                        }
+
+                        return (
+                            <button
+                            key={idx}
+                            disabled={isFeedback}
+                            onClick={() => handleAnswer(idx)}
+                            className={btnClass}
+                            >
+                            <span className="font-semibold mr-2">{idx + 1}.</span>
+                            {option}
+                            {isFeedback && idx === currentQ.correctIndex && (
+                                <CheckCircle2 className="absolute right-4 top-1/2 transform -translate-y-1/2 text-green-400" />
+                            )}
+                            {isFeedback && idx === selectedAnswerIndex && idx !== currentQ.correctIndex && (
+                                <XCircle className="absolute right-4 top-1/2 transform -translate-y-1/2 text-red-400" />
+                            )}
+                            </button>
+                        );
+                        })}
+                    </div>
+                    </div>
+
+                    {/* Feedback Section */}
+                    {isFeedback && (
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+                        <div className={`rounded-xl p-5 mb-6 border-l-4 ${isCorrect ? 'bg-green-900/20 border-green-500' : 'bg-red-900/20 border-red-500'}`}>
+                        <div className="flex items-center mb-3">
+                            {isCorrect ? (
+                            <div className="flex items-center text-green-400 font-bold text-xl"><CheckCircle2 className="mr-2"/> 正解！</div>
+                            ) : (
+                            <div className="flex items-center text-red-400 font-bold text-xl"><AlertCircle className="mr-2"/> 残念...</div>
+                            )}
+                        </div>
+                        <p className="text-slate-200 text-sm leading-relaxed mb-4">
+                            <span className="font-bold text-slate-400 block mb-1 text-xs">解説</span>
+                            {currentQ.explanation}
+                        </p>
+                        
+                        <div className="bg-slate-700/50 rounded-lg p-3 text-sm">
+                            <span className="font-bold text-yellow-400 block mb-1 text-xs flex items-center">
+                            <BookOpen className="w-3 h-3 mr-1"/> 秋葉原グルメ豆知識
+                            </span>
+                            <p className="text-slate-300 text-xs leading-relaxed">
+                            {currentQ.trivia}
+                            </p>
+                        </div>
+                        </div>
+
+                        <button
+                        onClick={nextQuestion}
+                        className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-6 rounded-xl shadow-lg transition-transform hover:scale-[1.02] flex items-center justify-center"
+                        >
+                        次の問題へ進む
+                        </button>
+                    </div>
+                    )}
+                </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<AkibaGourmetQuiz />);
+    </script>
+</body>
+</html>
