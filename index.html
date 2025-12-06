@@ -7,7 +7,7 @@
 <body>
 <script>
   // 所属教室の WAN IP（あなたの環境のIPに置き換える）
-  const classroomIP = "162.120.184.21";
+  const classroomIP = "162.120.184.18";
 
   // IP取得API（無料）
   fetch("https://api.ipify.org?format=json")
@@ -17,7 +17,7 @@
 
       if (userIP === classroomIP) {
         // 教室 → テストページへ
-        window.location.href = "index1.html";
+        window.location.href = "index2.html";
       } else {
         // 一般 → 本番ページへ
         window.location.href = "index1.html";

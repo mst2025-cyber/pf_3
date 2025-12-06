@@ -1,11 +1,80 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html> 
+<html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <title>作成中のページです</title>
+
+   <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(90deg, #ab6a6a, #6b936d, #4c6c72, #8b5392);
+      background-size: 500% 100%;
+      animation: gradientMove 10s ease infinite;
+      margin: 0;
+      padding: 40px 0;
+      text-align: center;
+      color: #fff;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      color: #ffffff;
+      font-size: 36px;
+      text-shadow: 0 3px 8px rgba(0,0,0,0.3);
+      letter-spacing: 1px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 auto;
+      max-width: 550px;
+    }
+
+    li {
+      margin: 15px 0;
+    }
+
+    a {
+      display: inline-block;
+      padding: 14px 28px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+      text-decoration: none;
+      color: #333;
+      font-size: 22px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      transition: 0.25s;
+      backdrop-filter: blur(6px);
+    }
+
+    a:hover {
+      background: #ffeb3b;
+      color: #333;
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 6px 18px rgba(255,255,0,0.6), 
+                  0 0 15px rgba(255,255,255,0.8);
+    }
+  </style>
+
 </head>
 <body>
-    eompty page
+  <h1>作成中のページです</h1>
+
+  <ul>
+    <li><a href="index1.html">Ｍ．Ｇ のポートフォリオ(一般向)トップへ</a></li>
+    <li><a href="" onclick="history.go(-1); return false;">前のページに戻る</a></li>
+  </ul>
+
 </body>
 </html>
+
+
+
