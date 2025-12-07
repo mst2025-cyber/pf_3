@@ -7,10 +7,19 @@
   <style>
     body {
       font-family: "Segoe UI", sans-serif;
-      background: #bce1cf;
+      background: linear-gradient(135deg, #7ce8d5, #6fb3ff, #ff8bd6);
+      background-size: 300% 300%;
+      animation: gradientMove 10s ease infinite;
       margin: 0;
       padding: 40px 0;
       text-align: center;
+      color: #fff;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     h1 {
