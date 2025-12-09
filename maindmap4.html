@@ -5,13 +5,21 @@
 <title>クリック展開式マインドマップ (ノード拡大)</title>
 <style>
     body {
-        margin: 0;
-        overflow: auto;
-        background: #fafafa;
-        font-family: 'Inter', sans-serif;
-        font-size: 16px; /* ★基準となるフォントサイズ */
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(90deg, #433852, #1b413a, #3a4e66, #4f2841);
+      background-size: 400% 400%;
+      animation: gradientMove 10s ease infinite;
+      margin: 0;
+      padding: 40px 0;
+      text-align: center;
+      color: #ffffff;
     }
 
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
     text {
         /* font-size: 16px; <--- JSでfont-sizeを取得するため、ここでのpx指定は削除 */
         fill: #333;
