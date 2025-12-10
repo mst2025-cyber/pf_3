@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Innovation Analysis: Next-Gen Learning Experience</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+    <!-- Google Fonts -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #F8FAFC; /* Slate 50 */
+            color: #334155; /* Slate 700 */
+        }
+
+        /* Chart Container Styling - MANDATORY */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .card-interaction {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-interaction:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .active-filter {
+            background-color: #0F172A; /* Slate 900 */
+            color: white;
+        }
+        .inactive-filter {
+            background-color: #E2E8F0; /* Slate 200 */
+            color: #475569; /* Slate 600 */
+        }
+    </style>
+
+    <!-- Chosen Palette: Slate (Neutrals) + Indigo (Intellect/Tech) + Emerald (Growth/New Direction) -->
+    <!-- Application Structure Plan:
+         1. Intro Section: Sets the context of the "EdTech/Learning Innovation" analysis.
+         2. Landscape Section (Dashboard): Displays the 8-10 collected ideas as data cards. Allows filtering to explore the "Efficiency" bias visually.
+         3. Analysis Section (Scatter Plot): Uses Plotly to visualize the concentration of current ideas (High Automation, Low Agency). This mathematically proves the "Direction" identified.
+         4. Strategic Pivot Section (Interactive Proposals): Presents 3 new directions. Clicking a direction reveals a detailed breakdown and a Radar Chart comparison against the status quo.
+         Rationale: Guides user from "Evidence" (Data) to "Insight" (Analysis) to "Solution" (Proposals).
+    -->
+    <!-- Visualization & Content Choices:
+         1. Idea Inventory -> Grid of Cards -> Filterable JS -> To list the raw data (8-10 ideas) clearly.
+         2. Concentration Map -> Plotly Scatter Plot -> X:Automation vs Y:Agency -> Visualizes the lack of "Agency" in current tools. No SVG.
+         3. New Directions -> Interactive Tab/Card System -> Comparison Radar Chart (Chart.js) -> Shows how new ideas expand the dimensions of value. No SVG.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-xl font-bold text-slate-800 tracking-tight">IDEATION<span class="text-indigo-600">.SCOPE</span></span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8 text-sm font-medium">
+                    <a href="#inventory" class="text-slate-500 hover:text-indigo-600 transition-colors">既存アイデアの棚卸し</a>
+                    <a href="#analysis" class="text-slate-500 hover:text-indigo-600 transition-colors">方向性分析</a>
+                    <a href="#proposals" class="px-4 py-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors shadow-sm">新規方向性の提案</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero / Context -->
+    <header class="bg-white pt-16 pb-12 px-4 sm:px-6 lg:px-8 border-b border-slate-100">
+        <div class="max-w-4xl mx-auto text-center">
+            <span class="inline-block py-1 px-3 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold tracking-wider mb-4">PROJECT: NEXT-GEN LEARNING</span>
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6 leading-tight">
+                「効率化」のその先へ。<br>学習体験における未開拓領域の探索
+            </h1>
+            <p class="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
+                これまでのリサーチで得られたアイデア群を分析し、現在の開発トレンドが集中している領域を特定。
+                そこから導き出される空白地帯（ホワイトスペース）に対し、3つの全く新しい方向性と具体案を提言します。
+            </p>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+
+        <!-- SECTION 1: Current Idea Landscape -->
+        <section id="inventory" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                        <span class="w-2 h-8 bg-slate-300 rounded-sm"></span>
+                        1. 既存アイデアのリスト化 (Inventory)
+                    </h2>
+                    <p class="text-slate-500 mt-2 text-sm">これまでのブレインストーミングで出たアイデア（9件）を分類。</p>
+                </div>
+                
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-2" id="filters">
+                    <button class="filter-btn active-filter px-4 py-2 rounded-full text-sm font-medium transition-colors" data-filter="all">All</button>
+                    <button class="filter-btn inactive-filter px-4 py-2 rounded-full text-sm font-medium transition-colors" data-filter="efficiency">効率化・自動化</button>
+                    <button class="filter-btn inactive-filter px-4 py-2 rounded-full text-sm font-medium transition-colors" data-filter="content">コンテンツ提供</button>
+                    <button class="filter-btn inactive-filter px-4 py-2 rounded-full text-sm font-medium transition-colors" data-filter="management">管理・計測</button>
+                </div>
+            </div>
+
+            <!-- Grid -->
+            <div id="ideas-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Cards will be injected by JS -->
+            </div>
+        </section>
+
+        <!-- SECTION 2: Analysis -->
+        <section id="analysis" class="py-16 bg-slate-50 border-y border-slate-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                    
+                    <!-- Text Analysis -->
+                    <div class="lg:col-span-5 flex flex-col justify-center">
+                        <h2 class="text-2xl font-bold text-slate-900 flex items-center gap-2 mb-6">
+                            <span class="w-2 h-8 bg-indigo-500 rounded-sm"></span>
+                            2. 集中領域の特定 (Analysis)
+                        </h2>
+                        
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 mb-6">
+                            <h3 class="font-bold text-slate-800 mb-3 border-b border-slate-100 pb-2">分析結果：極端な「効率化」への偏り</h3>
+                            <p class="text-slate-600 mb-4 text-sm leading-relaxed">
+                                既存アイデアを「学習者の主体性（Agency）」と「プロセスの自動化（Automation）」の軸でマッピングしました。
+                            </p>
+                            <ul class="space-y-3">
+                                <li class="flex items-start gap-3">
+                                    <span class="flex-shrink-0 w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs font-bold">!</span>
+                                    <p class="text-sm text-slate-700"><strong>90%が受動的体験:</strong> AIが答えを出す、AIがまとめる等、学習者が「楽をする」方向へ集中している。</p>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="flex-shrink-0 w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs font-bold">!</span>
+                                    <p class="text-sm text-slate-700"><strong>個の分断:</strong> 画面と個人の関係に閉じており、社会的文脈や他者との関わりが欠落している。</p>
+                                </li>
+                            </ul>
+                        </div>
+                        <p class="text-xs text-slate-400">※右図のプロット分布をご覧ください。右下（高自動化・低主体性）にアイデアが集中しています。</p>
+                    </div>
+
+                    <!-- Scatter Plot -->
+                    <div class="lg:col-span-7 bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+                        <div class="chart-container" style="max-width: 100%; height: 400px;">
+                            <div id="scatterPlot" class="w-full h-full"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: New Directions -->
+        <section id="proposals" class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-2xl font-bold text-slate-900 inline-flex items-center gap-2">
+                    <span class="w-2 h-8 bg-emerald-500 rounded-sm"></span>
+                    3. 新しい方向性と具体案 (New Horizons)
+                </h2>
+                <p class="text-slate-600 mt-4 max-w-2xl mx-auto">
+                    分析で判明した「主体性の欠如」と「個の分断」を解決する、3つの未開拓領域へのピボット案です。<br>
+                    カードをクリックして詳細な比較をご覧ください。
+                </p>
+            </div>
+
+            <!-- Interactive Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                
+                <!-- Direction A -->
+                <button onclick="selectProposal('A')" class="group text-left bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-400 rounded-xl p-6 transition-all duration-300 shadow-sm hover:shadow-md relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 text-6xl font-bold text-emerald-900">A</div>
+                    <span class="inline-block px-2 py-1 bg-slate-100 group-hover:bg-emerald-100 text-slate-600 group-hover:text-emerald-700 text-xs rounded font-bold mb-3">DIRECTION A</span>
+                    <h3 class="text-lg font-bold text-slate-800 mb-2 group-hover:text-emerald-900">問いの生成と内省支援</h3>
+                    <p class="text-sm text-slate-500 group-hover:text-emerald-800">「答えを与えるAI」から「考えさせるAI」への転換。</p>
+                </button>
+
+                <!-- Direction B -->
+                <button onclick="selectProposal('B')" class="group text-left bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-400 rounded-xl p-6 transition-all duration-300 shadow-sm hover:shadow-md relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 text-6xl font-bold text-indigo-900">B</div>
+                    <span class="inline-block px-2 py-1 bg-slate-100 group-hover:bg-indigo-100 text-slate-600 group-hover:text-indigo-700 text-xs rounded font-bold mb-3">DIRECTION B</span>
+                    <h3 class="text-lg font-bold text-slate-800 mb-2 group-hover:text-indigo-900">知識の生態系構築</h3>
+                    <p class="text-sm text-slate-500 group-hover:text-indigo-800">「個人の暗記」から「他者との知識接続」への転換。</p>
+                </button>
+
+                <!-- Direction C -->
+                <button onclick="selectProposal('C')" class="group text-left bg-white hover:bg-amber-50 border border-slate-200 hover:border-amber-400 rounded-xl p-6 transition-all duration-300 shadow-sm hover:shadow-md relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 text-6xl font-bold text-amber-900">C</div>
+                    <span class="inline-block px-2 py-1 bg-slate-100 group-hover:bg-amber-100 text-slate-600 group-hover:text-amber-700 text-xs rounded font-bold mb-3">DIRECTION C</span>
+                    <h3 class="text-lg font-bold text-slate-800 mb-2 group-hover:text-amber-900">身体的コンテキスト学習</h3>
+                    <p class="text-sm text-slate-500 group-hover:text-amber-800">「画面内の学習」から「現実世界の行動」への転換。</p>
+                </button>
+            </div>
+
+            <!-- Detail View Area -->
+            <div id="proposal-detail" class="hidden bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2">
+                    <!-- Text Content -->
+                    <div class="p-8 lg:p-10 flex flex-col justify-center">
+                        <div class="flex items-center mb-4">
+                            <span id="detail-badge" class="px-3 py-1 rounded text-xs font-bold uppercase tracking-wide mr-3"></span>
+                            <h3 id="detail-title" class="text-2xl font-bold text-slate-900"></h3>
+                        </div>
+                        
+                        <div class="mb-8">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase mb-2">Concept</h4>
+                            <p id="detail-desc" class="text-slate-600 text-lg leading-relaxed"></p>
+                        </div>
+
+                        <div class="bg-slate-50 rounded-xl p-6 border border-slate-100">
+                            <h4 class="text-sm font-bold text-indigo-600 uppercase mb-3 flex items-center">
+                                <span>💡 Specific Idea (具体案)</span>
+                            </h4>
+                            <p id="detail-idea" class="text-slate-700 font-medium"></p>
+                            <div class="mt-4 pt-4 border-t border-slate-200">
+                                <p class="text-xs text-slate-500">
+                                    <span class="font-bold text-slate-700">なぜ新しいか：</span>
+                                    <span id="detail-reason"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chart Content -->
+                    <div class="bg-slate-50 p-8 lg:p-10 flex flex-col items-center justify-center border-t lg:border-t-0 lg:border-l border-slate-200">
+                        <h4 class="text-sm font-bold text-slate-500 mb-6 w-full text-center">既存トレンド(平均) vs 新提案 の価値比較</h4>
+                        <div class="chart-container">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                        <div class="flex gap-6 mt-6 text-sm">
+                            <div class="flex items-center"><span class="w-3 h-3 bg-slate-400 rounded-full mr-2"></span>既存トレンド</div>
+                            <div class="flex items-center"><span id="legend-color" class="w-3 h-3 bg-emerald-500 rounded-full mr-2"></span>新提案</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Default Placeholder -->
+            <div id="proposal-placeholder" class="bg-slate-50 rounded-2xl border-2 border-dashed border-slate-300 p-12 text-center">
+                <p class="text-slate-400 font-medium text-lg">上の3つのカードから方向性を選択して詳細を表示してください</p>
+            </div>
+
+        </section>
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center text-slate-400 text-sm">
+            <p>&copy; 2024 Strategic Research Report. Generated for Ideation Analysis.</p>
+        </div>
+    </footer>
+
+    <!-- JS Logic -->
+    <script>
+        // --- DATA: Existing Ideas (The Source Material) ---
+        const ideas = [
+            { id: 1, title: "AI要約ノート", category: "efficiency", desc: "授業音声をリアルタイムで文字起こしし、重要ポイントを自動要約する。", auto: 9, agency: 2 },
+            { id: 2, title: "アダプティブ・ドリル", category: "content", desc: "過去の誤答パターンから、苦手な問題を自動生成して出題し続ける。", auto: 8, agency: 3 },
+            { id: 3, title: "エッセイ自動採点", category: "efficiency", desc: "文法や構成をAIが即座に採点し、修正案を提示する。", auto: 9, agency: 1 },
+            { id: 4, title: "集中力監視カメラ", category: "management", desc: "Webカメラで視線を追跡し、集中が切れた時にアラートを出す。", auto: 7, agency: 1 },
+            { id: 5, title: "学習スケジュール最適化", category: "management", desc: "試験日から逆算して、毎日の学習ノルマを自動で割り振る。", auto: 8, agency: 2 },
+            { id: 6, title: "VR歴史ツアー", category: "content", desc: "歴史的な出来事をVR空間で追体験する没入型コンテンツ。", auto: 6, agency: 4 },
+            { id: 7, title: "Chatbot家庭教師", category: "efficiency", desc: "分からない箇所を質問すると、即座に正解と解説を返す。", auto: 8, agency: 3 },
+            { id: 8, title: "多言語発音コーチ", category: "content", desc: "ネイティブの発音と波形を比較し、矯正箇所を指摘する。", auto: 7, agency: 5 },
+            { id: 9, title: "類似論文レコメンド", category: "efficiency", desc: "書いているレポートの内容に関連する参考文献を自動提示する。", auto: 9, agency: 2 }
+        ];
+
+        // --- DATA: New Proposals ---
+        const proposals = {
+            'A': {
+                title: "Dialogic Mirror (内省的対話)",
+                themeColor: "emerald",
+                colorHex: "#10b981", // emerald-500
+                desc: "正解を教えるのではなく、「なぜそう考えたの？」「別の視点はない？」と問いかけ続けることで、学習者のメタ認知能力（考える力）を鍛える。",
+                idea: "【Socratic AI Companion】<br>学習者がエッセイを書いている時、文法を直すのではなく『この主張の根拠は少し弱くない？』『反論があるとしたら何？』と横からチャットでツッコミを入れてくる、あえて答えを教えないAIパートナー。",
+                reason: "既存ツールは「思考のショートカット（楽をさせる）」ばかりだが、これは「思考の負荷（脳を使わせる）」を設計している点が真逆。",
+                metrics: [3, 9, 8, 7, 5] // [Efficiency, Agency, Creativity, Connection, Context]
+            },
+            'B': {
+                title: "Social Synapse (知識の生態系)",
+                themeColor: "indigo",
+                colorHex: "#6366f1", // indigo-500
+                desc: "個人が完結して学ぶのではなく、学習者同士の「興味の重なり」や「疑問の類似性」をAIがマッチングし、対話による相互理解を促す。",
+                idea: "【Curiosity Graph Connector】<br>『この問題を間違えた人』同士ではなく、『なぜ間違えたかという思考プロセスが似ている人』同士を繋げる。あるいは『今同じ疑問を持っている人』を可視化し、一時的な議論ルームを生成する。",
+                reason: "「個別最適化」の名の下に進む孤独な学習に対し、人間本来の社会的学習（Social Learning）をテクノロジーで復権させる。",
+                metrics: [4, 7, 6, 10, 4]
+            },
+            'C': {
+                title: "Ambient Context (身体的学習)",
+                themeColor: "amber",
+                colorHex: "#f59e0b", // amber-500
+                desc: "机の上や画面の中だけでなく、料理、工作、スポーツなど現実世界の身体的アクションの中に学習情報を重ね合わせる。",
+                idea: "【Action-Triggered Audio Guide】<br>スマートグラスやイヤホンを使い、実際の料理中に『今、火を強めたね。メイラード反応が起きているよ』と科学的解説を流すなど、体験と知識をリアルタイムで同期させる。",
+                reason: "情報（バーチャル）と体験（リアル）の乖離を埋め、身体感覚を伴う深い記憶定着（Embodied Cognition）を狙う。",
+                metrics: [2, 6, 8, 5, 10]
+            }
+        };
+
+        const currentAvgMetrics = [9, 2, 3, 2, 2]; // High Efficiency, Low others
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderIdeaCards('all');
+            initFilters();
+            renderScatterPlot();
+            // Radar chart is initialized on first click
+        });
+
+        // --- 1. RENDER IDEA CARDS ---
+        function renderIdeaCards(filter) {
+            const container = document.getElementById('ideas-grid');
+            container.innerHTML = '';
+            
+            const filteredIdeas = filter === 'all' ? ideas : ideas.filter(i => i.category === filter);
+            
+            filteredIdeas.forEach(idea => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-6 rounded-xl border border-slate-100 shadow-sm card-interaction flex flex-col h-full";
+                
+                // Badge color based on category
+                let badgeClass = "bg-slate-100 text-slate-600";
+                if(idea.category === 'efficiency') badgeClass = "bg-blue-50 text-blue-600";
+                if(idea.category === 'content') badgeClass = "bg-purple-50 text-purple-600";
+                if(idea.category === 'management') badgeClass = "bg-orange-50 text-orange-600";
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="px-2 py-1 rounded text-xs font-bold uppercase ${badgeClass}">${idea.category}</span>
+                        <div class="flex space-x-2 text-xs text-slate-400 font-mono">
+                            <span>Auto:${idea.auto}</span>
+                            <span>Agency:${idea.agency}</span>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-2">${idea.title}</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed flex-grow">${idea.desc}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function initFilters() {
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    // Update UI
+                    buttons.forEach(b => {
+                        b.classList.remove('active-filter', 'bg-slate-900', 'text-white');
+                        b.classList.add('inactive-filter', 'bg-slate-200', 'text-slate-600');
+                    });
+                    e.target.classList.remove('inactive-filter', 'bg-slate-200', 'text-slate-600');
+                    e.target.classList.add('active-filter', 'bg-slate-900', 'text-white');
+                    
+                    // Filter Data
+                    renderIdeaCards(e.target.dataset.filter);
+                });
+            });
+        }
+
+        // --- 2. RENDER SCATTER PLOT (Plotly) ---
+        function renderScatterPlot() {
+            const trace1 = {
+                x: ideas.map(i => i.auto),
+                y: ideas.map(i => i.agency),
+                text: ideas.map(i => i.title),
+                mode: 'markers',
+                type: 'scatter',
+                marker: {
+                    size: 14,
+                    color: ideas.map(i => i.category === 'efficiency' ? '#3b82f6' : i.category === 'content' ? '#a855f7' : '#f97316'),
+                    opacity: 0.7,
+                    line: { color: 'white', width: 2 }
+                },
+                hovertemplate: '<b>%{text}</b><br>自動化レベル: %{x}<br>主体性レベル: %{y}<extra></extra>'
+            };
+
+            // Annotation for the "Gap"
+            const trace2 = {
+                x: [2, 3, 4], // Low Auto
+                y: [8, 9, 8], // High Agency
+                mode: 'text',
+                text: ['Direction A', 'Direction B', 'Direction C'],
+                textfont: { color: '#10b981', weight: 'bold' },
+                hoverinfo: 'none'
+            };
+
+            const layout = {
+                title: { text: 'アイデア分布：自動化レベル vs 主体性', font: { size: 14 } },
+                xaxis: { title: 'プロセスの自動化 (Automation)', range: [0, 10.5], zeroline: false },
+                yaxis: { title: '学習者の主体性 (Agency)', range: [0, 10.5], zeroline: false },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(248,250,252,1)', // slate-50
+                margin: { t: 40, b: 40, l: 60, r: 20 },
+                showlegend: false,
+                shapes: [
+                    // Highlight the concentration area
+                    {
+                        type: 'rect',
+                        x0: 6, y0: 0, x1: 10, y1: 4,
+                        fillcolor: '#e2e8f0',
+                        opacity: 0.5,
+                        line: { width: 0 }
+                    }
+                ],
+                annotations: [{
+                    x: 8.5, y: 2,
+                    text: '現在の集中領域<br>(高効率・受動的)',
+                    showarrow: true,
+                    arrowhead: 2,
+                    ax: 0, ay: -40,
+                    font: { color: '#64748b', size: 10 }
+                }]
+            };
+
+            const config = { responsive: true, displayModeBar: false };
+            Plotly.newPlot('scatterPlot', [trace1, trace2], layout, config);
+        }
+
+        // --- 3. PROPOSAL SELECTION & RADAR CHART ---
+        let radarChart = null;
+
+        function selectProposal(key) {
+            const data = proposals[key];
+            
+            // 1. Toggle Views
+            document.getElementById('proposal-placeholder').classList.add('hidden');
+            document.getElementById('proposal-detail').classList.remove('hidden');
+            document.getElementById('proposal-detail').classList.add('flex'); // Ensure flex is applied
+
+            // 2. Update Content
+            const badge = document.getElementById('detail-badge');
+            badge.innerText = `Direction ${key}`;
+            
+            // Reset Badge Colors
+            badge.className = "px-3 py-1 rounded text-xs font-bold uppercase tracking-wide mr-3";
+            if(data.themeColor === 'emerald') badge.classList.add('bg-emerald-100', 'text-emerald-800');
+            if(data.themeColor === 'indigo') badge.classList.add('bg-indigo-100', 'text-indigo-800');
+            if(data.themeColor === 'amber') badge.classList.add('bg-amber-100', 'text-amber-800');
+
+            document.getElementById('detail-title').innerText = data.title;
+            document.getElementById('detail-desc').innerText = data.desc;
+            document.getElementById('detail-idea').innerHTML = data.idea;
+            document.getElementById('detail-reason').innerText = data.reason;
+            document.getElementById('legend-color').style.backgroundColor = data.colorHex;
+
+            // 3. Update Chart
+            updateRadarChart(data.metrics, data.colorHex, data.title);
+
+            // Scroll to details on mobile
+            if(window.innerWidth < 768) {
+                document.getElementById('proposal-detail').scrollIntoView({behavior: 'smooth'});
+            }
+        }
+
+        function updateRadarChart(newMetrics, color, label) {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            const chartData = {
+                labels: ['効率性 (Efficiency)', '主体性 (Agency)', '創造性 (Creativity)', '社会的接続 (Connection)', '実世界文脈 (Context)'],
+                datasets: [
+                    {
+                        label: '既存トレンド平均',
+                        data: currentAvgMetrics,
+                        backgroundColor: 'rgba(148, 163, 184, 0.2)', // slate-400
+                        borderColor: '#94a3b8',
+                        pointBackgroundColor: '#94a3b8',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'New: ' + label,
+                        data: newMetrics,
+                        backgroundColor: hexToRgbA(color, 0.2),
+                        borderColor: color,
+                        pointBackgroundColor: color,
+                        borderWidth: 2
+                    }
+                ]
+            };
+
+            const config = {
+                type: 'radar',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#e2e8f0' },
+                            grid: { color: '#e2e8f0' },
+                            pointLabels: {
+                                font: { size: 10, family: "'Noto Sans JP', sans-serif" },
+                                color: '#64748b'
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 10,
+                            ticks: { display: false, stepSize: 2 }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            titleFont: { family: "'Noto Sans JP', sans-serif" },
+                            bodyFont: { family: "'Noto Sans JP', sans-serif" },
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    const item = tooltipItems[0];
+                                    let label = item.chart.data.labels[item.dataIndex];
+                                    if (Array.isArray(label)) {
+                                      return label.join(' ');
+                                    } else {
+                                      return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            if (radarChart) {
+                radarChart.destroy();
+            }
+            radarChart = new Chart(ctx, config);
+        }
+
+        // Helper
+        function hexToRgbA(hex, alpha){
+            let c;
+            if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
+                c= hex.substring(1).split('');
+                if(c.length== 3){
+                    c= [c[0], c[0], c[1], c[1], c[2], c[2]];
+                }
+                c= '0x'+c.join('');
+                return 'rgba('+[(c>>16)&255, (c>>8)&255, c&255].join(',')+','+alpha+')';
+            }
+            throw new Error('Bad Hex');
+        }
+
+    </script>
+</body>
+</html>

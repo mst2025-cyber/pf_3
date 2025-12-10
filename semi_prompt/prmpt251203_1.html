@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ideation Analysis & Strategic Direction Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans JP', sans-serif; background-color: #F5F5F4; color: #1C1917; }
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin: 0 auto; height: 350px; max-height: 400px; }
+        .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); cursor: pointer; }
+        .active-tab { border-bottom: 2px solid #D97706; color: #D97706; font-weight: bold; }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals (Stone/Sand) with Burnt Orange and Slate Blue accents for a calm, professional look. -->
+    <!-- Application Structure Plan:
+        1. "Current Landscape" (Dashboard): An interactive grid of the 8-10 existing ideas. Allows filtering to understand the breadth.
+        2. "Direction Analysis" (Scatter Plot): A visual representation of where these ideas cluster using Plotly. This proves the "concentration" point.
+        3. "New Horizons" (Interactive Proposal): 3 Distinct columns for new directions. Clicking one updates a Radar Chart to compare the new direction against the old "average".
+        Rationale: This flow guides the user from "What is" -> "Why it's limited" -> "What could be", fostering understanding through comparison.
+    -->
+    <!-- Visualization & Content Choices:
+        1. Idea List -> Grid Cards -> Filterable JS -> To show raw data clearly.
+        2. Concentration Analysis -> Plotly Scatter Plot -> "Efficiency vs. Emotional Depth" -> Shows the clustering visualy (No SVG).
+        3. Proposal Comparison -> Chart.js Radar Chart -> "Metrics Comparison" -> Allows user to see how new ideas stretch the boundaries of the current paradigm.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Navigation -->
+    <nav class="bg-stone-100 border-b border-stone-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-xl font-bold text-stone-800">IDEATION LAB <span class="text-orange-600">.REPORT</span></span>
+                </div>
+                <div class="hidden sm:flex items-center space-x-8">
+                    <button onclick="scrollToSection('landscape')" class="text-stone-600 hover:text-orange-600 transition-colors">現状のランドスケープ</button>
+                    <button onclick="scrollToSection('analysis')" class="text-stone-600 hover:text-orange-600 transition-colors">方向性分析</button>
+                    <button onclick="scrollToSection('proposals')" class="text-stone-600 hover:text-orange-600 transition-colors font-semibold">新規提案</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header / Context -->
+    <header class="bg-white py-12 px-4 border-b border-stone-200">
+        <div class="max-w-5xl mx-auto text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-stone-800 mb-4">リモートワーク・コミュニケーションの次なる一手</h1>
+            <p class="text-lg text-stone-600 max-w-3xl mx-auto">
+                既存のアイデア群（8〜10案）を分析し、現在の開発トレンドが集中している領域を特定。
+                そこから導き出される「未開拓の空白地帯」へ向けた3つの全く新しい方向性と具体案を提言します。
+            </p>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+        
+        <!-- Section 1: Current Ideas Landscape -->
+        <section id="landscape" class="py-16 px-4 max-w-7xl mx-auto">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-stone-800 border-l-4 border-slate-500 pl-4 mb-2">1. 既存アイデアの棚卸し (Current Ideas)</h2>
+                <p class="text-stone-600 mb-6">
+                    これまでのブレインストーミングや市場調査で得られた主要なアイデアリストです。
+                    これらの多くは「効率化」と「オフィスの再現」に焦点を当てています。クリックして詳細を確認できます。
+                </p>
+                
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-2 mb-6" id="filter-container">
+                    <button class="px-4 py-1 rounded-full bg-stone-800 text-white text-sm" onclick="filterIdeas('all')">All</button>
+                    <button class="px-4 py-1 rounded-full bg-stone-200 text-stone-700 hover:bg-stone-300 text-sm" onclick="filterIdeas('Tool')">ツール・機能</button>
+                    <button class="px-4 py-1 rounded-full bg-stone-200 text-stone-700 hover:bg-stone-300 text-sm" onclick="filterIdeas('Management')">管理・可視化</button>
+                    <button class="px-4 py-1 rounded-full bg-stone-200 text-stone-700 hover:bg-stone-300 text-sm" onclick="filterIdeas('Environment')">環境再現</button>
+                </div>
+            </div>
+
+            <div id="ideas-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- JS will populate cards here -->
+            </div>
+        </section>
+
+        <!-- Section 2: Analysis of Concentration -->
+        <section id="analysis" class="py-16 px-4 bg-stone-50 border-t border-stone-200">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h2 class="text-2xl font-bold text-stone-800 border-l-4 border-orange-500 pl-4 mb-4">2. 方向性の分析：どこに集中しているか？</h2>
+                        <p class="text-stone-600 mb-4 leading-relaxed">
+                            収集したアイデアを「業務効率性（x軸）」と「情緒的つながり（y軸）」でマッピングしました。
+                            <br><br>
+                            <strong class="text-slate-700">【分析結果】</strong><br>
+                            現在のアイデアの90%は、<span class="bg-yellow-100 px-1 font-bold">「高効率・低情緒」</span>の領域（右下）に極端に集中しています。
+                            これらは「いかに無駄をなくすか」「いかに情報を正確に伝えるか」という方向性です。
+                        </p>
+                        <ul class="list-disc list-inside text-stone-600 space-y-2 bg-white p-6 rounded-lg shadow-sm">
+                            <li><strong>支配的な方向性：</strong>論理的最適化、同期性の維持、視覚情報の重視。</li>
+                            <li><strong>見落とされている領域：</strong>「偶然性」「身体感覚」「非言語的な気配」。</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-md">
+                        <div id="scatter-plot" class="w-full h-[400px]"></div>
+                        <p class="text-xs text-center text-stone-400 mt-2">※ Plotly.jsによる分析マッピング</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: New Directions & Proposals -->
+        <section id="proposals" class="py-16 px-4 max-w-7xl mx-auto">
+            <h2 class="text-2xl font-bold text-stone-800 border-l-4 border-orange-600 pl-4 mb-8">3. 全く新しい3つの方向性と具体案</h2>
+            <p class="text-stone-600 mb-8 max-w-3xl">
+                分析で判明した「空白地帯」を埋めるための3つの新しいベクトルを定義しました。
+                各方向性を選択すると、既存アイデア平均との比較チャートが表示されます。
+            </p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+                <!-- Direction A -->
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 hover:border-orange-400 transition-colors cursor-pointer p-6 relative overflow-hidden group" onclick="selectDirection('A')">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 text-6xl font-bold text-stone-400">A</div>
+                    <h3 class="text-lg font-bold text-stone-800 mb-2">身体的・触覚的共存</h3>
+                    <p class="text-sm text-stone-500 mb-4">Visual & Audio Biasからの脱却</p>
+                    <p class="text-stone-600 text-sm">画面の中だけでなく、温度や振動など「物理的」な感覚を通じて相手の存在を感じる方向性。</p>
+                    <div class="mt-4 pt-4 border-t border-stone-100">
+                        <span class="text-xs font-bold text-orange-600 uppercase tracking-wide">具体案: Haptic Desk Mat</span>
+                    </div>
+                </div>
+
+                <!-- Direction B -->
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 hover:border-orange-400 transition-colors cursor-pointer p-6 relative overflow-hidden group" onclick="selectDirection('B')">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 text-6xl font-bold text-stone-400">B</div>
+                    <h3 class="text-lg font-bold text-stone-800 mb-2">非同期のセレンディピティ</h3>
+                    <p class="text-sm text-stone-500 mb-4">Planned Efficiencyへの対抗</p>
+                    <p class="text-stone-600 text-sm">スケジュールされた会議ではなく、オフィスですれ違うような「意図しない偶然の出会い」をデジタルで設計する。</p>
+                    <div class="mt-4 pt-4 border-t border-stone-100">
+                        <span class="text-xs font-bold text-orange-600 uppercase tracking-wide">具体案: Digital Shadows</span>
+                    </div>
+                </div>
+
+                <!-- Direction C -->
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 hover:border-orange-400 transition-colors cursor-pointer p-6 relative overflow-hidden group" onclick="selectDirection('C')">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 text-6xl font-bold text-stone-400">C</div>
+                    <h3 class="text-lg font-bold text-stone-800 mb-2">生態系的ワークフロー</h3>
+                    <p class="text-sm text-stone-500 mb-4">Human-CentricからEco-Centricへ</p>
+                    <p class="text-stone-600 text-sm">個人の生産性向上だけでなく、働くこと自体が環境やコミュニティへの貢献となる循環システム。</p>
+                    <div class="mt-4 pt-4 border-t border-stone-100">
+                        <span class="text-xs font-bold text-orange-600 uppercase tracking-wide">具体案: Kinetic Contribution</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detail & Comparison View -->
+            <div id="proposal-detail" class="bg-white rounded-2xl shadow-lg border border-stone-200 p-6 md:p-10 hidden transition-all duration-500">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div>
+                        <div class="flex items-center mb-4">
+                            <span id="detail-badge" class="px-3 py-1 rounded text-xs font-bold bg-orange-100 text-orange-800 mr-3">DIRECTION A</span>
+                            <h3 id="detail-title" class="text-2xl font-bold text-stone-800"></h3>
+                        </div>
+                        <p id="detail-desc" class="text-stone-600 mb-6 text-lg leading-relaxed"></p>
+                        
+                        <div class="bg-stone-50 p-6 rounded-lg border border-stone-100">
+                            <h4 class="font-bold text-stone-700 mb-2">🔍 具体的なアイデア詳細</h4>
+                            <p id="detail-idea" class="text-stone-600"></p>
+                        </div>
+
+                        <div class="mt-6">
+                             <h4 class="font-bold text-stone-700 mb-2">💡 なぜこれが新しいのか？</h4>
+                             <p id="detail-reason" class="text-sm text-stone-500"></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Radar Chart Container -->
+                    <div class="flex flex-col items-center justify-center bg-stone-50 rounded-xl p-4">
+                        <h4 class="text-sm font-bold text-stone-500 mb-4">既存平均 vs 新提案の指標比較</h4>
+                        <div class="chart-container">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                        <div class="flex gap-4 mt-4 text-xs">
+                            <div class="flex items-center"><span class="w-3 h-3 bg-slate-300 rounded-full mr-2"></span>既存平均</div>
+                            <div class="flex items-center"><span class="w-3 h-3 bg-orange-500 rounded-full mr-2"></span>新提案</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="proposal-placeholder" class="text-center py-12 bg-stone-100 rounded-xl border-2 border-dashed border-stone-300">
+                <p class="text-stone-500 font-medium">上の3つの方向性カードをクリックして、詳細と分析データを表示してください。</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-800 text-stone-400 py-8 mt-8">
+        <div class="max-w-7xl mx-auto px-4 text-center text-sm">
+            <p>&copy; 2024 Ideation Analysis Report. Generated for Strategic Planning.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- Data: Existing Ideas (8-10 items) ---
+        const existingIdeas = [
+            { id: 1, title: "バーチャルオフィス (2D/3D)", category: "Environment", desc: "アバターを使って仮想空間に出社。在席状況を可視化する。", efficiency: 8, emotion: 4 },
+            { id: 2, title: "AI議事録・要約ツール", category: "Tool", desc: "会議の発言を自動でテキスト化し、ToDoを抽出する。", efficiency: 9, emotion: 1 },
+            { id: 3, title: "ノイズキャンセリング・ボイス", category: "Tool", desc: "生活音（子供の声、工事音）をAIが完全に除去するマイク。", efficiency: 9, emotion: 2 },
+            { id: 4, title: "スマートカレンダー調整", category: "Management", desc: "チーム全員の空き時間を分析し、最適な会議時間を自動設定。", efficiency: 10, emotion: 1 },
+            { id: 5, title: "デジタルホワイトボード", category: "Tool", desc: "手書き入力をリアルタイムで共有できる付箋ツール。", efficiency: 7, emotion: 5 },
+            { id: 6, title: "チームムードトラッカー", category: "Management", desc: "日々の気分別パルスサーベイで組織のコンディションを可視化。", efficiency: 6, emotion: 4 },
+            { id: 7, title: "フォーカスタイマー連携", category: "Management", desc: "ポモドーロテクニックをチームで共有し、集中時間を確保する。", efficiency: 8, emotion: 2 },
+            { id: 8, title: "非同期ビデオメッセージ", category: "Tool", desc: "会議の代わりに短い動画を送って報告を済ませる。", efficiency: 8, emotion: 5 },
+            { id: 9, title: "背景自動生成・美肌補正", category: "Environment", desc: "部屋が散らかっていても、顔色が優れなくてもWeb会議に出られる。", efficiency: 7, emotion: 3 }
+        ];
+
+        // --- Data: New Directions ---
+        const newDirections = {
+            'A': {
+                title: "身体的・触覚的共存 (Haptic Co-presence)",
+                desc: "視覚と聴覚に偏った現在のリモートワークツールに対し、触覚や温覚を用いた『気配』の伝達を提案する。",
+                idea: "【Haptic Desk Mat (温もりデスクマット)】<br>チームメンバーが『近く』(仮想的な距離)にいる時、デスクマットがほんのり温かくなる。誰かが自分宛てのメッセージを書いている時、マットの隅が微かに振動する。画面を見なくても『そこに誰かがいる』感覚を皮膚で感じるデバイス。",
+                reason: "情報は効率的に伝わるが『孤独感』が解消されない現状に対し、言語化されない安心感を提供する。",
+                metrics: [3, 9, 8, 4, 9] // [Efficiency, Novelty, Emotion, Logic, Serendipity]
+            },
+            'B': {
+                title: "非同期のセレンディピティ (Asynchronous Serendipity)",
+                desc: "効率化によって失われた『無駄話』や『偶然の発見』を、時間を同期させずにシステム的に発生させる。",
+                idea: "【Digital Shadows (デジタル・シャドウ)】<br>過去1週間のメンバーの作業ログや閲覧ドキュメントから、AIが『思考の軌跡』を抽象的な影としてデスクトップに投影する。クリックすると『〇〇さんが昨日この資料を見て悩んでいました』と表示され、そこから意図せぬ会話が始まる。",
+                reason: "『用事がある時しか話さない』というタコツボ化を打破し、イノベーションの源泉である雑談を誘発する。",
+                metrics: [4, 8, 7, 5, 10]
+            },
+            'C': {
+                title: "生態系的ワークフロー (Eco-Systemic Work)",
+                desc: "働くエネルギーを消費だけでなく、環境や他者への還元エネルギーへと変換する循環型モデル。",
+                idea: "【Kinetic Contribution (貢献の可視化)】<br>タイピング量や会議の発言音声エネルギーを仮想的な『電力』や『植林ポイント』に変換する。働けば働くほど、チームの仮想の森が育ったり、チャリティに寄付される。仕事の疲れを社会的貢献感で癒やすゲーミフィケーション。",
+                reason: "労働の対価を金銭以外（社会的意義・環境貢献）に即時変換し、バーンアウトを防ぐ新たなモチベーション設計。",
+                metrics: [5, 9, 6, 6, 7]
+            }
+        };
+
+        const existingAverageMetrics = [8, 3, 3, 9, 2]; // Simulated average of existing ideas
+
+        // --- Init Functions ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderIdeaCards(existingIdeas);
+            renderScatterPlot();
+            // Initial render of Radar Chart (placeholder data)
+        });
+
+        // --- Render Idea Cards ---
+        function renderIdeaCards(ideas) {
+            const container = document.getElementById('ideas-grid');
+            container.innerHTML = ideas.map(idea => `
+                <div class="bg-white p-6 rounded-lg border border-stone-200 shadow-sm card-hover flex flex-col h-full">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-semibold px-2 py-1 bg-stone-100 text-stone-600 rounded uppercase">${idea.category}</span>
+                        <div class="flex space-x-1 text-xs text-stone-400">
+                            <span>Eff:${idea.efficiency}</span>
+                            <span>Emo:${idea.emotion}</span>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-bold text-stone-800 mb-2">${idea.title}</h3>
+                    <p class="text-stone-600 text-sm flex-grow">${idea.desc}</p>
+                </div>
+            `).join('');
+        }
+
+        // --- Filter Logic ---
+        function filterIdeas(category) {
+            const buttons = document.querySelectorAll('#filter-container button');
+            buttons.forEach(btn => {
+                if(btn.textContent.includes(category) || (category === 'all' && btn.textContent === 'All')) {
+                    btn.classList.remove('bg-stone-200', 'text-stone-700');
+                    btn.classList.add('bg-stone-800', 'text-white');
+                } else {
+                    btn.classList.add('bg-stone-200', 'text-stone-700');
+                    btn.classList.remove('bg-stone-800', 'text-white');
+                }
+            });
+
+            if (category === 'all') {
+                renderIdeaCards(existingIdeas);
+            } else {
+                const filtered = existingIdeas.filter(idea => idea.category === category);
+                renderIdeaCards(filtered);
+            }
+        }
+
+        // --- Navigation Scroll ---
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- Plotly Scatter Plot ---
+        function renderScatterPlot() {
+            // Existing ideas data
+            const xValues = existingIdeas.map(i => i.efficiency);
+            const yValues = existingIdeas.map(i => i.emotion);
+            const textValues = existingIdeas.map(i => i.title);
+
+            const trace1 = {
+                x: xValues,
+                y: yValues,
+                mode: 'markers+text',
+                type: 'scatter',
+                text: existingIdeas.map((i, index) => index + 1), // Use numbers for cleaner look
+                textposition: 'top center',
+                name: '既存アイデア',
+                marker: { size: 12, color: '#64748b' }, // Slate-500
+                hovertemplate: '<b>%{text}</b><br>効率性: %{x}<br>情緒性: %{y}<extra></extra>',
+                text: textValues
+            };
+
+            // Annotation for the gap
+            const trace2 = {
+                x: [2, 3, 8],
+                y: [9, 8, 9],
+                mode: 'text',
+                type: 'scatter',
+                text: ['新規提案領域 A', '新規提案領域 B', '新規提案領域 C'],
+                textposition: 'center',
+                showlegend: false,
+                textfont: { color: '#ea580c', weight: 'bold' } // Orange-600
+            };
+
+            const layout = {
+                title: { text: 'アイデア分布：効率性 vs 情緒性', font: { size: 14 } },
+                xaxis: { title: '業務効率・論理性 (Efficiency)', range: [0, 11] },
+                yaxis: { title: '情緒・身体性 (Emotion)', range: [0, 11] },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                margin: { t: 40, b: 40, l: 50, r: 20 },
+                showlegend: false,
+                shapes: [
+                    {
+                        type: 'circle',
+                        xref: 'x', yref: 'y',
+                        x0: 5.5, y0: 0.5, x1: 10.5, y1: 5.5,
+                        opacity: 0.2,
+                        fillcolor: '#64748b',
+                        line: { color: '#64748b' }
+                    }
+                ],
+                annotations: [{
+                    x: 9, y: 1,
+                    xref: 'x', yref: 'y',
+                    text: '現在の集中領域<br>(高効率・低情緒)',
+                    showarrow: true,
+                    arrowhead: 2,
+                    ax: -40, ay: -40,
+                    font: { color: '#475569', size: 10 }
+                }]
+            };
+
+            const config = { responsive: true, displayModeBar: false };
+            Plotly.newPlot('scatter-plot', [trace1], layout, config);
+        }
+
+        // --- Chart.js Radar Chart ---
+        let radarChartInstance = null;
+
+        function renderRadarChart(newMetrics) {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            const data = {
+                labels: ['効率性', '新規性', '情緒・身体性', '論理構造', 'セレンディピティ'],
+                datasets: [{
+                    label: '既存アイデア平均',
+                    data: existingAverageMetrics,
+                    fill: true,
+                    backgroundColor: 'rgba(148, 163, 184, 0.2)', // Slate-400
+                    borderColor: 'rgb(148, 163, 184)',
+                    pointBackgroundColor: 'rgb(148, 163, 184)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(148, 163, 184)'
+                }, {
+                    label: '選択された新方向性',
+                    data: newMetrics,
+                    fill: true,
+                    backgroundColor: 'rgba(234, 88, 12, 0.2)', // Orange-600
+                    borderColor: 'rgb(234, 88, 12)',
+                    pointBackgroundColor: 'rgb(234, 88, 12)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(234, 88, 12)'
+                }]
+            };
+
+            const config = {
+                type: 'radar',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    elements: { line: { borderWidth: 3 } },
+                    scales: {
+                        r: {
+                            angleLines: { display: true },
+                            suggestedMin: 0,
+                            suggestedMax: 10,
+                            ticks: { display: false } // Hide chart ticks for cleaner look
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false } // Custom legend used in HTML
+                    }
+                },
+            };
+
+            if (radarChartInstance) {
+                radarChartInstance.destroy();
+            }
+            radarChartInstance = new Chart(ctx, config);
+        }
+
+        // --- Selection Logic ---
+        function selectDirection(key) {
+            const data = newDirections[key];
+            const placeholder = document.getElementById('proposal-placeholder');
+            const detailView = document.getElementById('proposal-detail');
+
+            // Hide placeholder, show detail
+            placeholder.classList.add('hidden');
+            detailView.classList.remove('hidden');
+            
+            // Populate Text
+            document.getElementById('detail-badge').innerText = `DIRECTION ${key}`;
+            document.getElementById('detail-title').innerText = data.title;
+            document.getElementById('detail-desc').innerText = data.desc;
+            document.getElementById('detail-idea').innerHTML = data.idea;
+            document.getElementById('detail-reason').innerText = data.reason;
+
+            // Update Chart
+            renderRadarChart(data.metrics);
+        }
+
+    </script>
+</body>
+</html>
