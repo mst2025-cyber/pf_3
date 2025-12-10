@@ -5,20 +5,32 @@
 <title>クリック展開式マインドマップ (ノード拡大)</title>
 <style>
     body {
-      font-family: "Segoe UI", sans-serif;
-      background: linear-gradient(90deg, #433852, #1b413a, #3a4e66, #4f2841);
-      background-size: 400% 400%;
-      animation: gradientMove 10s ease infinite;
-      margin: 0;
-      padding: 40px 0;
-      text-align: center;
-      color: #ffffff;
+        background: url(backpic.jpeg) center / 120% no-repeat;
+        position: relative;
+        margin: 0;
+        height: 100vh;
     }
 
-    @keyframes gradientMove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: inherit;
+        background-size: inherit;
+        background-position: inherit;
+        background-repeat: inherit;
+
+        /* 初期 filter */
+        filter: brightness(0.2) contrast(1.0);
+
+        animation: lightShift 4s ease-in-out infinite;
+        z-index: -1;
+    }
+
+    @keyframes lightShift {
+        0%   { filter: brightness(0.2) contrast(1.0); }
+        50%  { filter: brightness(0.7) contrast(1.0); }
+        100% { filter: brightness(0.2) contrast(1.0); }
     }
     text {
         /* font-size: 16px; <--- JSでfont-sizeを取得するため、ここでのpx指定は削除 */
