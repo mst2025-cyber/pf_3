@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>現在学んでいること</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e0e0e0; /* 背景色（画像に合わせて薄いグレー） */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* 画像の「①の四角」（タイトルとリストエリア）と推測される部分 */
+        .content-area {
+            background-color: white; /* 中央のコンテンツ背景色 */
+            padding: 40px;
+            border-radius: 5px; /* 角をわずかに丸く */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            width: 90%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .main-title {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #333; /* タイトルの下の線 */
+        }
+
+        .learning-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .learning-item {
+            background-color: black;
+            color: white;
+            padding: 10px 20px;
+            margin: 10px 0;
+            border-radius: 20px; /* カプセル型にするために大きく丸める */
+            font-size: 1.2em;
+            display: inline-block; /* 内容に合わせて幅を調整 */
+            clear: both; /* 左右の要素の影響を受けないようにする */
+        }
+
+        .sub-text {
+            display: block;
+            font-size: 0.7em;
+            color: #ccc;
+            margin-top: -5px;
+        }
+
+        /* 画像を表現する要素（ここではダミーのプレースホルダーとして配置） */
+        .illustration-image {
+            float: right; /* リストの横に配置 */
+            width: 45%;
+            height: auto;
+            max-width: 300px;
+            margin-left: 20px;
+        }
+
+        /* レスポンシブ対応（画面が狭い場合は画像を非表示にするか、下に配置） */
+        @media (max-width: 600px) {
+            .illustration-image {
+                float: none;
+                margin: 20px auto 0;
+                display: block;
+            }
+            .content-area {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="content-area">
+        <h1 class="main-title">現在学んでいるもの</h1>
+
+        <img src="placeholder.jpg" alt="ノートパソコンとデザインツールのイラスト" class="illustration-image">
+
+        <ul class="learning-list">
+            <li class="learning-item">プロンプトエンジニアリング</li>
+            <li class="learning-item">webマーケティング</li>
+            <li class="learning-item">データサイエンス<span class="sub-text">google colab 環境</span></li>
+            </ul>
+        
+    </div>
+
+</body>
+</html>

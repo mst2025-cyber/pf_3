@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table of Content - 再現</title>
+    <style>
+        body {
+            /* 画像の背景色に近いミディアムグレー */
+            background-color: #e0e0e0; 
+            margin: 0;
+            display: flex;
+            flex-direction: column; /* 縦に要素を並べる */
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            padding-top: 50px; /* 上部にスペースを確保 */
+        }
+
+        /* ------------------------------------- */
+        /* タイトルエリア（上部の白い帯） */
+        /* ------------------------------------- */
+
+        .title-area {
+            width: 100%;
+            background-color: white;
+            padding: 30px 0;
+            text-align: center;
+            /* 下部に影や線がないため、シンプルに */
+        }
+
+        .title {
+            font-size: 3em;
+            font-weight: 500;
+            color: #333;
+            margin: 0;
+        }
+
+        /* ------------------------------------- */
+        /* 目次リストのコンテナ（白いボックス） */
+        /* ------------------------------------- */
+
+        .content-box {
+            background-color: white;
+            width: 90%;
+            max-width: 450px; /* リストの最大幅を設定 */
+            padding: 40px 30px;
+            margin-top: 30px; /* タイトルとボックスの間のスペース */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* 軽い影で立体感を出す */
+            border-radius: 4px; /* 角を少し丸める */
+        }
+
+        /* ------------------------------------- */
+        /* リストのスタイル */
+        /* ------------------------------------- */
+
+        .content-list {
+            list-style-type: none; /* デフォルトの黒丸を削除 */
+            padding: 0;
+            margin: 0;
+        }
+
+        .content-list li {
+            font-size: 1.5em;
+            font-weight: bold; /* メインテキストは太字 */
+            color: black;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee; /* リスト項目間の区切り線 */
+            display: flex; /* 黒丸とテキストを配置するため */
+            align-items: center;
+        }
+
+        .content-list li:last-child {
+            border-bottom: none; /* 最後の項目は区切り線を削除 */
+        }
+
+        /* カスタムの黒丸を疑似要素で追加 */
+        .content-list li::before {
+            content: '•'; /* 黒丸の文字 */
+            color: black;
+            font-size: 1em; /* サイズ調整 */
+            margin-right: 15px;
+            font-weight: 900;
+        }
+
+        /* 日本語のフォントとサイズ調整 */
+        .japanese-text {
+            font-weight: normal; /* 日本語部分は太字を解除 */
+            font-size: 0.8em; /* 日本語部分を少し小さく */
+            color: #555; /* 日本語部分の色を少し薄く */
+            margin-left: 10px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="title-area">
+        <h1 class="title">Table of Content</h1>
+    </div>
+
+    <div class="content-box">
+        <ul class="content-list">
+            <li>About Me <span class="japanese-text">私について</span></li>
+            <li>Personal Skills <span class="japanese-text">略歴</span></li>
+            <li>Project Portfolio</li>
+            <li>Vision &amp; Mission <span class="japanese-text">これから</span></li>
+            <li>Work Experience</li>
+            <li>Contact Us</li>
+        </ul>
+    </div>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ポートフォリオコンテンツ統合</title>
+    <style>
+        body {
+            /* 共通の背景色：明るいグレー */
+            background-color: #f0f0f0; 
+            margin: 0;
+            font-family: Arial, sans-serif;
+            padding: 40px 20px;
+        }
+
+        /* 全体コンテナ */
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ------------------------------------- */
+        /* コンテンツブロックの共通スタイル */
+        /* ------------------------------------- */
+        .content-block {
+            background-color: white;
+            padding: 30px;
+            margin-bottom: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden; /* 内部の float 対策 */
+        }
+
+        .section-title {
+            font-size: 2.5em;
+            font-weight: 500;
+            color: black;
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* ------------------------------------- */
+        /* その１：基本情報 + 目次 (左上の四角) */
+        /* ------------------------------------- */
+        .block-one {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .about-me-card {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+            background-color: #f7f7f7;
+            border-radius: 4px;
+        }
+
+        .toc-card {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+            background-color: #f7f7f7;
+            border-radius: 4px;
+        }
+
+        /* About Me 詳細 */
+        .profile-info {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-top: 15px;
+        }
+
+        /* 目次リスト */
+        .toc-list {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+        
+        .toc-list li {
+            font-weight: bold;
+            padding: 5px 0;
+        }
+        
+        .toc-list li span {
+            font-weight: normal;
+            color: #555;
+            margin-left: 5px;
+        }
+
+
+        /* ------------------------------------- */
+        /* その２：実務経験 (右下の四角) */
+        /* ------------------------------------- */
+        .block-two .content-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .experience-column {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .experience-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .experience-list {
+            list-style-type: square; /* 四角いリストマーク */
+            padding-left: 20px;
+            margin: 0;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        
+        .experience-list li {
+            margin-bottom: 5px;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 150px;
+            background-color: #ccc; /* 画像のプレースホルダー */
+            margin-top: 15px;
+        }
+
+        /* ------------------------------------- */
+        /* レスポンシブ対応 */
+        /* ------------------------------------- */
+        @media (max-width: 600px) {
+            .content-block {
+                padding: 20px;
+            }
+            .section-title {
+                font-size: 2em;
+            }
+            .block-one, .block-two .content-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+
+        <div class="content-block block-one">
+            <h2 class="section-title">基本情報と目次</h2>
+            
+            <div class="about-me-card">
+                <h3 class="experience-title">About Me (私について)</h3>
+                <div class="profile-info">
+                    <p><strong>氏名イニシャル:</strong> M G</p>
+                    <p>19※※年生まれ ※※歳</p>
+                    <p>神奈川県横浜市出身、現在都内北区在住</p>
+                    <p>横浜市立小・中学校卒</p>
+                    <p>神奈川県立の高等学校卒</p>
+                    <p style="margin-top: 15px;"><strong>関連リンク:</strong></p>
+                    <a href="#" style="display: block;">github page</a>
+                    <a href="#" style="display: block;">team-shinyからの内部接続専用ページ</a>
+                </div>
+            </div>
+
+            <div class="toc-card">
+                <h3 class="experience-title">Table of Content (目次)</h3>
+                <ul class="toc-list">
+                    <li>About Me <span>私について</span></li>
+                    <li>Personal Skills <span>略歴</span></li>
+                    <li>Project Portfolio</li>
+                    <li>Vision &amp; Mission <span>これから</span></li>
+                    <li>Work Experience</li>
+                    <li>Contact Us</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="content-block block-two">
+            <h2 class="section-title">実務経験</h2>
+            
+            <div class="content-group">
+                <div class="experience-column">
+                    <h3 class="experience-title">情報処理関連でこれまでに経験したもの</h3>
+                    <ul class="experience-list">
+                        <li>社内OJTとして N88 BASIC、COBOL</li>
+                        <li>在庫管理・発注記録などの帳票出力: COBOL</li>
+                        <li>ドアホン・コードレス子機付き留守番電話: 組込み H8アセンブラ</li>
+                        <li>図書管理ソフト: MS-DOS: dBASE言語 (Quicksilver: コンパイル型dbase)</li>
+                        <li>サーバー・クライアント型ワークステーション 
+                            <ul style="list-style-type: circle;">
+                                <li>保険業務用システム リモートメンテナンス機能を担当 OS/2: C言語</li>
+                                <li>光回線中継・切替設備用組込みプログラム 回線テスト機能を担当 C++</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="image-placeholder"> (画像プレースホルダー: ノートPC) </div>
+                </div>
+                
+                <div class="experience-column">
+                    <h3 class="experience-title">店舗スタッフとして過ごしている間に学んだもの</h3>
+                    <ul class="experience-list">
+                        <li>店舗業務として</li>
+                        <li>ExcelVBAを使った顧客向けポイントサービスの集計プログラム</li>
+                        <li>個人的なホビーとして 
+                            <ul style="list-style-type: circle;">
+                                <li>楽天証券が提供している取引アプリからExcelにリアルタイムにデータを表示する機能を利用しリストされた銘柄のティックデータをCSVファイルに書き出す機能をシート関数とVBAで作成</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="image-placeholder"> (画像プレースホルダー: スタジオ照明) </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

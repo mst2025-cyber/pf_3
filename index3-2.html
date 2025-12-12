@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>統合ポートフォリオデザイン再現</title>
+    <style>
+        body {
+            /* Table of Content画像の背景色に近い明るいグレー */
+            background-color: #f0f0f0; 
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* ------------------------------------- */
+        /* Table of Content (目次) エリア */
+        /* ------------------------------------- */
+        .toc-section {
+            background-color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        .toc-title {
+            font-size: 3em;
+            font-weight: 500;
+            color: black;
+            margin: 0 0 30px 0;
+        }
+
+        .toc-box {
+            background-color: white;
+            width: 90%;
+            max-width: 450px;
+            margin: 0 auto; /* 中央揃え */
+            padding: 20px 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            /* About Meセクションと区別するため、ここでは影を控えめに */
+        }
+
+        .toc-list {
+            list-style-type: disc; /* 黒丸リスト */
+            list-style-position: inside;
+            padding: 0;
+            margin: 0;
+            text-align: left; /* リストを左寄せ */
+        }
+
+        .toc-list li {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: black;
+            padding: 10px 0;
+        }
+
+        .toc-list li span {
+            font-weight: normal;
+            font-size: 0.9em;
+            color: #555;
+            margin-left: 5px;
+        }
+
+        /* ------------------------------------- */
+        /* About Me (自己紹介) エリア */
+        /* ------------------------------------- */
+
+        .about-me-section {
+            background-color: #f0f0f0;
+            padding: 50px 0;
+        }
+
+        .about-me-title {
+            font-size: 3em;
+            font-weight: 500;
+            color: black;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .about-me-content {
+            display: flex;
+            flex-wrap: wrap; /* スマホで折り返す */
+            max-width: 1100px;
+            margin: 0 auto;
+            background-color: white; /* About Meセクション全体の背景 */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-left {
+            flex: 1;
+            min-width: 300px; /* 最小幅 */
+            padding: 40px;
+            position: relative;
+        }
+
+        .profile-box {
+            background-color: black;
+            color: white;
+            padding: 15px 30px;
+            width: fit-content;
+            border-radius: 8px;
+            position: absolute;
+            top: 100px;
+            left: 20px;
+            z-index: 10;
+        }
+        
+        /* About Me画像の左右中央の黒いボックスを再現 */
+        .profile-box-mg-large {
+            font-size: 2em;
+            font-weight: 900;
+            line-height: 1;
+        }
+        .profile-box-mg-small {
+            font-size: 1em;
+            font-weight: 500;
+            line-height: 1;
+        }
+
+
+        .profile-details {
+            margin-top: 150px; /* 黒いボックスの下にスペースを空ける */
+            font-size: 1.2em;
+            line-height: 1.8;
+            color: #333;
+        }
+        
+        .profile-details p {
+            margin-bottom: 5px;
+        }
+
+        .profile-right {
+            flex: 1;
+            min-width: 350px; /* 最小幅 */
+            position: relative;
+            background-color: white; /* 白い背景 */
+            padding: 40px;
+            box-sizing: border-box;
+        }
+
+        .profile-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            /* 画像の再現にはプレースホルダーを使用 */
+            background-color: #ccc; 
+            min-height: 250px;
+        }
+
+        .github-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .github-link a {
+            font-size: 1.2em;
+            color: black;
+            text-decoration: underline;
+            display: block;
+        }
+        
+        .internal-link {
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        /* ------------------------------------- */
+        /* レスポンシブ対応 */
+        /* ------------------------------------- */
+        @media (max-width: 768px) {
+            .about-me-content {
+                flex-direction: column;
+            }
+
+            .profile-box {
+                position: static;
+                width: 100%;
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            
+            .profile-left {
+                padding: 20px;
+            }
+            
+            .profile-details {
+                margin-top: 0;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    
+    <div class="toc-section">
+        <h1 class="toc-title">Table of Content</h1>
+        <div class="toc-box">
+            <ul class="toc-list">
+                <li>About Me <span>私について</span></li>
+                <li>Personal Skills <span>略歴</span></li>
+                <li>Project Portfolio</li>
+                <li>Vision &amp; Mission <span>これから</span></li>
+                <li>Work Experience</li>
+                <li>Contact Us</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="about-me-section">
+        <h1 class="about-me-title">About Me</h1>
+        
+        <div class="about-me-content">
+            <div class="profile-left">
+                <div class="profile-box">
+                    <div class="profile-box-mg-large">M G</div>
+                    <div class="profile-box-mg-small">M G</div>
+                </div>
+                
+                <div class="profile-details">
+                    <p>19※※年生まれ ※※歳</p>
+                    <p>神奈川県横浜市出身現在都内北区在住</p>
+                    <p>横浜市立小・中学校卒</p>
+                    <p>神奈川県立の高等学校卒</p>
+                </div>
+            </div>
+            
+            <div class="profile-right">
+                <div class="profile-image">
+                    <div style="background-image: url('data:image/jpeg;base64,...[実際の画像データをここにエンコードして埋め込むか、外部ファイルパスを使用]'); height: 100%; background-size: cover; background-position: center;"></div>
+                </div>
+                
+                <div class="github-link">
+                    <a href="#">github page</a>
+                    <a href="#" class="internal-link">team-shinyからの内部接続専用ページ</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>s

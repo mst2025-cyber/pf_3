@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative PORTFOLIO - 再現</title>
+    <style>
+        body {
+            /* 画像の背景色に近い明るいグレー */
+            background-color: #f0f0f0; 
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            overflow: hidden; /* 画面外の要素を非表示に */
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            max-width: 800px; /* 最大幅を設定 */
+            height: 400px; /* 高さの調整 */
+            background-color: transparent; /* コンテナ自体は透明 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            /* 影や境界線が必要な場合はここで追加できます */
+        }
+
+        /* ------------------------------------- */
+        /* 背景の斜めの白い帯を再現するCSS */
+        /* ------------------------------------- */
+
+        .diagonal-band {
+            position: absolute;
+            width: 200%; /* 画面全体をカバーするために幅を広げる */
+            height: 100px;
+            background-color: white;
+            /* 角度を付けて斜めにする */
+            transform: rotate(-3deg); 
+            /* 帯がコンテナ内に収まるように */
+            left: -50%; 
+            right: -50%;
+            z-index: 1; /* テキストの背面にする */
+        }
+
+        /* 1本目の斜めの帯 */
+        .band-top {
+            top: 25%; /* 上から25%の位置に配置 */
+        }
+
+        /* 2本目の斜めの帯 */
+        .band-bottom {
+            bottom: 25%; /* 下から25%の位置に配置 */
+            transform: rotate(3deg); /* 角度を反転させて対称にする */
+        }
+        
+        /* ------------------------------------- */
+        /* テキストのスタイル */
+        /* ------------------------------------- */
+
+        .content {
+            position: relative;
+            z-index: 2; /* 帯よりも前面に表示 */
+            text-align: center;
+            color: black;
+            padding: 20px;
+            /* 帯によってできた白い部分がコンテンツの背景のように見える効果 */
+        }
+
+        .creative {
+            font-size: 3em;
+            font-weight: 500;
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        .portfolio {
+            font-size: 5em;
+            font-weight: 900; /* 極太 */
+            line-height: 1;
+            margin: 0.1em 0;
+        }
+
+        .by-mg {
+            font-size: 1.5em;
+            font-weight: 400;
+            margin-top: 1em;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="diagonal-band band-top"></div>
+        <div class="diagonal-band band-bottom"></div>
+
+        <div class="content">
+            <h1 class="creative">Creative</h1>
+            <h2 class="portfolio">PORTFOLIO</h2>
+            <p class="by-mg">By M.G</p>
+        </div>
+    </div>
+</body>
+</html> 
