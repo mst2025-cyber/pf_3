@@ -21,6 +21,7 @@
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
+
     h1 {
       margin-bottom: 30px;
       color: #333;
@@ -28,12 +29,14 @@
 
     ul {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
       gap: 20px;
     }
 
     li {
+      list-style: none;
       margin: 10px 0;
+      padding: 0 20px;  /* ★左右の余白を追加 */
     }
 
     a {
