@@ -24,40 +24,46 @@
 
     h1 {
       margin-bottom: 30px;
-      color: #333;
+      color: #ffffff;
+      font-size: 36px;
+      text-shadow: 0 3px 8px rgba(0,0,0,0.3);
+      letter-spacing: 1px;
     }
 
     ul {
       list-style: none;
-      padding: 0;
-      margin: 0 auto;
-      max-width: 800px;
-
       display: grid;
-      grid-template-columns: repeat(2, 1fr); /* ★ここで列数を調整 */
-      gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      padding: 0 50px;  /* ★左右の余白を追加 */
     }
 
     li {
+      list-style: none;
       margin: 10px 0;
+      padding: 0 20px;  /* ★左右の余白を追加 */
     }
 
     a {
       display: inline-block;
-      padding: 12px 20px;
-      background: #fff;
-      border-radius: 8px;
+      padding: 16px 32px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
       text-decoration: none;
       color: #333;
-      font-size: 24px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      transition: 0.2s;
+      font-size: 22px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      transition: 0.25s;
+      backdrop-filter: blur(6px);
     }
 
     a:hover {
-      background: #7298e0;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      background: #ffeb3b;
+      color: #333;
+      transform: translateY(-2px) scale(1.15);
+      box-shadow: 0 0 20px rgba(255,255,0,0.6), 
+                  0 0 40px rgba(255,255,255,0.8);
     }
   </style>
 
