@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>生成AI関連ゼミ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: "Segoe UI", sans-serif;
+  color: #ffffff;
+  background: transparent; /* ← three.js に任せる */
+  overflow-x: hidden;
+}
+
+/* three.js 背景 */
+#bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* UI 全体 */
+body {
+  position: relative;
+  z-index: 1;
+}
+
+/* UI の見た目（今まで通り） */
+.content {
+  padding: 40px 0;        /* ← 余白はここ */
+  text-align: center;
+}
+
+
+    h1 {
+      margin-bottom: 30px;
+      font-size: 36px;
+      text-shadow: 0 3px 8px rgba(0,0,0,0.5);
+      letter-spacing: 1px;
+    }
+
+    ul {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 60px;
+      padding: 0 40px;
+    }
+
+    li { margin: 15px 0; }
+
+    a {
+      display: inline-block;
+      padding: 16px 32px;
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 12px;
+      text-decoration: none;
+      color: #333;
+      font-size: 22px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      transition: 0.25s;
+      backdrop-filter: blur(6px);
+    }
+
+    a:hover {
+      background: #ffeb3b;
+      transform: translateY(-2px) scale(1.15);
+      box-shadow: 0 0 20px rgba(255,255,0,0.6),
+                  0 0 40px rgba(255,255,255,0.8);
+    }
+  </style>
+</head>
+<body>
+
+<div id="bg"></div>
+
+
+<div class="content">
+  <h1>生成ＡＩ関連ゼミ</h1>
+
+  <ul>
+    <li><a href="semi_gene_ai_bg/semi_gene_ai_bg.html">生成AI初級ゼミ</a></li>
+    <li><a href="semi_gene_ai_md/semi_gene_ai_md.html">生成AI中級ゼミ</a></li>
+  </ul>
+</div>
+
+
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+const CONNECTION_DISTANCE = 60; // 接続する最大距離
+const REWIRE_INTERVAL = 3000;   // 再結線(ms)
+
+const container = document.getElementById('bg');
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x0b0f19, 40, 200);
+
+const camera = new THREE.PerspectiveCamera(
+  60,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  500
+);
+camera.position.z = 120;
+
+const lineMaterial = new THREE.LineBasicMaterial({
+  color: 0x7fa2ff,
+  transparent: true,
+  opacity: 0.35
+});
+
+let lineMesh;
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setClearColor(0x0b0f19, 1);
+container.appendChild(renderer.domElement);
+
+function rebuildConnections() {
+  if (lineMesh) scene.remove(lineMesh);
+
+  const points = [];
+
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const d = nodes[i].position.distanceTo(nodes[j].position);
+      if (d < CONNECTION_DISTANCE) {
+        points.push(nodes[i].position, nodes[j].position);
+      }
+    }
+  }
+
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  lineMesh = new THREE.LineSegments(geometry, lineMaterial);
+  scene.add(lineMesh);
+}
+
+
+/* ---- nodes ---- */
+const NODE_COUNT = 140;
+const nodes = [];
+
+const geometry = new THREE.SphereGeometry(0.7, 10, 10);
+const material = new THREE.MeshBasicMaterial({ color: 0xbfd2ff });
+
+for (let i = 0; i < NODE_COUNT; i++) {
+  const mesh = new THREE.Mesh(geometry, material.clone());
+mesh.position.set(
+  (Math.random() - 0.5) * 220,
+  (Math.random() - 0.5) * 140,
+  (Math.random() - 0.5) * 160
+);
+  mesh.userData = {
+    v: new THREE.Vector3(
+      (Math.random() - 0.5) * 0.04,
+      (Math.random() - 0.5) * 0.04,
+      (Math.random() - 0.5) * 0.04
+    ),
+    phase: Math.random() * Math.PI * 2
+  };
+  nodes.push(mesh);
+  scene.add(mesh);
+}
+
+rebuildConnections();
+setInterval(rebuildConnections, REWIRE_INTERVAL);
+
+
+/* ---- animate ---- */
+function animate() {
+  requestAnimationFrame(animate);
+
+  nodes.forEach(n => {
+    n.userData.phase += 0.03;
+    const s = 1 + Math.sin(n.userData.phase) * 0.3;
+    n.scale.setScalar(s);
+
+    n.position.add(n.userData.v);
+    ['x','y','z'].forEach(a => {
+      if (Math.abs(n.position[a]) > 60) n.userData.v[a] *= -1;
+    });
+  });
+
+  renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+
+</body>
+</html>

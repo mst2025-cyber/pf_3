@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>クリック展開式マインドマップ (ノード拡大)</title>
+<style>
+    body {
+        background: url(backpic2.jpg) center / 120% no-repeat;
+        position: relative;
+        margin: 0;
+        height: 100vh;
+    }
+
+    body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: inherit;
+        background-size: inherit;
+        background-position: inherit;
+        background-repeat: inherit;
+
+        /* 初期 filter */
+        filter: brightness(0.2) contrast(1.0);
+
+        animation: lightShift 4s ease-in-out infinite;
+        z-index: -1;
+    }
+
+    @keyframes lightShift {
+        0%   { filter: brightness(0.2) contrast(1.0); }
+        50%  { filter: brightness(0.7) contrast(1.0); }
+        100% { filter: brightness(0.2) contrast(1.0); }
+    }
+    text {
+        /* font-size: 16px; <--- JSでfont-sizeを取得するため、ここでのpx指定は削除 */
+        fill: #333;
+        cursor: pointer;
+        user-select: none;
+        pointer-events: none;
+    }
+
+    rect {
+        fill: #fff;
+        stroke: #4A90E2;
+        stroke-width: 2px;
+        cursor: pointer;
+        transition: all 0.5s;
+    }
+
+    .node--internal rect {
+        fill: #e6f2ff;
+        stroke: #4A90E2;
+    }
+
+    .node--root rect {
+        fill: #4A90E2;
+        stroke: #1C5B9E;
+    }
+    .node--root text {
+        fill: #fff;
+        font-weight: bold;
+    }
+
+    .node--link text {
+        fill: #0066cc;
+        text-decoration: underline;
+    }
+    .node--link rect {
+        stroke: #0066cc;
+        fill: #f0f8ff;
+    }
+
+    .link {
+        fill: none;
+        stroke: #bbb;
+        stroke-width: 2px;
+        transition: stroke 0.5s;
+    }
+</style>
+</head>
+<body>
+
+<!-- ▼ D3.js（CDN） -->
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+
+<script>
+//------------------------------------
+// マインドマップデータ
+//------------------------------------
+const treeData = {
+    name: "Masato's Mindmap",
+    children: [
+        {
+            name: "生成AI初級ゼミ",
+            children: [
+                { name: "面白画像の生成", url: "const.html" },
+                { name: "面白動画の生成", url: "const.html"  },
+                { name: "AIを利用した絵本の作成", url: "const.html"  },
+                { name: "動画生成AIを使う", url: "const.html"  }
+            ]
+        },
+        {
+            name: "生成AI中級ゼミ",
+            children: [
+                { name: "バイブコーディングによるアプリ開発", url: "const.html" },    
+                { name: "difyハンズオンセミナー",
+                     children: [                
+                        { name: "第1回：Dify導入と環境構築", url: "const.html"  },
+                        { name: "第2回：LLMノードとプロンプト設計", url: "const.html"  },
+                        { name: "第3回：Knowledge（RAG）とドキュメント連携", url: "const.html" },
+                        { name: "第4回：エージェントと外部連携", url: "const.html"  },
+                        { name: "第5回：デプロイ・運用・発表", url: "const.html"  }
+                    ]
+                },
+            ]
+        },
+        {
+            name: "プロンプトゼミ",
+            children: [
+                { name: "2025/11/26:金属加工業 2035年の未来予測", url: "semi_prompt/prmpt251126.html" },
+                { name: "【上流工程】多視点ブレインストーミングによる\n副業（副収入）アイデア", url: "semi_prompt/prmpt251005.html" },
+                { name: "NotebookLMとGemini2.5 Proを活用した\n業務生産性向上セミナー\nファシリテータ：sakioAKI",
+                children: [
+                    { name: "秋葉原グルメクイズ２０２５年８月版\n【初期Ver：PC画面向き(横型)】", url: "semi_prompt/gquiz.html" },
+                    { name: "秋葉原グルメ検定・秋葉原グルメクイズ\n２０２５年１２月版\n【最新版：スマホ画面対応版】", url: "semi_prompt/akbgrmquiznew.html" },
+                    { name: "クイズフォーマットのみの抽出",  url: "semi_prompt/quizformat.html" },
+                    { name: "詳細 1-4" }
+                    ]
+                },
+                { name: "詳細 1-3" },
+                { name: "詳細 1-4" }
+            ]
+        },
+        {
+            name: "WEBマーケティングゼミ",
+            children: [
+                { name: "「作って終わり」ではない！ビジネスを成長させる\nウェブサイト運営の全技術", url: "const.html"  },
+                { name: "「GA4と広告」連携 超入門セミナー", url: "const.html"  },
+                { name: "LLMO × SEO", url: "const.html"  },
+                { name: "「GA4と広告」連携 超入門セミナー", url: "const.html"  },
+                { name: "【GEMINI x GA4】勘から確信へ！\nWEBマーケティング業務効率化ゼミ", url: "const.html"  },
+                { name: "「GA4と広告」連携 超入門セミナー", url: "const.html"  },
+                { name: "「GA4と広告」連携 超入門セミナー", url: "const.html"  },
+                { name: "第一回WEBマーケティング（広告）ゼミ", url: "const.html"  },
+                { name: "第2回：【デモ中心】検索キャンペーンを作成しよう", url: "const.html"  },
+                { name: "Google広告UIゼミ", url: "const.html"  },
+                { name: "「GA4と広告」連携 超入門セミナー", url: "const.html"  },
+                { name: "「GA4と広告」連携 超入門セミナー", url: "const.html"  },
+                { name: "Webマーケティング全体像とSNSの役割", url: "const.html"  }
+            ]
+        },
+        {
+            name: "Gemini業務効率化ゼミ",
+            children: [
+                { name: "詳細 1-1", url: "const.html"  },
+                { name: "詳細 1-2", url: "const.html"  },
+                { name: "詳細 1-3", url: "const.html"  },
+                { name: "詳細 1-4", url: "const.html"  }
+            ]
+        },
+        {
+            name: "DB関連ゼミ",
+            children: [
+                { name: "詳細 2-1", url: "const.html"  },
+                { name: "詳細 2-2", url: "const.html"  }
+            ]
+        },
+        {
+            name: "pythonゼミ",
+            children: [
+                { name: "詳細 1-1", url: "const.html"  },
+                { name: "詳細 1-2", url: "const.html"  },
+                { name: "詳細 1-3", url: "const.html"  },
+                { name: "詳細 1-4", url: "const.html"  }
+            ]
+        },
+        {
+        
+            name: "ゼミ数学ゼミ",
+            children: [
+                { name: "詳細 1-1", url: "const.html"  },
+                { name: "詳細 1-2", url: "const.html"  },
+                { name: "詳細 1-3", url: "const.html"  },
+                { name: "詳細 1-4", url: "const.html" }
+            ]
+        }
+    ]
+};
+
+//------------------------------------
+// SVGセットアップ
+//------------------------------------
+const margin = {top: 20, right: 20, bottom: 20, left: 20};
+let i = 0;
+
+const svg = d3.select("body")
+    .append("svg")
+    .attr("width", window.innerWidth)
+    .attr("height", window.innerHeight);
+
+const g = svg.append("g")
+    .attr("transform", `translate(${window.innerWidth/2},${window.innerHeight/2})`);
+
+const linkGroup = g.append("g").attr("class", "links-layer");
+const nodeGroup = g.append("g").attr("class", "nodes-layer");
+
+const tree = d3.tree()
+    .nodeSize([80, 320]); 
+
+const linkGenerator = d3.linkHorizontal()
+    .x(d => d.y)
+    .y(d => d.x);
+
+let root = d3.hierarchy(treeData);
+root.x0 = 0;
+root.y0 = 0;
+
+// 初期状態でルートのみにする処理
+if (root.children) {
+    root.children.forEach(collapse);
+    collapse(root);
+}
+
+update(root);
+
+window.addEventListener('resize', () => {
+    update(root);
+});
+
+function collapse(d) {
+    if (d.children) {
+        d._children = d.children;
+        d._children.forEach(collapse);
+        d.children = null;
+    }
+}
+
+//------------------------------------
+// ★追加: CSSからフォントサイズを取得
+//------------------------------------
+function getFontSize() {
+    const style = window.getComputedStyle(document.body);
+    return parseFloat(style.fontSize); // 例: 16px -> 16
+}
+
+
+//------------------------------------
+// テキスト幅計算（複数行対応）
+//------------------------------------
+function getTextWidth(text) {
+    const lines = text.split('\n');
+    let maxWidth = 0;
+    const fontSizePx = getFontSize();
+    
+    // 全角文字の幅をフォントサイズとほぼ同等 (1.1倍程度)
+    // 半角文字の幅をフォントサイズの半分程度 (0.6倍程度)
+    const wideCharRatio = 1.1; 
+    const narrowCharRatio = 0.6;
+    const padding = 50; // 左右パディングはフォントサイズによらず一定
+
+    lines.forEach(line => {
+        let len = 0;
+        for (let i = 0; i < line.length; i++) {
+            // 全角文字の場合
+            if (line.charCodeAt(i) > 255) {
+                len += fontSizePx * wideCharRatio;
+            } 
+            // 半角文字の場合
+            else {
+                len += fontSizePx * narrowCharRatio;
+            }
+        }
+        if (len > maxWidth) maxWidth = len;
+    });
+
+    return maxWidth + padding; 
+}
+
+//------------------------------------
+// 行数を取得する関数
+//------------------------------------
+function getLineCount(text) {
+    return text.split('\n').length;
+}
+
+//------------------------------------
+// ノードの高さを計算する関数
+//------------------------------------
+function getNodeHeight(text) {
+    const lines = getLineCount(text);
+    const fontSizePx = getFontSize();
+    const lineHeightPx = fontSizePx * 1.5; // 行間はフォントサイズの1.5倍程度とする
+    const verticalPadding = 10; // 上下の固定パディング
+
+    if (lines === 1) {
+        // 1行の場合: 行の高さ + 上下パディング
+        return lineHeightPx + verticalPadding * 2;
+    } else {
+        // 複数行の場合: 1行目の高さ + (行数 - 1) * 行の高さ + 上下パディング
+        return lineHeightPx + (lines - 1) * lineHeightPx + verticalPadding * 2;
+    }
+}
+
+//------------------------------------
+// 描画更新
+//------------------------------------
+function update(source) {
+    const treeLayout = tree(root);
+    const nodes = treeLayout.descendants();
+    const links = treeLayout.links();
+
+    nodes.forEach(d => { d.y = d.depth * 320; });
+
+    // サイズ計算とスクロール制御
+    let minX = Infinity, maxX = -Infinity; 
+    let minY = Infinity, maxY = -Infinity; 
+
+    nodes.forEach(d => {
+        const w = getTextWidth(d.data.name);
+        const h = getNodeHeight(d.data.name);
+        
+        const nodeLeft = d.y - w / 2;
+        const nodeRight = d.y + w / 2;
+        const nodeTop = d.x - h / 2;
+        const nodeBottom = d.x + h / 2;
+
+        if (nodeLeft < minX) minX = nodeLeft;
+        if (nodeRight > maxX) maxX = nodeRight;
+        if (nodeTop < minY) minY = nodeTop;
+        if (nodeBottom > maxY) maxY = nodeBottom;
+    });
+
+    const contentWidth = maxX - minX;
+    const contentHeight = maxY - minY;
+    
+    const winWidth = window.innerWidth;
+    const winHeight = window.innerHeight;
+    const padding = 80; 
+
+    const newSvgWidth = Math.max(winWidth, contentWidth + padding * 2);
+    const newSvgHeight = Math.max(winHeight, contentHeight + padding * 2);
+
+    svg.transition().duration(500)
+        .attr("width", newSvgWidth)
+        .attr("height", newSvgHeight);
+
+    let tx, ty;
+
+    if (newSvgWidth > winWidth) {
+        tx = -minX + padding;
+    } else {
+        tx = (winWidth - contentWidth) / 2 - minX;
+    }
+
+    if (newSvgHeight > winHeight) {
+        ty = -minY + padding;
+    } else {
+        ty = (winHeight - contentHeight) / 2 - minY;
+    }
+
+    g.transition()
+        .duration(500)
+        .attr("transform", `translate(${tx},${ty})`);
+
+    //------------------------------------
+    // ノード描画
+    //------------------------------------
+    const node = nodeGroup.selectAll("g.node")
+        .data(nodes, d => d.id || (d.id = ++i));
+
+    const nodeEnter = node.enter()
+        .append("g")
+        .attr("class", d => {
+            let classes = "node";
+            if (d.children || d._children) classes += " node--internal";
+            else classes += " node--leaf";
+            
+            if (d.depth === 0) classes += " node--root";
+            if (d.data.url) classes += " node--link";
+            return classes;
+        })
+        .attr("transform", d => `translate(${source.y0},${source.x0})`)
+        .on("click", (e, d) => {
+            if (d.data.url) {
+                window.open(d.data.url, '_blank');
+                return; 
+            }
+            if (d.children || d._children) {
+                if (d.children) {
+                    d._children = d.children;
+                    d.children = null;
+                } else {
+                    d.children = d._children;
+                    d._children = null;
+                }
+                update(d);
+            }
+        });
+
+    nodeEnter.append("rect")
+        .attr("rx", 10) 
+        .attr("ry", 10)
+        .attr("width", 0)
+        .attr("height", 0) 
+        .attr("y", 0)
+        .attr("x", 0);
+
+    // テキスト要素自体にはpxでフォントサイズを指定しない（bodyから継承するため）
+    nodeEnter.append("text")
+        .attr("dy", "0.35em")
+        .attr("x", 0)
+        .attr("text-anchor", "middle")
+        .style("fill-opacity", 0);
+
+    const nodeUpdate = nodeEnter.merge(node);
+
+    nodeUpdate.transition()
+        .duration(500)
+        .attr("transform", d => `translate(${d.y},${d.x})`);
+
+    // Rect更新
+    nodeUpdate.select("rect")
+        .transition()
+        .duration(500)
+        .attr("width", d => getTextWidth(d.data.name))
+        .attr("height", d => getNodeHeight(d.data.name))
+        .attr("x", d => -getTextWidth(d.data.name) / 2)
+        .attr("y", d => -getNodeHeight(d.data.name) / 2)
+        .style("fill", d => {
+            if (d.depth === 0) return "#4A90E2";
+            if (d.data.url) return "#f0f8ff";
+            return (d.children || d._children) ? "#e6f2ff" : "#fff";
+        })
+        .style("stroke", d => d.data.url ? "#0066cc" : "#4A90E2");
+
+    // テキスト更新
+    nodeUpdate.select("text")
+        .style("fill-opacity", 1)
+        .style("fill", d => {
+            if (d.depth === 0) return "#fff";
+            if (d.data.url) return "#0066cc";
+            return "#333";
+        })
+        .style("text-decoration", d => d.data.url ? "underline" : "none")
+        .each(function(d) {
+            const el = d3.select(this);
+            el.text(null);
+            
+            const lines = d.data.name.split('\n');
+            const lineHeight = 1.2; // tspanの行間 (em単位)
+            
+            // 垂直方向のセンタリング開始位置を計算
+            const startDy = 0.35 - ((lines.length - 1) * lineHeight) / 2;
+
+            lines.forEach((line, i) => {
+                el.append("tspan")
+                    .attr("x", 0)
+                    .attr("dy", i === 0 ? startDy + "em" : lineHeight + "em")
+                    .text(line);
+            });
+        });
+
+    const nodeExit = node.exit().transition()
+        .duration(500)
+        .attr("transform", d => `translate(${source.y},${source.x})`)
+        .remove();
+
+    nodeExit.select("rect")
+        .attr("width", 0)
+        .attr("height", 0);
+
+    nodeExit.select("text")
+        .style("fill-opacity", 0);
+
+    //------------------------------------
+    // リンク描画
+    //------------------------------------
+    const link = linkGroup.selectAll("path.link")
+        .data(links, d => d.target.id);
+
+    const linkEnter = link.enter()
+        .append("path")
+        .attr("class", "link")
+        .attr("d", d => linkGenerator({ source: source, target: source }));
+
+    linkEnter.merge(link).transition()
+        .duration(500)
+        .attr("d", linkGenerator)
+        .style("stroke", d => d.source.depth === 0 ? "#4A90E2" : "#bbb");
+
+    link.exit().transition()
+        .duration(500)
+        .attr("d", d => linkGenerator({ source: source, target: source }))
+        .remove();
+
+    nodes.forEach(d => {
+        d.x0 = d.x;
+        d.y0 = d.y;
+    });
+}
+</script>
+
+</body>
+</html>
