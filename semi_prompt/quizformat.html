@@ -591,6 +591,10 @@ document.addEventListener('DOMContentLoaded', () => {
         akibaLevelEl.textContent = getLevel(score);
     }
 });
-</script>
+window.addEventListener('popstate', () => {
+  if (window.opener) {
+    window.close(); // 成功する可能性あり
+  }
+});</script>
 </body>
 </html>
