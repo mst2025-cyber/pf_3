@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akiba Maid Matcher 🎀</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            background-color: #fff5f7; /* 薄いピンク */
+        }
+        .maid-gradient {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+        }
+        .btn-primary {
+            background-color: #ff4b4b;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #e03131;
+            transform: translateY(-2px);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* アニメーション */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="text-gray-800 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+            <h1 class="text-2xl font-bold text-red-500 flex items-center gap-2">
+                <span>🎀</span> Akiba Maid Matcher
+            </h1>
+            <span class="text-xs font-bold bg-pink-100 text-pink-600 px-2 py-1 rounded-full">v1.0 JS Edition</span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container max-w-2xl mx-auto px-4 py-8">
+        
+        <!-- Intro Screen -->
+        <div id="intro-screen" class="fade-in bg-white rounded-2xl p-8 card-shadow text-center">
+            <div class="mb-6 text-6xl">🏰</div>
+            <h2 class="text-3xl font-bold mb-4 text-gray-800">あなたの「推し店」見つけます</h2>
+            <p class="text-gray-600 mb-8 leading-relaxed">
+                簡単な10個の質問に答えるだけで、あなたの好み（ベクトル）を解析。<br>
+                秋葉原の数あるメイドカフェの中から、<br>
+                アルゴリズムが最適な一軒を提案します。
+            </p>
+            <div class="grid grid-cols-2 gap-4 text-left bg-pink-50 p-4 rounded-lg mb-8 text-sm">
+                <div>✨ 雰囲気 (Energy)</div>
+                <div>🦄 世界観 (Immersion)</div>
+                <div>💖 萌え度 (Moe)</div>
+                <div>🗣️ 距離感 (Interaction)</div>
+                <div>💰 予算感 (Cost)</div>
+            </div>
+            <button onclick="startQuiz()" class="btn-primary text-white font-bold py-4 px-12 rounded-full text-lg shadow-lg w-full md:w-auto">
+                診断スタート！
+            </button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden fade-in">
+            <div class="mb-6 flex justify-between items-center">
+                <span class="text-sm font-bold text-pink-500">QUESTION <span id="current-q-num">1</span>/10</span>
+                <div class="w-1/2 bg-gray-200 rounded-full h-2.5">
+                    <div id="progress-bar" class="bg-pink-500 h-2.5 rounded-full" style="width: 10%"></div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 md:p-8 card-shadow relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-2 h-full bg-pink-400"></div>
+                <h3 id="question-text" class="text-xl md:text-2xl font-bold mb-8 text-gray-800 leading-snug">
+                    質問がここに表示されます
+                </h3>
+                <div id="options-container" class="space-y-4">
+                    <!-- Options will be injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="hidden fade-in space-y-8">
+            <!-- Best Match Card -->
+            <div class="bg-white rounded-2xl overflow-hidden card-shadow border-4 border-pink-200">
+                <div class="bg-pink-50 p-4 text-center border-b border-pink-100">
+                    <span class="text-pink-600 font-bold tracking-wider text-sm">🏆 BEST MATCH</span>
+                </div>
+                <div class="p-6 md:p-8 text-center">
+                    <h2 id="result-name" class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">店舗名</h2>
+                    <p id="result-category" class="text-sm text-gray-500 mb-4 font-bold">カテゴリ名</p>
+                    
+                    <div id="result-tags" class="flex flex-wrap justify-center gap-2 mb-6">
+                        <!-- Tags -->
+                    </div>
+
+                    <p id="result-desc" class="text-gray-600 leading-relaxed mb-6 bg-gray-50 p-4 rounded-lg text-left">
+                        説明文
+                    </p>
+
+                    <div class="flex items-center justify-center gap-2 mb-2">
+                        <span class="text-gray-500 text-sm">マッチング度</span>
+                        <span id="result-score" class="text-3xl font-bold text-pink-500">98.5%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart & Details -->
+            <div class="grid md:grid-cols-1 gap-6">
+                <!-- Radar Chart -->
+                <div class="bg-white rounded-2xl p-6 card-shadow">
+                    <h3 class="font-bold text-gray-700 mb-4 text-center">パラメータ分析</h3>
+                    <div class="relative h-64 w-full">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                    <p class="text-xs text-center text-gray-400 mt-2">赤: あなたの希望 / 青: お店の特徴</p>
+                </div>
+
+                <!-- Other Candidates -->
+                <div class="bg-white rounded-2xl p-6 card-shadow">
+                    <h3 class="font-bold text-gray-700 mb-4">その他の候補</h3>
+                    <div id="other-candidates" class="space-y-4">
+                        <!-- List items -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center pt-4 pb-12">
+                <button onclick="location.reload()" class="text-gray-500 hover:text-pink-500 underline text-sm">
+                    もう一度診断する
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white text-center py-4 text-xs">
+        <p>&copy; 2024 Akiba Maid Matcher | Powered by JS & Tailwind</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // ==========================================
+        // 1. データセット (JSON)
+        // ==========================================
+        const shopsData = [
+            {
+                "id": 1, "name": "あっとほぉ～むカフェ", "category": "王道・エンタメ系",
+                "features": { "energy": 9, "immersion": 10, "moe": 10, "interaction": 9, "cost": 6 },
+                "tags": ["エンタメ", "初心者推奨", "レジェンド"],
+                "description": "挨拶やおまじないの声が響くテーマパークのような賑やかさ。「萌え」の元祖にして完成形。"
+            },
+            {
+                "id": 2, "name": "めいどりーみん", "category": "王道・エンタメ系",
+                "features": { "energy": 10, "immersion": 9, "moe": 8, "interaction": 8, "cost": 7 },
+                "tags": ["ライブ", "入国システム", "体育会系ノリ"],
+                "description": "ライブステージで盛り上がる夢の国。元気で明るいアイドル的な萌え要素が強い。"
+            },
+            {
+                "id": 3, "name": "ハートオブハーツ", "category": "王道・エンタメ系",
+                "features": { "energy": 10, "immersion": 7, "moe": 7, "interaction": 9, "cost": 6 },
+                "tags": ["ライブ", "ヲタ芸", "文化祭ノリ"],
+                "description": "ライブ頻度が高くヲタ芸も打てる高エネルギー空間。親しみやすいクラスメイト的な可愛さ。"
+            },
+            {
+                "id": 4, "name": "マジカルロリポップ", "category": "王道・エンタメ系",
+                "features": { "energy": 8, "immersion": 8, "moe": 9, "interaction": 8, "cost": 7 },
+                "tags": ["魔法少女", "ゆめかわいい", "ビジュアル高"],
+                "description": "魔法少女見習い設定とゆめかわいい内装。THE アキバのコンカフェ嬢というオーラ。"
+            },
+            {
+                "id": 5, "name": "Cure Maid Cafe", "category": "クラシック・癒し・紅茶系",
+                "features": { "energy": 2, "immersion": 6, "moe": 2, "interaction": 2, "cost": 5 },
+                "tags": ["クラシカル", "紅茶専門店", "静寂"],
+                "description": "クラシック音楽が流れる静寂な空間。19世紀英国のような空気が完成されている。"
+            },
+            {
+                "id": 6, "name": "ぴなふぉあ", "category": "クラシック・癒し・紅茶系",
+                "features": { "energy": 5, "immersion": 4, "moe": 6, "interaction": 6, "cost": 4 },
+                "tags": ["アットホーム", "老舗", "フランク"],
+                "description": "常連とメイドの笑い声が程よく聞こえるアットホームな老舗。気取らない可愛さ。"
+            },
+            {
+                "id": 7, "name": "メイリッシュ", "category": "クラシック・癒し・紅茶系",
+                "features": { "energy": 3, "immersion": 7, "moe": 5, "interaction": 4, "cost": 5 },
+                "tags": ["ティーサロン", "淑女", "落ち着き"],
+                "description": "まったりとしたティーサロン。クラシカルな制服と空間が、現実にありそうな非日常を作る。"
+            },
+            {
+                "id": 11, "name": "アキバ絶対領域", "category": "アキバ絶対領域グループ",
+                "features": { "energy": 8, "immersion": 9, "moe": 10, "interaction": 8, "cost": 7 },
+                "tags": ["ニーハイ", "猫耳", "王道萌え"],
+                "description": "「絶対領域＝ニーハイ」を強調し、ビジュアルと萌え仕草に特化した王道系。"
+            },
+            {
+                "id": 15, "name": "クラウンティアラ", "category": "TOYグループ",
+                "features": { "energy": 7, "immersion": 10, "moe": 7, "interaction": 7, "cost": 8 },
+                "tags": ["豪華内装", "世界観", "営業力"],
+                "description": "ディズニー並みに内装にお金をかけた豪華空間。世界観の住人としてのロールプレイが光る。"
+            },
+            {
+                "id": 19, "name": "大人なのに女児服着てるカフェ", "category": "勇者系列",
+                "features": { "energy": 8, "immersion": 9, "moe": 10, "interaction": 9, "cost": 7 },
+                "tags": ["妹属性", "お兄ちゃん", "パステル"],
+                "description": "「お兄ちゃん」と呼ばれ続けることで脳がバグる没入感。妹属性に特化した萌え。"
+            },
+            {
+                "id": 20, "name": "龍龍 (ロンロン)", "category": "勇者系列",
+                "features": { "energy": 6, "immersion": 8, "moe": 7, "interaction": 7, "cost": 6 },
+                "tags": ["キョンシー", "中華", "カウンター"],
+                "description": "怪しげな中華BGMとお札の世界観。チャイナ娘的な可愛さと少しの毒っ気。"
+            },
+            {
+                "id": 21, "name": "Blue Egg", "category": "勇者系列",
+                "features": { "energy": 5, "immersion": 9, "moe": 8, "interaction": 6, "cost": 6 },
+                "tags": ["魔法学校", "清楚", "上品"],
+                "description": "清楚で上品な空気が漂う魔法学校の寮。王道メイドの進化系、清楚萌えの最高峰。"
+            },
+            {
+                "id": 24, "name": "ブラックロンド", "category": "ダーク・ゴシック",
+                "features": { "energy": 5, "immersion": 9, "moe": 7, "interaction": 9, "cost": 7 },
+                "tags": ["死神", "病みかわ", "接触チェキ"],
+                "description": "死神の世界観で統一された暗い空間。病みかわいい、Sっ気など変化球の萌え。"
+            },
+            {
+                "id": 28, "name": "LittleTGV", "category": "鉄道・特殊系",
+                "features": { "energy": 6, "immersion": 7, "moe": 3, "interaction": 5, "cost": 4 },
+                "tags": ["鉄道", "鉄オタ", "家族連れ可"],
+                "description": "本物の鉄道部品がある店内。萌え演技より鉄道知識が武器の乗務員が接客。"
+            },
+            {
+                "id": 29,
+                "name": "ザ・グランヴァニア",
+                "category": "食事・お酒",
+                "features": { "energy": 6, "immersion": 6, "moe": 3, "interaction": 3, "cost": 4 },
+                "tags": ["RPG酒場", "飯が旨い", "コスパ良"],
+                "description": "RPGの酒場風だが客層はリアル。露出は高いが接客はサバサバしたウェイトレススタイル。"
+            },
+             {
+                "id": 33, "name": "アキバギルド", "category": "食事・お酒・特殊系",
+                "features": { "energy": 7, "immersion": 8, "moe": 5, "interaction": 10, "cost": 7 },
+                "tags": ["カジノ", "ポーカー", "会話多"],
+                "description": "カジノテーブルが並ぶ非日常空間。ゲームプレイ中は常に会話が発生し盛り上がる。"
+            },
+            {
+                "id": 35, "name": "MeltTune", "category": "注目店",
+                "features": { "energy": 8, "immersion": 8, "moe": 8, "interaction": 7, "cost": 8 },
+                "tags": ["映え", "話題店", "洗練"],
+                "description": "衣装や内装のプロデュース力が強く映える話題店。ビジュアル採用基準が高い。"
+            },
+             {
+                "id": 36, "name": "Lilliel (リリエル)", "category": "注目店",
+                "features": { "energy": 4, "immersion": 8, "moe": 9, "interaction": 6, "cost": 7 },
+                "tags": ["天使", "透明感", "清楚"],
+                "description": "白を基調とした天使界の設定。儚げな可愛さと癒し重視のソフトな接客。"
+            }
+        ];
+
+        // ==========================================
+        // 2. 質問ロジック (Array of Objects)
+        // ==========================================
+        const questions = [
+            {
+                q: "Q1. 今日の気分の「テンション」は？",
+                options: [
+                    { text: "静かにまったり過ごしたい", val: { energy: -2, interaction: -1 } },
+                    { text: "普通・フラットな気分", val: {} },
+                    { text: "ワイワイ盛り上がりたい！", val: { energy: 2, interaction: 1 } }
+                ]
+            },
+            {
+                q: "Q2. メイドさんの「衣装」の好みは？",
+                options: [
+                    { text: "ロングスカートでクラシカル（上品）", val: { moe: -2, immersion: -1 } },
+                    { text: "膝丈で活動的なベーシックスタイル", val: { moe: 1 } },
+                    { text: "フリフリ・パステル・アイドル風", val: { moe: 2, immersion: 1 } }
+                ]
+            },
+            {
+                q: "Q3. 「魔法」や「おまじない」についてどう思う？",
+                options: [
+                    { text: "正直、恥ずかしいのでナシで…", val: { immersion: -3, energy: -1 } },
+                    { text: "郷に入っては郷に従う", val: { immersion: 1, energy: 1 } },
+                    { text: "全力で「おいしくなーれ！」したい", val: { immersion: 3, energy: 2 } }
+                ]
+            },
+            {
+                q: "Q4. メイドさんとの「会話」のスタンスは？",
+                options: [
+                    { text: "基本は放置してほしい", val: { interaction: -3 } },
+                    { text: "注文や提供の時に少し話すくらい", val: { interaction: 0 } },
+                    { text: "友達みたいにガッツリ話したい", val: { interaction: 3 } }
+                ]
+            },
+            {
+                q: "Q5. 接客されるなら、どっちのタイプが好き？",
+                options: [
+                    { text: "妹系・ドジっ子・元気っ子（タメ口）", val: { moe: 2, interaction: 1 } },
+                    { text: "お姉さん・クール・忠実な使用人（敬語）", val: { moe: -2, interaction: -1 } }
+                ]
+            },
+            {
+                q: "Q6. お店自体の「世界観（設定）」は？",
+                options: [
+                    { text: "普通のカフェや居酒屋に近い方が落ち着く", val: { immersion: -3 } },
+                    { text: "ちょっとしたコンセプトがあるくらい", val: { immersion: 0 } },
+                    { text: "宇宙・海賊・病院…徹底的に作り込んでほしい", val: { immersion: 3 } }
+                ]
+            },
+            {
+                q: "Q7. 今日の「予算」のイメージは？",
+                options: [
+                    { text: "1,000円〜2,000円でサクッと", val: { cost: -3 } },
+                    { text: "2,000円〜4,000円（食事＋チェキなど）", val: { cost: 0 } },
+                    { text: "金額は気にしない、楽しければOK", val: { cost: 3 } }
+                ]
+            },
+            {
+                q: "Q8. 料理やドリンクに求めるものは？",
+                options: [
+                    { text: "味とボリューム（普通の食事がしたい）", val: { immersion: -2, cost: -1 } },
+                    { text: "お絵かきオムライスやオリジナルカクテル（映え重視）", val: { immersion: 2, cost: 1 } }
+                ]
+            },
+            {
+                q: "Q9. 店内の「音（BGM）」の許容度は？",
+                options: [
+                    { text: "落ち着いたBGMが良い", val: { energy: -2 } },
+                    { text: "アニソンやJ-POPが流れているくらい", val: { energy: 0 } },
+                    { text: "マイクパフォーマンスやライブステージ歓迎", val: { energy: 3 } }
+                ]
+            },
+            {
+                q: "Q10. 最後に、今回の「一番の目的」は？",
+                options: [
+                    { text: "「癒やし」と「休息」", val: { energy: -2, interaction: -1 } },
+                    { text: "「非日常体験」と「萌え」", val: { immersion: 2, moe: 2 } },
+                    { text: "キャストや他のお客さんとの「交流」", val: { interaction: 3, energy: 1 } }
+                ]
+            }
+        ];
+
+        // ==========================================
+        // 3. アプリケーション状態管理
+        // ==========================================
+        let currentQuestionIndex = 0;
+        let userVector = { energy: 5, immersion: 5, moe: 5, interaction: 5, cost: 5 };
+        const categories = ["energy", "immersion", "moe", "interaction", "cost"];
+        const categoriesLabel = ["Energy", "Immersion", "Moe", "Interaction", "Cost"];
+
+        // DOM要素
+        const introScreen = document.getElementById('intro-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const progressBar = document.getElementById('progress-bar');
+        const currentQNum = document.getElementById('current-q-num');
+
+        // スタート処理
+        function startQuiz() {
+            introScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            renderQuestion();
+        }
+
+        // 質問描画
+        function renderQuestion() {
+            const q = questions[currentQuestionIndex];
+            
+            // アニメーション用クラスのリセット
+            questionText.classList.remove('fade-in');
+            optionsContainer.classList.remove('fade-in');
+            void questionText.offsetWidth; // trigger reflow
+            questionText.classList.add('fade-in');
+            optionsContainer.classList.add('fade-in');
+
+            questionText.textContent = q.q;
+            currentQNum.textContent = currentQuestionIndex + 1;
+            
+            // プログレスバー更新
+            const progressPercent = ((currentQuestionIndex) / questions.length) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+
+            // 選択肢生成
+            optionsContainer.innerHTML = '';
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-xl border-2 border-pink-100 hover:border-pink-400 hover:bg-pink-50 transition-all font-medium text-gray-700 active:scale-95";
+                btn.textContent = opt.text;
+                btn.onclick = () => handleAnswer(opt.val);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        // 回答処理
+        function handleAnswer(scoreChange) {
+            // スコア加算
+            for (let key in scoreChange) {
+                if (userVector.hasOwnProperty(key)) {
+                    userVector[key] += scoreChange[key];
+                }
+            }
+
+            // 次へ進む
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                renderQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        // 完了・集計処理
+        function finishQuiz() {
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            // ベクトルのクリッピング (1-10)
+            for (let key in userVector) {
+                userVector[key] = Math.max(1, Math.min(10, userVector[key]));
+            }
+
+            // マッチング計算
+            const results = shopsData.map(shop => {
+                let sumSqDiff = 0;
+                categories.forEach(cat => {
+                    sumSqDiff += Math.pow(userVector[cat] - shop.features[cat], 2);
+                });
+                const distance = Math.sqrt(sumSqDiff);
+                // 簡易スコア計算: 最大距離(約20)からの逆算
+                const similarity = Math.max(0, 100 - (distance * 6));
+                return { ...shop, distance, similarity };
+            });
+
+            // ソート
+            results.sort((a, b) => b.similarity - a.similarity);
+            const best = results[0];
+
+            // UI反映: ベストマッチ
+            document.getElementById('result-name').textContent = best.name;
+            document.getElementById('result-category').textContent = best.category;
+            document.getElementById('result-desc').textContent = best.description;
+            document.getElementById('result-score').textContent = best.similarity.toFixed(1) + "%";
+
+            // タグ生成
+            const tagsDiv = document.getElementById('result-tags');
+            tagsDiv.innerHTML = best.tags.map(tag => 
+                `<span class="bg-pink-100 text-pink-600 px-3 py-1 rounded-full text-xs font-bold">#${tag}</span>`
+            ).join('');
+
+            // その他候補生成
+            const othersDiv = document.getElementById('other-candidates');
+            othersDiv.innerHTML = results.slice(1, 4).map((shop, idx) => `
+                <div class="border-b border-gray-100 pb-3 last:border-0">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-gray-700">${idx+2}. ${shop.name}</span>
+                        <span class="text-sm text-pink-500 font-bold">${shop.similarity.toFixed(1)}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-1.5 mb-2">
+                        <div class="bg-pink-400 h-1.5 rounded-full" style="width: ${shop.similarity}%"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 truncate">${shop.description}</p>
+                </div>
+            `).join('');
+
+            // レーダーチャート描画
+            drawChart(best);
+        }
+
+        // チャート描画 (Chart.js)
+        function drawChart(bestShop) {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            // ユーザーデータの配列化
+            const userData = categories.map(c => userVector[c]);
+            // 店舗データの配列化
+            const shopData = categories.map(c => bestShop.features[c]);
+
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: categoriesLabel,
+                    datasets: [{
+                        label: 'あなたの希望',
+                        data: userData,
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(255, 99, 132, 1)'
+                    }, {
+                        label: bestShop.name,
+                        data: shopData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(54, 162, 235, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 10,
+                            ticks: { stepSize: 2, display: false },
+                            pointLabels: {
+                                font: { size: 12, family: "'M PLUS Rounded 1c', sans-serif" }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
