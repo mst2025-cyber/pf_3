@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<title>生成AI関連ゼミ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: "Segoe UI", sans-serif;
+  color: #fff;
+  background: #0b0f19;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* three.js background */
+#bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* UI layer */
+#ui {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 40px 0;
+  overflow-y: auto;
+}
+
+h1 {
+  margin-bottom: 40px;
+  font-size: 36px;
+  text-shadow: 0 3px 10px rgba(0,0,0,0.6);
+}
+
+ul {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 60px;
+  padding: 0 40px;
+
+}
+
+a {
+  display: inline-block;
+  padding: 18px 36px;
+  background: rgba(255,255,255,0.92);
+  border-radius: 14px;
+  text-decoration: none;
+  color: #333;
+  font-size: 22px;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+  transition: 0.25s;
+  backdrop-filter: blur(6px);
+}
+
+a:hover {
+  background: #ffeb3b;
+  transform: scale(1.15);
+  box-shadow:
+    0 0 25px rgba(255,255,0,0.7),
+    0 0 50px rgba(255,255,255,0.8);
+}
+</style>
+</head>
+
+<body>
+
+<div id="bg"></div>
+
+<div id="ui">
+  <h1>Ｍ．Ｇ のポートフォリオ : team-shinyからの内部接続専用ページ</h1>
+  <ul>
+    <li><a href="index1.html">一般向けポートフォリオ</a></li>
+    <li><a href="index0.html">Canvaで制作したポートフォリオ</a></li>
+    <li><a href="maindmap4.html">マインドマップ型内部向けポートフォリオリンク ( D3.js 利用 )</a></li>
+    <li><a href="maindmap2.html">team-shiny内部向けポートフォリオ ( D3.js 利用 )</a></li>
+    <li><a href="const.html">データサイエンス</a></li>
+    <li><a href="semi_gene_ai/index.html">生成ＡＩ初級・中級ゼミ</a></li>
+    <li><a href="semi_python/index.html">pythonゼミ関連</a></li>
+    <li><a href="semi_math/index.html">数学ゼミ関連</a></li>
+    <li><a href="DB_main.html">データベース関連</a></li>
+    <li><a href="semi_effic/effic.html">業務効率化ゼミ【Gemini/GA4/LookerStudio】</a></li>
+    <li><a href="gglclb_main.html">google colab 利用</a></li>
+    <li><a href="semi_prompt/prompt.html">プロンプトゼミからの生成物</a></li>
+    <li><a href="semi_github/wpsamples.html">git&githubゼミよりサンプルHP</a></li>
+    <li><a href="index2.html">old_internal</a></li>
+    <li><a href="index1.html">old_external</a></li>
+  </ul>
+</div>
+
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+/* ---------- scene ---------- */
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x0b0f19, 80, 260);
+
+const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 600);
+camera.position.z = 160;
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setClearColor(0x000000, 0);
+document.getElementById('bg').appendChild(renderer.domElement);
+
+/* ---------- nodes ---------- */
+const NODE_COUNT = 60;
+const nodes = [];
+const velocities = [];
+
+const geo = new THREE.SphereGeometry(0.8, 10, 10);
+
+for (let i = 0; i < NODE_COUNT; i++) {
+  const mat = new THREE.MeshBasicMaterial({
+    color: 0xbfd6ff,
+    transparent: true,
+    opacity: 0.7
+  });
+
+  const m = new THREE.Mesh(geo, mat);
+  m.position.set(
+    (Math.random() - 0.5) * 260,
+    (Math.random() - 0.5) * 160,
+    (Math.random() - 0.5) * 160
+  );
+
+  m.userData.phase = Math.random() * Math.PI * 2;
+
+  velocities.push(new THREE.Vector3(
+    (Math.random() - 0.5) * 0.05,
+    (Math.random() - 0.5) * 0.05,
+    (Math.random() - 0.5) * 0.05
+  ));
+
+  nodes.push(m);
+  scene.add(m);
+}
+
+/* ---------- connections ---------- */
+let lineMesh;
+const BASE_DISTANCE = 42;
+const lineMat = new THREE.LineBasicMaterial({
+  color: 0x6fa3ff,
+  transparent: true,
+  opacity: 0.35
+});
+
+let attractor = null;
+
+function rebuildLines() {
+  if (lineMesh) scene.remove(lineMesh);
+  const pts = [];
+
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      let limit = BASE_DISTANCE;
+      if (attractor && nodes[i].position.distanceTo(attractor) < 120) {
+        limit *= 1.8;
+      }
+      if (nodes[i].position.distanceTo(nodes[j].position) < limit) {
+        pts.push(nodes[i].position, nodes[j].position);
+      }
+    }
+  }
+
+  const g = new THREE.BufferGeometry().setFromPoints(pts);
+  lineMesh = new THREE.LineSegments(g, lineMat);
+  scene.add(lineMesh);
+}
+
+/* ---------- link → attractor ---------- */
+document.querySelectorAll('a').forEach(link => {
+  link.addEventListener('mouseenter', () => {
+    const r = link.getBoundingClientRect();
+    const x = (r.left + r.width / 2) / innerWidth * 2 - 1;
+    const y = -((r.top + r.height / 2) / innerHeight) * 2 + 1;
+    attractor = new THREE.Vector3(x, y, 0.5).unproject(camera);
+  });
+  link.addEventListener('mouseleave', () => attractor = null);
+});
+
+/* ---------- animate ---------- */
+let tick = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  tick++;
+
+  nodes.forEach((n, i) => {
+    n.userData.phase += 0.03;
+    const s = 1 + Math.sin(n.userData.phase) * 0.35;
+    n.scale.setScalar(s);
+
+    n.position.add(velocities[i]);
+
+    ['x','y','z'].forEach(a => {
+      if (Math.abs(n.position[a]) > 130) velocities[i][a] *= -1;
+    });
+
+    if (attractor) {
+      const d = attractor.clone().sub(n.position);
+      if (d.length() < 140) {
+        d.normalize();
+        n.position.add(d.multiplyScalar(0.18));
+      }
+    }
+  });
+
+  if (tick % 6 === 0) rebuildLines();
+  renderer.render(scene, camera);
+}
+animate();
+
+/* ---------- resize ---------- */
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+
+</body>
+</html>
