@@ -1,0 +1,84 @@
+<!DOCTYPE html> 
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>NotebookLMの部屋</title>
+
+   <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #7ce8d5, #6fb3ff, #ff8bd6);
+      background-size: 300% 300%;
+      animation: gradientMove 10s ease infinite;
+      margin: 0;
+      padding: 40px 0;
+      text-align: center;
+      color: #fff;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      color: #ffffff;
+      font-size: 36px;
+      text-shadow: 0 3px 8px rgba(0,0,0,0.3);
+      letter-spacing: 1px;
+    }
+
+    ul {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 40px;
+      padding: 0 50px;  /* ★左右の余白を追加 */
+    }
+
+    li {
+      list-style: none;
+      margin: 15px 0;
+
+    }
+
+    a {
+      display: inline-block;
+      padding: 14px 28px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+      text-decoration: none;
+      color: #333;
+      font-size: 22px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      transition: 0.25s;
+      backdrop-filter: blur(6px);
+    }
+
+    a:hover {
+      background: #ffeb3b;
+      color: #333;
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 6px 18px rgba(255,255,0,0.6), 
+                  0 0 15px rgba(255,255,255,0.8);
+    }
+  </style>
+
+</head>
+<body>
+  <h1>NotebookLMの部屋</h1>
+
+  <ul>
+    <li><a href="pss.pdf">2025/12/10<br>ペロブスカイト太陽電池の<br>エネルギー革命</a></li>
+    <li><a href="Chaos_Engineering.pdf">2026/01/15<br>カオスエンジニアリング<br>戦略的概観</a></li>
+    <li><a href="Industrial_and_Failure.pdf">2026/01/25<br>失敗の解剖学<br>普遍的構造の理解</a></li>
+  </ul>
+
+</body>
+</html>
+
+
+
