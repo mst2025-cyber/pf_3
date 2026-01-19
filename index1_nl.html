@@ -17,6 +17,29 @@
       overflow-x: hidden;
     }
 
+    #gradient-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+
+      background: linear-gradient(
+        90deg,
+        #35175e,
+        #082a24,
+        #254f80,
+        #380d29
+      );
+
+      background-size: 400% 400%;
+      animation: gradientMove 10s ease infinite;
+    }
+
+    @keyframes gradientMove {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
     /* three.js 背景 */
     #bg {
       position: fixed;
@@ -78,6 +101,11 @@
 </head>
 <body>
 
+
+<!-- 最背面：感情・雰囲気レイヤー -->
+<div id="gradient-bg"></div>
+
+<!-- three.js の canvas がここに挿入される -->
 <div id="bg"></div>
 
 

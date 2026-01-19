@@ -12,6 +12,7 @@
    基本レイアウト（ページ全体）
    ================================ */
 html, body {
+  
   margin: 0;
   padding: 0;
   width: 100%;
@@ -20,12 +21,36 @@ html, body {
   color: #fff;
 
   /* 背景色（three.js が透過なので、最背面として見える） */
-  background: #0b0f19;
+  background: transparent; /* ← 重要 */
 
   /* 横スクロールは禁止、縦スクロールは許可 */
   overflow-x: hidden;
   overflow-y: auto;
 }
+
+#gradient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+
+  background: linear-gradient(
+    90deg,
+    #35175e,
+    #082a24,
+    #254f80,
+    #380d29
+  );
+
+  background-size: 400% 400%;
+  animation: gradientMove 10s ease infinite;
+}
+
+@keyframes gradientMove {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 
 /* ================================
    three.js 背景レイヤー
@@ -102,6 +127,9 @@ a.btn {
 </head>
 
 <body>
+
+<!-- 最背面：感情・雰囲気レイヤー -->
+<div id="gradient-bg"></div>
 
 <!-- three.js の canvas がここに挿入される -->
 <div id="bg"></div>
