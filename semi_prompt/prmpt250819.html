@@ -63,6 +63,18 @@
                   0 0 15px rgba(255,255,255,0.8);
     }
 
+    a.btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-icon {
+      width: 320px;
+      height: 320px;
+      object-fit: contain;
+    }
+
     window.addEventListener('popstate', () => {
       if (window.opener) {
         window.close(); // 成功する可能性あり
@@ -81,7 +93,8 @@
     <li><a href="sgab250819_2.html#top3">
       <span style="font-size: 24px;">～手法1: 秋葉原グルメ情報をeラーニング化～<br>（ＷＥＢアプリケーション化）</span><br>
       <span style="font-size: 18px;">① NotebookLMでグルメ情報を収集し、質問集を作成させる。</span><br>
-      <span style="font-size: 18px;">② Gemini 2.5 Proでグイズアプリ化</span>
+      <span style="font-size: 18px;">② Gemini 2.5 Proでグイズアプリ化</span><br>
+      <img src="../images/akibagou.jpg" alt="" class="btn-icon">
     </a></li>
 
     <li><a href="gquiz.html">
@@ -106,7 +119,8 @@
     <li><a href="sgab250819_2.html#top4">
       <span style="font-size: 24px;">～手法2：メイドカフェ自分好み分析マッチング～</span><br>
       <span style="font-size: 18px;">① NotebookLMで秋葉原メイドカフェ情報を整理する</span><br>
-      <span style="font-size: 18px;">② Gemini 2.5 Proでメイドカフェの好みを分析する</span>
+      <span style="font-size: 18px;">② Gemini 2.5 Proでメイドカフェの好みを分析する</span><br>
+      <img src="../images/mcafe.jpg" alt="" class="btn-icon">
     </a></li>
 
     <li><a href="../selfdep/sgab251226.html#top1">
