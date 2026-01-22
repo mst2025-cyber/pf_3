@@ -6,37 +6,60 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  font-family: "Segoe UI", sans-serif;
-  color: #ffffff;
-  background: transparent; /* ← three.js に任せる */
-  overflow-x: hidden;
-}
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      font-family: "Segoe UI", sans-serif;
+      color: #ffffff;
+      background: transparent; /* ← three.js に任せる */
+      overflow-x: hidden;
+    }
 
-/* three.js 背景 */
-#bg {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-}
+    #gradient-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
 
-/* UI 全体 */
-body {
-  position: relative;
-  z-index: 1;
-}
+      background: linear-gradient(
+        90deg,
+        #35175e,
+        #082a24,
+        #254f80,
+        #380d29
+      );
 
-/* UI の見た目（今まで通り） */
-.content {
-  padding: 40px 0;        /* ← 余白はここ */
-  text-align: center;
-}
+      background-size: 400% 400%;
+      animation: gradientMove 10s ease infinite;
+    }
 
+    @keyframes gradientMove {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* three.js 背景 */
+    #bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: transparent; /* ← three.js に任せる */
+    }
+
+    /* UI 全体 */
+    body {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* UI の見た目（今まで通り） */
+    .content {
+      padding: 40px 0;        /* ← 余白はここ */
+      text-align: center;
+    }
 
     h1 {
       margin-bottom: 30px;
@@ -79,15 +102,23 @@ body {
 </head>
 <body>
 
+
+<!-- 最背面：感情・雰囲気レイヤー -->
+<div id="gradient-bg"></div>
+
+<!-- three.js の canvas がここに挿入される -->
 <div id="bg"></div>
+
+<!-- UI コンテンツ -->
+<div id="ui">
 
 
 <div class="content">
   <h1>生成ＡＩ関連ゼミ</h1>
 
   <ul>
-    <li><a href="semi_gene_ai_bg/semi_gene_ai_bg.html">生成AI初級ゼミ</a></li>
-    <li><a href="semi_gene_ai_md/semi_gene_ai_md.html">生成AI中級ゼミ</a></li>
+    <li><a href="semi_gene_ai_bg/semi_gene_ai_bg.html">生成AI初級ゼミ<br><img src="../images/ai_bg.jpg" alt="初級ゼミ" width="300"></a></li>
+    <li><a href="semi_gene_ai_md/semi_gene_ai_md.html">生成AI中級ゼミ<br><img src="../images/ai_mid.jpg" alt="中級ゼミ" width="300"></a></li>
   </ul>
 </div>
 
@@ -122,7 +153,7 @@ let lineMesh;
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setClearColor(0x0b0f19, 1);
+renderer.setClearColor(0x000000, 0);
 container.appendChild(renderer.domElement);
 
 function rebuildConnections() {
