@@ -22,6 +22,16 @@
       100% { background-position: 0% 50%; }
     }
 
+    /* ================================
+      three.js 背景レイヤー
+      ================================ */
+    #bg {
+      position: fixed;      /* スクロールしても常に固定 */
+      inset: 0;             /* top/right/bottom/left を一括指定 */
+      z-index: 0;           /* UIより背面 */
+      pointer-events: none; /* マウス操作をUIに透過 */
+    }
+
     h1 {
       margin-bottom: 30px;
       color: #ffffff;
@@ -82,22 +92,221 @@
 
 </head>
 <body>
-  <h1>生成AIプロンプトゼミでのカリキュラム</h1>
+  <!-- 最背面：感情・雰囲気レイヤー -->
+  <div id="gradient-bg"></div>
 
-  <ul>
-    <li><a href="prmpt251210.html">2025/12/10:金属加工業 2035年の未来予測</a></li>
-    <li><a href="prmpt251203.html">2025/12/03:【上流工程】AIを活用した創造的アイデア創出・発展技法の実践講座「リモートワーク・コミュニケーションの次なる一手」</a></li>
-    <li><a href="prmpt251126.html">2025/11/26:「ロジカルな発想でAIと共想するアイデア発想術」part3 金属加工業 2035年の未来予測</a></li>
-    <li><a href="prmpt251119.html">2025/11/19:特別ゼミ AIを活用した「アイデア発想術」「ロジカルな発想でAIと共想するアイデア発想術」 ファシリテータ：sakioAKI</a></li>
-    <li><a href="prmpt251005.html">2025/11/05:【上流工程】多視点ブレインストーミングによる副業（副収入）アイデア</a></li>
-    <li><a href="prmpt250819.html">2025/08/19:NotebookLMとGemini2.5 Proを活用した業務生産性向上セミナー ファシリテータ：sakioAKI
-        <br><img src="../images/akibagou.jpg"" class="btn-icon">
-        <img src="../images/mcafe.jpg"" class="btn-icon"></a></li>
-    <li><a href="../const.html">サンプル9のページ</a></li>
-    <li><a href="../const.html">サンプル10のページ</a></li>
-  </ul>
+  <!-- three.js の canvas がここに挿入される -->
+  <div id="bg"></div>
 
+  <div class="content"> 
+
+    <h1>生成AIプロンプトゼミでのカリキュラム</h1>
+
+    <ul>
+      <li><a href="prmpt251210.html">2025/12/10:金属加工業 2035年の未来予測</a></li>
+      <li><a href="prmpt251203.html">2025/12/03:【上流工程】AIを活用した創造的アイデア創出・発展技法の実践講座「リモートワーク・コミュニケーションの次なる一手」</a></li>
+      <li><a href="prmpt251126.html">2025/11/26:「ロジカルな発想でAIと共想するアイデア発想術」part3 金属加工業 2035年の未来予測</a></li>
+      <li><a href="prmpt251119.html">2025/11/19:特別ゼミ AIを活用した「アイデア発想術」「ロジカルな発想でAIと共想するアイデア発想術」 ファシリテータ：sakioAKI</a></li>
+      <li><a href="prmpt251005.html">2025/11/05:【上流工程】多視点ブレインストーミングによる副業（副収入）アイデア</a></li>
+      <li><a href="prmpt250819.html">2025/08/19:NotebookLMとGemini2.5 Proを活用した業務生産性向上セミナー ファシリテータ：sakioAKI
+          <br><img src="../images/akibagou.jpg"" class="btn-icon">
+          <img src="../images/mcafe.jpg"" class="btn-icon"></a></li>
+      <li><a href="../const.html">サンプル9のページ</a></li>
+      <li><a href="../const.html">サンプル10のページ</a></li>
+    </ul>
+  </div>
 </body>
+
+<script type="module">
+/* ================================
+   three.js モジュール読み込み
+   ================================ */
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+/* ================================
+   シーン全体の設定
+   ================================ */
+const scene = new THREE.Scene();
+
+/* 霧：奥に行くほど暗くなり、奥行き感を演出 */
+scene.fog = new THREE.Fog(0x0b0f19, 80, 260);
+
+/* カメラ設定（視野角 / アスペクト / 近・遠） */
+const camera = new THREE.PerspectiveCamera(
+  60,
+  innerWidth / innerHeight,
+  0.1,
+  600
+);
+camera.position.z = 160;
+
+/* レンダラー（透過Canvas） */
+const renderer = new THREE.WebGLRenderer({
+  antialias: true,
+  alpha: true
+});
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setClearColor(0x000000, 0); // 完全透過
+document.getElementById('bg').appendChild(renderer.domElement);
+
+/* ================================
+   ノード（ニューロン）生成
+   ================================ */
+const NODE_COUNT = 60;
+const nodes = [];
+const velocities = [];
+
+/* 球体ジオメトリ（全ノード共通） */
+const geo = new THREE.SphereGeometry(0.8, 10, 10);
+
+for (let i = 0; i < NODE_COUNT; i++) {
+  /* ノードのマテリアル */
+  const mat = new THREE.MeshBasicMaterial({
+    color: 0xbfd6ff,
+    transparent: true,
+    opacity: 0.7
+  });
+
+  /* ノード本体 */
+  const m = new THREE.Mesh(geo, mat);
+
+  /* ランダム配置（立体空間） */
+  m.position.set(
+    (Math.random() - 0.5) * 260,
+    (Math.random() - 0.5) * 160,
+    (Math.random() - 0.5) * 160
+  );
+
+  /* 脈動用の位相 */
+  m.userData.phase = Math.random() * Math.PI * 2;
+
+  /* 移動速度ベクトル */
+  velocities.push(new THREE.Vector3(
+    (Math.random() - 0.5) * 0.05,
+    (Math.random() - 0.5) * 0.05,
+    (Math.random() - 0.5) * 0.05
+  ));
+
+  nodes.push(m);
+  scene.add(m);
+}
+
+/* ================================
+   ノード間の線（シナプス）
+   ================================ */
+let lineMesh;
+const BASE_DISTANCE = 42;
+
+/* 線のマテリアル */
+const lineMat = new THREE.LineBasicMaterial({
+  color: 0x6fa3ff,
+  transparent: true,
+  opacity: 0.35
+});
+
+/* 注目点（リンクhover時に設定） */
+let attractor = null;
+
+/* 線を再生成（思考の再配線） */
+function rebuildLines() {
+  if (lineMesh) scene.remove(lineMesh);
+  const pts = [];
+
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      let limit = BASE_DISTANCE;
+
+      /* 注目点付近では接続距離を拡張 */
+      if (attractor && nodes[i].position.distanceTo(attractor) < 120) {
+        limit *= 1.8;
+      }
+
+      if (nodes[i].position.distanceTo(nodes[j].position) < limit) {
+        pts.push(nodes[i].position, nodes[j].position);
+      }
+    }
+  }
+
+  const g = new THREE.BufferGeometry().setFromPoints(pts);
+  lineMesh = new THREE.LineSegments(g, lineMat);
+  scene.add(lineMesh);
+}
+
+/* ================================
+   リンク hover → 注目点生成
+   ================================ */
+document.querySelectorAll('a').forEach(link => {
+  link.addEventListener('mouseenter', () => {
+    const r = link.getBoundingClientRect();
+
+    /* DOM座標 → 正規化デバイス座標 */
+    const x = (r.left + r.width / 2) / innerWidth * 2 - 1;
+    const y = -((r.top + r.height / 2) / innerHeight) * 2 + 1;
+
+    /* NDC → three.js ワールド座標 */
+    attractor = new THREE.Vector3(x, y, 0.5).unproject(camera);
+  });
+
+  link.addEventListener('mouseleave', () => attractor = null);
+});
+
+/* ================================
+   アニメーションループ
+   ================================ */
+let tick = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  tick++;
+
+// 基準となる「思考の中心」
+const HOME = new THREE.Vector3(0, 0, 0);
+
+
+  nodes.forEach((n, i) => {
+    /* 脈動（生体感） */
+    n.userData.phase += 0.03;
+    const s = 1 + Math.sin(n.userData.phase) * 0.35;
+    n.scale.setScalar(s);
+
+    /* 通常移動 */
+    n.position.add(velocities[i]);
+
+    /* 境界反射 */
+    ['x','y','z'].forEach(a => {
+      if (Math.abs(n.position[a]) > 130) velocities[i][a] *= -1;
+    });
+
+    /* 注目点への引力 */
+    if (attractor) {
+      const d = attractor.clone().sub(n.position);
+      if (d.length() < 140) {
+        d.normalize();
+        n.position.add(d.multiplyScalar(0.38));
+      }
+    } else {
+        // 🔹 注目解除：ゆっくり元へ戻る
+        n.position.lerp(HOME, 0.001);
+    }
+  });
+
+  /* 定期的に配線を更新 */
+  if (tick % 6 === 0) rebuildLines();
+
+  renderer.render(scene, camera);
+}
+animate();
+
+/* ================================
+   リサイズ対応
+   ================================ */
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+
 </html>
 
 
