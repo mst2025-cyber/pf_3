@@ -1,0 +1,516 @@
+<!--
+PLAN NARRATIVE & STRUCTURE:
+1. Header: Engaging Title and Subtitle based on the "2025 Strategy" theme.
+2. Introduction: Sets the context of Data Collection as a strategic asset.
+3. Section 1: The 4 Approaches (Overview).
+   - Visualization: Donut Chart (Chart.js) showing a conceptual resource distribution among the 4 types to illustrate balance.
+   - Text: Explains Human, System, External, and Technical methods.
+4. Section 2: Comparative Analysis (Pros/Cons).
+   - Visualization: Radar Chart (Chart.js) comparing System, External, and Technical methods on axes like Speed, Depth, Cost, and Scalability.
+   - Text: Deep dive into the trade-offs (e.g., Speed vs. Depth).
+5. Section 3: Strategic Matrix (The "Sho-Chiku-Bai" / Pine-Bamboo-Plum).
+   - Visualization: HTML/CSS Grid (Heatmap style). No Canvas needed here as it's text-heavy. Used Tailwind for layout.
+   - Text: Guidance on selecting Low, Mid, or High resource paths based on objectives.
+6. Section 4: Action Roadmap.
+   - Visualization: Vertical Timeline using Tailwind borders and CSS shapes (No SVG).
+   - Text: Phased approach from PoC to Differentiation.
+7. Footer: Summary and CTA.
+
+PALETTE: "Vibrant Professional"
+- Background: #F3F4F6 (Light Gray)
+- Cards: #FFFFFF (White)
+- Primary Text: #1F2937 (Gray-900)
+- Accents: 
+  - Blue: #3B82F6 (System)
+  - Pink: #EC4899 (Human)
+  - Yellow: #F59E0B (External)
+  - Teal: #10B981 (Technical)
+
+CONFIRMATION:
+- NO SVG used.
+- NO Mermaid JS used.
+- Charts implemented via Chart.js (Canvas).
+- Icons using Unicode/CSS.
+-->
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>データ収集戦略インフォグラフィック 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #F3F4F6;
+            color: #1F2937;
+        }
+
+        /* Chart Container Styling Rules */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px; /* Tailwind max-w-xl approx equivalent */
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px; /* Base height */
+            max-height: 400px;
+        }
+
+        @media (max-width: 640px) {
+            .chart-container {
+                height: 280px;
+            }
+        }
+
+        /* Custom Scrollbar for a polished look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-blue-200">
+
+    <!-- Header Section -->
+    <header class="bg-slate-900 text-white py-12 px-4 shadow-lg">
+        <div class="max-w-6xl mx-auto text-center">
+            <h1 class="text-3xl md:text-5xl font-bold mb-4 tracking-tight">データ収集戦略 2025</h1>
+            <p class="text-xl md:text-2xl text-blue-200 font-light">手法の全体像と最適解の選択：インサイトからAI学習データまで</p>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="max-w-6xl mx-auto p-4 md:p-8 space-y-12">
+
+        <!-- INTRO -->
+        <section class="bg-white rounded-xl shadow-md p-6 md:p-8 border-l-8 border-blue-500">
+            <h2 class="text-2xl font-bold mb-4 text-slate-800">戦略的データ収集の重要性</h2>
+            <p class="text-gray-600 leading-relaxed text-lg">
+                データは現代のビジネスにおける「原油」ですが、ただ集めるだけでは価値を生み出しません。
+                目的（AI学習、マーケティング、業務改善）に合わせて、「人」「システム」「外部」「技術」の4つのアプローチを適切に組み合わせることが重要です。
+                本インフォグラフィックでは、コストとリソースに応じた最適な収集戦略を可視化します。
+            </p>
+        </section>
+
+        <!-- SECTION 1: 4 APPROACHES OVERVIEW -->
+        <section>
+            <div class="mb-6">
+                <h3 class="text-2xl font-bold text-slate-800 border-b-2 border-gray-200 pb-2 mb-2">1. データ収集の4つのアプローチ</h3>
+                <p class="text-gray-600">
+                    データ収集の手法は大きく4つに分類されます。それぞれの特性を理解し、プロジェクトのポートフォリオを組むことが成功への第一歩です。
+                    以下のチャートは、先進的なデータ活用企業における、理想的な収集リソースの配分イメージを示しています。
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-white rounded-xl shadow-md p-6">
+                <!-- Text Content -->
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <span class="text-2xl mr-3">👤</span>
+                        <div>
+                            <h4 class="font-bold text-pink-600">① 「人」から集める (能動的)</h4>
+                            <p class="text-sm text-gray-600">アンケートやインタビュー。ユーザーの深いインサイトや「Why（感情）」を知るのに最適。</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-2xl mr-3">🖥️</span>
+                        <div>
+                            <h4 class="font-bold text-blue-600">② 「システム」から集める (受動的)</h4>
+                            <p class="text-sm text-gray-600">ログ解析やIoTセンサー。事実（Fact）や量をリアルタイムに捕捉する。</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-2xl mr-3">🌐</span>
+                        <div>
+                            <h4 class="font-bold text-yellow-600">③ 「外部」を活用する (既存資産)</h4>
+                            <p class="text-sm text-gray-600">オープンデータやSNS分析。自社外の市場環境や競合動向を把握する。</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-2xl mr-3">🤖</span>
+                        <div>
+                            <h4 class="font-bold text-teal-600">④ 技術で「作る」 (生成AI・拡張)</h4>
+                            <p class="text-sm text-gray-600">合成データやシミュレーション。AI学習用データの不足解消やレアケース生成に。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visualization: Donut Chart -->
+                <div class="flex flex-col items-center justify-center">
+                    <div class="chart-container">
+                        <canvas id="approachesChart"></canvas>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2 text-center">※リソース配分の一例</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: PROS & CONS ANALYSIS -->
+        <section>
+            <div class="mb-6">
+                <h3 class="text-2xl font-bold text-slate-800 border-b-2 border-gray-200 pb-2 mb-2">2. 手法の特性比較</h3>
+                <p class="text-gray-600">
+                    すべてに優れた万能な手法は存在しません。例えば、システムログは正確ですが「感情」は見えません。
+                    外部データは即効性がありますが、権利リスクがあります。以下のレーダーチャートで、主要な3つのアプローチの強みと弱みを比較します。
+                </p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Cards showing Pros/Cons -->
+                    <div class="col-span-1 md:col-span-1 space-y-4">
+                        <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                            <h4 class="font-bold text-blue-800 mb-1">システム収集 (受動)</h4>
+                            <p class="text-xs text-blue-900 font-bold">メリット: 客観性・リアルタイム性</p>
+                            <p class="text-xs text-gray-600 mt-1">リスク: ノイズが多く、理由(Why)が不明</p>
+                        </div>
+                        <div class="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-500">
+                            <h4 class="font-bold text-yellow-800 mb-1">外部活用 (既存)</h4>
+                            <p class="text-xs text-yellow-900 font-bold">メリット: スピード・網羅性</p>
+                            <p class="text-xs text-gray-600 mt-1">リスク: 権利関係・データ形式の不統一</p>
+                        </div>
+                        <div class="bg-teal-50 p-4 rounded-lg border-l-4 border-teal-500">
+                            <h4 class="font-bold text-teal-800 mb-1">技術生成 (AI)</h4>
+                            <p class="text-xs text-teal-900 font-bold">メリット: プライバシーフリー・レアケース</p>
+                            <p class="text-xs text-gray-600 mt-1">リスク: 実世界との乖離 (Sim-to-Real)</p>
+                        </div>
+                    </div>
+
+                    <!-- Visualization: Radar Chart -->
+                    <div class="col-span-1 md:col-span-2 flex flex-col justify-center items-center">
+                        <div class="chart-container">
+                            <canvas id="comparisonRadar"></canvas>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-4 text-center max-w-lg">
+                            <span class="inline-block w-3 h-3 bg-blue-500 rounded-full mr-1"></span>システムは客観性と量に優れ、
+                            <span class="inline-block w-3 h-3 bg-yellow-500 rounded-full mr-1"></span>外部活用はスピードに長け、
+                            <span class="inline-block w-3 h-3 bg-teal-500 rounded-full mr-1"></span>技術生成は制御性とプライバシーに強みを持ちます。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: STRATEGY MATRIX -->
+        <section>
+            <div class="mb-6">
+                <h3 class="text-2xl font-bold text-slate-800 border-b-2 border-gray-200 pb-2 mb-2">3. 戦略マトリクス：目的 × リソース</h3>
+                <p class="text-gray-600">
+                    予算と期間（リソース）に応じて、取るべきアクションは異なります。
+                    「梅（ローリソース）」から始め、「竹（実運用）」で自動化し、「松（差別化）」で独自の強みを築くのが定石です。
+                </p>
+            </div>
+
+            <div class="overflow-x-auto bg-white rounded-xl shadow-md p-2">
+                <div class="min-w-[700px] grid grid-cols-4 gap-2 text-sm">
+                    
+                    <!-- Header Row -->
+                    <div class="bg-slate-800 text-white p-4 rounded-tl-lg flex items-center justify-center font-bold">目的 \ リソース</div>
+                    <div class="bg-slate-100 text-slate-700 p-4 font-bold flex flex-col items-center justify-center border-t-4 border-gray-400">
+                        <span class="text-lg">【梅】Low Resource</span>
+                        <span class="text-xs font-normal">無料・即日・PoC</span>
+                    </div>
+                    <div class="bg-slate-100 text-slate-700 p-4 font-bold flex flex-col items-center justify-center border-t-4 border-blue-500">
+                        <span class="text-lg">【竹】Mid Resource</span>
+                        <span class="text-xs font-normal">SaaS・月数万・実運用</span>
+                    </div>
+                    <div class="bg-slate-100 text-slate-700 p-4 rounded-tr-lg font-bold flex flex-col items-center justify-center border-t-4 border-purple-600">
+                        <span class="text-lg">【松】High Resource</span>
+                        <span class="text-xs font-normal">独自開発・半年〜・差別化</span>
+                    </div>
+
+                    <!-- Row A: Market Analysis -->
+                    <div class="bg-slate-50 p-4 font-bold flex items-center border-l-4 border-slate-300">
+                        A. 市場把握・競合分析
+                    </div>
+                    <div class="bg-white p-4 border border-slate-100 rounded hover:shadow-lg transition duration-300">
+                        <div class="font-bold text-gray-800 mb-2">① 手動 & 無料ツール</div>
+                        <ul class="list-disc list-inside text-xs text-gray-600 space-y-1">
+                            <li>Google検索 / e-Stat</li>
+                            <li>無料版スクレイピング</li>
+                        </ul>
+                    </div>
+                    <div class="bg-blue-50 p-4 border border-blue-100 rounded hover:shadow-lg transition duration-300">
+                        <div class="font-bold text-blue-900 mb-2">② 有料API & SaaS</div>
+                        <ul class="list-disc list-inside text-xs text-gray-600 space-y-1">
+                            <li>SimilarWeb / SNS分析</li>
+                            <li>APIによる定期収集</li>
+                        </ul>
+                    </div>
+                    <div class="bg-purple-50 p-4 border border-purple-100 rounded hover:shadow-lg transition duration-300">
+                        <div class="font-bold text-purple-900 mb-2">③ データ購入・独自網</div>
+                        <ul class="list-disc list-inside text-xs text-gray-600 space-y-1">
+                            <li>調査会社データ購入</li>
+                            <li>大規模クローラー開発</li>
+                        </ul>
+                    </div>
+
+                    <!-- Row B: Operation Improvement -->
+                    <div class="bg-slate-50 p-4 font-bold flex items-center border-l-4 border-slate-300">
+                        B. 業務改善・可視化
+                    </div>
+                    <div class="bg-white p-4 border border-slate-100 rounded hover:shadow-lg transition duration-300">
+                        <div class="font-bold text-gray-800 mb-2">④ 既存ログ & スマホ</div>
+                        <ul class="list-disc list-inside text-xs text-gray-600 space-y-1">
+                            <li>GA4標準解析</li>
+                            <li>スマホセンサー活用</li>
+                        </ul>
+                    </div>
+                    <div class="bg-blue-50 p-4 border border-blue-100 rounded hover:shadow-lg transition duration-300">
+                        <div class="font-bold text-blue-900 mb-2">⑤ SaaS連携 & 簡易IoT</div>
+                        <ul class="list-disc list-inside text-xs text-gray-600 space-y-1">
+                            <li>Zapier自動化</li>
+                            <li>ラズパイ等の安価設置</li>
+                        </ul>
+                    </div>
+                    <div class="bg-purple-50 p-4 border border-purple-100 rounded hover:shadow-lg transition duration-300">
+                        <div class="font-bold text-purple-900 mb-2">⑥ 基盤 & デジタルツイン</div>
+                        <ul class="list-disc list-inside text-xs text-gray-600 space-y-1">
+                            <li>DWH構築 (Snowflake等)</li>
+                            <li>工場全体IoT化</li>
+                        </ul>
+                    </div>
+
+                    <!-- Row C: AI Development -->
+                    <div class="bg-slate-50 p-4 font-bold flex items-center rounded-bl-lg border-l-4 border-slate-300">
+                        C. AI開発・精度向上
+                    </div>
+                    <div class="bg-white p-4 border border-slate-100 rounded hover:shadow-lg transition duration-300">
+                        <div class="font-bold text-gray-800 mb-2">⑦ 公開データ & 転移学習</div>
+                        <ul class="list-disc list-inside text-xs text-gray-600 space-y-1">
+                            <li>Kaggleデータセット</li>
+                            <li>学習済みモデル利用</li>
+                        </ul>
+                    </div>
+                    <div class="bg-blue-50 p-4 border border-blue-100 rounded hover:shadow-lg transition duration-300">
+                        <div class="font-bold text-blue-900 mb-2">⑧ クラウドソーシング</div>
+                        <ul class="list-disc list-inside text-xs text-gray-600 space-y-1">
+                            <li>人力アノテーション</li>
+                            <li>画像増強ライブラリ</li>
+                        </ul>
+                    </div>
+                    <div class="bg-purple-50 p-4 border border-purple-100 rounded rounded-br-lg hover:shadow-lg transition duration-300">
+                        <div class="font-bold text-purple-900 mb-2">⑨ 合成データ & Sim</div>
+                        <ul class="list-disc list-inside text-xs text-gray-600 space-y-1">
+                            <li>生成AIによるデータ作成</li>
+                            <li>物理シミュレーション</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: ROADMAP -->
+        <section>
+            <div class="mb-6">
+                <h3 class="text-2xl font-bold text-slate-800 border-b-2 border-gray-200 pb-2 mb-2">4. 推奨アクションプラン</h3>
+                <p class="text-gray-600">
+                    いきなり大規模な投資をするのではなく、フェーズごとに着実にステップアップすることで、失敗のリスクを最小限に抑えられます。
+                </p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-8 relative">
+                <!-- Timeline connector line -->
+                <div class="absolute left-8 top-8 bottom-8 w-1 bg-gray-200 hidden md:block"></div>
+
+                <div class="space-y-8">
+                    <!-- Phase 1 -->
+                    <div class="relative pl-0 md:pl-12">
+                        <!-- Circle Marker -->
+                        <div class="absolute left-6 top-1 w-5 h-5 bg-gray-400 rounded-full border-4 border-white transform -translate-x-1/2 hidden md:block"></div>
+                        
+                        <div class="bg-gray-50 border-l-4 border-gray-400 p-5 rounded shadow-sm">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="text-xl font-bold text-gray-700">Phase 1: 検証 (PoC)</h4>
+                                <span class="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded">Start Here</span>
+                            </div>
+                            <p class="text-gray-600 mb-2 font-bold">【梅】ローリソース活用：まずは「無料・手動」でデータの有用性を確認する。</p>
+                            <p class="text-sm text-gray-500">例: オープンデータの分析、既存ログの確認、手動でのサンプル収集。</p>
+                        </div>
+                    </div>
+
+                    <!-- Phase 2 -->
+                    <div class="relative pl-0 md:pl-12">
+                        <!-- Circle Marker -->
+                        <div class="absolute left-6 top-1 w-5 h-5 bg-blue-500 rounded-full border-4 border-white transform -translate-x-1/2 hidden md:block"></div>
+                        
+                        <div class="bg-blue-50 border-l-4 border-blue-500 p-5 rounded shadow-sm">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="text-xl font-bold text-blue-700">Phase 2: 実装・効率化</h4>
+                                <span class="bg-blue-200 text-blue-800 text-xs px-2 py-1 rounded">Scale Up</span>
+                            </div>
+                            <p class="text-gray-700 mb-2 font-bold">【竹】SaaS・API投資：収集作業を自動化し、分析に時間を割く。</p>
+                            <p class="text-sm text-gray-600">例: 有料ツールの導入、アノテーション外注、IoTセンサー設置。</p>
+                        </div>
+                    </div>
+
+                    <!-- Phase 3 -->
+                    <div class="relative pl-0 md:pl-12">
+                        <!-- Circle Marker -->
+                        <div class="absolute left-6 top-1 w-5 h-5 bg-purple-600 rounded-full border-4 border-white transform -translate-x-1/2 hidden md:block"></div>
+                        
+                        <div class="bg-purple-50 border-l-4 border-purple-600 p-5 rounded shadow-sm">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="text-xl font-bold text-purple-800">Phase 3: 差別化</h4>
+                                <span class="bg-purple-200 text-purple-900 text-xs px-2 py-1 rounded">Unique Value</span>
+                            </div>
+                            <p class="text-gray-700 mb-2 font-bold">【松】独自資産化：他社が持っていないデータを創出する。</p>
+                            <p class="text-sm text-gray-600">例: 大規模シミュレーション環境構築、独自データ基盤整備。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-300 py-8 mt-12 text-center">
+        <div class="max-w-4xl mx-auto px-4">
+            <h5 class="text-lg font-bold text-white mb-2">Next Step</h5>
+            <p class="mb-6">現在のプロジェクトが「どのフェーズ」で「何の目的」かを特定し、マトリクスの該当セルから具体的なツール選定を開始してください。</p>
+            <p class="text-xs text-slate-500">&copy; 2025 Data Strategy Team. Generated based on brainstorming session.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts for Chart.js -->
+    <script>
+        // Utility: Wrap labels for Chart.js
+        function wrapLabel(str, maxChars) {
+            const words = str.split(''); // Splitting by char for Japanese text wrapping
+            const lines = [];
+            let currentLine = words[0];
+
+            for (let i = 1; i < words.length; i++) {
+                if (currentLine.length + 1 <= maxChars) {
+                    currentLine += words[i];
+                } else {
+                    lines.push(currentLine);
+                    currentLine = words[i];
+                }
+            }
+            lines.push(currentLine);
+            return lines;
+        }
+
+        // Shared Tooltip Configuration
+        const sharedTooltipConfig = {
+            callbacks: {
+                title: function(tooltipItems) {
+                    const item = tooltipItems[0];
+                    let label = item.chart.data.labels[item.dataIndex];
+                    if (Array.isArray(label)) {
+                        return label.join('');
+                    } else {
+                        return label;
+                    }
+                }
+            }
+        };
+
+        // 1. Donut Chart (Overview)
+        const ctxApproaches = document.getElementById('approachesChart').getContext('2d');
+        new Chart(ctxApproaches, {
+            type: 'doughnut',
+            data: {
+                // Pre-wrapped labels
+                labels: [
+                    wrapLabel('① 人 (能動的)', 10),
+                    wrapLabel('② システム (受動的)', 10),
+                    wrapLabel('③ 外部 (既存資産)', 10),
+                    wrapLabel('④ 技術 (生成AI)', 10)
+                ],
+                datasets: [{
+                    data: [20, 35, 30, 15], // Representative distribution
+                    backgroundColor: [
+                        '#EC4899', // Pink (Human)
+                        '#3B82F6', // Blue (System)
+                        '#F59E0B', // Yellow (External)
+                        '#14B8A6'  // Teal (Tech)
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { font: { family: "'Noto Sans JP', sans-serif" } }
+                    },
+                    tooltip: sharedTooltipConfig,
+                    title: {
+                        display: true,
+                        text: '推奨リソース配分イメージ',
+                        font: { size: 16, family: "'Noto Sans JP', sans-serif" }
+                    }
+                }
+            }
+        });
+
+        // 2. Radar Chart (Comparison)
+        const ctxRadar = document.getElementById('comparisonRadar').getContext('2d');
+        new Chart(ctxRadar, {
+            type: 'radar',
+            data: {
+                labels: ['客観性・事実', 'リアルタイム性', 'コスト効率', '情報の深さ (Why)', 'プライバシー/安全性'],
+                datasets: [{
+                    label: '② システム収集',
+                    data: [5, 5, 4, 1, 3],
+                    borderColor: '#3B82F6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                    pointBackgroundColor: '#3B82F6'
+                }, {
+                    label: '③ 外部活用',
+                    data: [3, 4, 5, 2, 2],
+                    borderColor: '#F59E0B',
+                    backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                    pointBackgroundColor: '#F59E0B'
+                }, {
+                    label: '④ 技術生成',
+                    data: [4, 3, 3, 1, 5],
+                    borderColor: '#14B8A6',
+                    backgroundColor: 'rgba(20, 184, 166, 0.2)',
+                    pointBackgroundColor: '#14B8A6'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: { color: '#E5E7EB' },
+                        grid: { color: '#E5E7EB' },
+                        pointLabels: {
+                            font: { size: 12, family: "'Noto Sans JP', sans-serif" },
+                            color: '#4B5563'
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 5
+                    }
+                },
+                plugins: {
+                    tooltip: sharedTooltipConfig,
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
