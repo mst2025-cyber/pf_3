@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IDとClassの使い分け例</title>
+  <style>
+    /* 1. すべてのカードに共通するスタイル (class) */
+    .card {
+      border: 2px solid #4CAF50; /* 緑色の枠線 */
+      padding: 20px;
+      margin: 10px 0;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+    }
+
+    /* 2. 特定の要素だけ上書きするスタイル (id) */
+    #special-card {
+      background-color: #fff9c4; /* 薄い黄色 */
+      border-color: #ff9800;    /* オレンジの枠線 */
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>ユーザーA</h1>
+    <p>こちらは共通のデザイン（class="card"）が適用されています。</p>
+  </div>
+
+  <div class="card" id="special-card">
+    <h3>ユーザーB（特別）</h3>
+    <p>classで共通設定を使いつつ、idで個別の色を指定しています。</p>
+  </div>
+
+  <div class="card">
+    <h3>ユーザーC</h3>
+    <p>再び共通のデザインです。</p>
+  </div>
+
+</body>
+</html>
