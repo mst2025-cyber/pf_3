@@ -11,6 +11,22 @@
       background-color: #000;
       font-family: sans-serif;
     }
+
+    /* ================================
+    three.js 背景レイヤー
+    ================================ */
+    #bg {
+      position: fixed;      /* スクロールしても常に固定 */
+      inset: 0;             /* top/right/bottom/left を一括指定 */
+      z-index: 0;           /* UIより背面 */
+      pointer-events: none; /* マウス操作をUIに透過 */
+      margin: 0; 
+      overflow: hidden; 
+      background-color: #000;
+      font-family: sans-serif;
+      background: transparent; /* ← 重要 */
+    }
+
     #ui {
       position: absolute;
       top: 20px;
@@ -19,9 +35,74 @@
       pointer-events: none;
       text-shadow: 1px 1px 2px black;
     }
+        /* UI 全体 */
+    body {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* UI の見た目（今まで通り） */
+    .content {
+      padding: 40px 0;        /* ← 余白はここ */
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      font-size: 36px;
+      text-shadow: 0 3px 8px rgba(0,0,0,0.5);
+      letter-spacing: 1px;
+    }
+
+    ul {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 60px;
+      padding: 0 40px;
+    }
+
+    li { margin: 15px 0; }
+
+    a {
+      display: inline-block;
+      padding: 16px 32px;
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 12px;
+      text-decoration: none;
+      color: #333;
+      font-size: 22px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      transition: 0.25s;
+      backdrop-filter: blur(6px);
+    }
+
+    a:hover {
+      background: #ffeb3b;
+      transform: translateY(-2px) scale(1.15);
+      box-shadow: 0 0 20px rgba(255,255,0,0.6),
+                  0 0 40px rgba(255,255,255,0.8);
+    }
   </style>
 </head>
 <body>
+
+  <!-- three.js の canvas がここに挿入される -->
+  <div id="bg"></div>
+
+  <div class="content">
+  
+      <h1>生成ＡＩ関連ゼミ</h1>
+
+      <ul>
+        <li><a href="semi_gene_ai/semi_gene_ai_bg/semi_gene_ai_bg.html">生成AI初級ゼミ<br><img src="../images/ai_bg.jpg" alt="初級ゼミ" width="300"></a></li>
+        <li><a href="semi_gene_ai/semi_gene_ai_md/semi_gene_ai_md.html">生成AI中級ゼミ<br><img src="../images/ai_mid.jpg" alt="中級ゼミ" width="300"></a></li>
+      </ul>
+
+  </div>
+  
+  
   <div id="ui">
     <h1>Multi-Textured Cube</h1>
     <p>Drag to move the camera | Scroll to zoom</p>
@@ -48,7 +129,8 @@ camera.position.z = 5;
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
-document.body.appendChild(renderer.domElement);
+//document.body.appendChild(renderer.domElement);
+document.getElementById('bg').appendChild(renderer.domElement);
 
 /**
  * Texture Generation Helper
