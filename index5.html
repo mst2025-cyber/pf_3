@@ -84,7 +84,7 @@
       color: #333;
       font-size: 22px;
       font-weight: 600;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
       transition: 0.25s;
       backdrop-filter: blur(6px);
     }
@@ -203,7 +203,7 @@ scene.add(cube);
    E. ライティング（照明）
    物体を明るく照らすための光を追加します。
 ============================================================ */
-scene.add(new THREE.AmbientLight(0xffffff, 0.6)); // 環境光
+scene.add(new THREE.AmbientLight(0xffffff, 0.8)); // 環境光
 
 const light = new THREE.PointLight(0xffffff, 8); // 点光源
 light.position.set(5, 5, 5);
