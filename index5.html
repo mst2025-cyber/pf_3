@@ -6,6 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
+    /* ------------------------------------------------------------
+       1. 基本レイアウト設定
+       画面いっぱいに表示し、余計なスクロールを防止します。
+    ------------------------------------------------------------ */
     html, body {
       margin: 0;
       width: 100%;
@@ -15,8 +19,10 @@
       font-family: sans-serif;
     }
 
-
-    /* three.js 背景レイヤー */
+    /* ------------------------------------------------------------
+       2. 背景レイヤー（Three.js表示領域）
+       画面最背面に固定し、クリックイベントを背後の要素へ通します。
+    ------------------------------------------------------------ */
     #bg {
       position: fixed;
       inset: 0;
@@ -24,7 +30,9 @@
       pointer-events: none;
     }
 
-    /* UI レイヤー */
+    /* ------------------------------------------------------------
+       3. UIレイヤー（タイトルや説明文）
+    ------------------------------------------------------------ */
     #ui {
       position: fixed;
       top: 20px;
@@ -35,10 +43,16 @@
       pointer-events: none;
     }
 
-    /* UI の見た目（今まで通り） */
+    /* ------------------------------------------------------------
+       4. コンテンツエリア（リンクボタン一覧）
+    ------------------------------------------------------------ */
     .content {
-      padding: 40px 0;        /* ← 余白はここ */
+      padding: 40px 0;
       text-align: center;
+      position: relative;
+      color: white;
+      text-shadow: 1px 1px 2px black;
+      z-index: 5; /* Three.jsより前面に配置 */
     }
 
     h1 {
@@ -58,6 +72,9 @@
 
     li { margin: 15px 0; }
 
+    /* ------------------------------------------------------------
+       5. ボタン（リンクカード）のデザイン
+    ------------------------------------------------------------ */
     a {
       display: inline-block;
       padding: 16px 32px;
@@ -72,9 +89,10 @@
       backdrop-filter: blur(6px);
     }
 
+    /* ホバー時のアニメーション効果 */
     a:hover {
       background: #ffeb3b;
-      transform: translateY(-2px) scale(1.15);
+      transform: translateY(-2px) scale(1.05);
       box-shadow: 0 0 20px rgba(255,255,0,0.6),
                   0 0 40px rgba(255,255,255,0.8);
     }    
@@ -90,39 +108,53 @@
     <p></p>
   </div>
 
-<div class="content">
-  <h1>生成ＡＩ関連ゼミ</h1>
+  <div class="content">
+    <h1>生成ＡＩ関連ゼミ</h1>
 
-  <ul>
-    <li><a href="./semi_gene_ai/semi_gene_ai_bg/semi_gene_ai_bg.html">生成AI初級ゼミ<br><img src="../images/ai_bg.jpg" alt="初級ゼミ" width="300"></a></li>
-    <li><a href="./semi_gene_ai/semi_gene_ai_md/semi_gene_ai_md.html">生成AI中級ゼミ<br><img src="../images/ai_mid.jpg" alt="中級ゼミ" width="300"></a></li>
-  </ul>
-</div>
+    <ul>
+      <li>
+        <a href="./semi_gene_ai/semi_gene_ai_bg/semi_gene_ai_bg.html">
+          生成AI初級ゼミ<br>
+          <img src="../images/ai_bg.jpg" alt="初級ゼミ" width="300">
+        </a>
+      </li>
+      <li>
+        <a href="./semi_gene_ai/semi_gene_ai_md/semi_gene_ai_md.html">
+          生成AI中級ゼミ<br>
+          <img src="../images/ai_mid.jpg" alt="中級ゼミ" width="300">
+        </a>
+      </li>
+    </ul>
+  </div>
 
 
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 
-/* =========================
-   Video Setup (安全版)
-========================= */
+/* ============================================================
+   A. ビデオ要素の作成とテクスチャ設定
+   背景の立方体に貼り付ける動画を読み込みます。
+============================================================ */
 const video = document.createElement('video');
 video.src = 'images/ts2.mp4';
 video.muted = true;
 video.loop = true;
 video.playsInline = true;
 
+// ブラウザの自動再生ポリシーに対応
 video.play().catch(() => {
   console.warn('Autoplay blocked. Waiting for user interaction.');
   window.addEventListener('click', () => video.play(), { once: true });
 });
 
+// 動画をThree.jsのテクスチャとして変換
 const videoTexture = new THREE.VideoTexture(video);
 videoTexture.colorSpace = THREE.SRGBColorSpace;
 
-/* =========================
-   Scene / Camera
-========================= */
+/* ============================================================
+   B. シーンとカメラの設定
+   3D空間の土台と、それを見る視点を設定します。
+============================================================ */
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(
@@ -131,11 +163,12 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-camera.position.z = 3;
+camera.position.z = 3; // カメラを手前に配置
 
-/* =========================
-   Renderer (透明背景)
-========================= */
+/* ============================================================
+   C. レンダラーの設定（背景を透明にする）
+   HTMLの背景が見えるように alpha: true を設定します。
+============================================================ */
 const renderer = new THREE.WebGLRenderer({
   antialias: true,
   alpha: true
@@ -143,15 +176,18 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.setClearAlpha(0);
+renderer.setClearAlpha(0); // 背景透過度を完全に透明に
 
+// HTMLの#bg要素にキャンバスを追加
 document.getElementById('bg').appendChild(renderer.domElement);
 
-/* =========================
-   Cube
-========================= */
+/* ============================================================
+   D. 3Dオブジェクト（立方体）の作成
+   動画テクスチャを6面に貼り付けた立方体を作成します。
+============================================================ */
 const geometry = new THREE.BoxGeometry(2, 2, 2);
 
+// 6面すべてに同じ動画テクスチャを適用
 const materials = Array.from({ length: 6 }, () =>
   new THREE.MeshStandardMaterial({
     map: videoTexture,
@@ -163,18 +199,20 @@ const materials = Array.from({ length: 6 }, () =>
 const cube = new THREE.Mesh(geometry, materials);
 scene.add(cube);
 
-/* =========================
-   Lighting
-========================= */
-scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+/* ============================================================
+   E. ライティング（照明）
+   物体を明るく照らすための光を追加します。
+============================================================ */
+scene.add(new THREE.AmbientLight(0xffffff, 0.6)); // 環境光
 
-const light = new THREE.PointLight(0xffffff, 8);
+const light = new THREE.PointLight(0xffffff, 8); // 点光源
 light.position.set(5, 5, 5);
 scene.add(light);
 
-/* =========================
-   Interaction
-========================= */
+/* ============================================================
+   F. インタラクション（マウス操作）
+   ドラッグで回転、ホイールでズームを実現します。
+============================================================ */
 let isDragging = false;
 let prev = { x: 0, y: 0 };
 
@@ -193,26 +231,29 @@ window.addEventListener('mousemove', e => {
   const dx = e.clientX - prev.x;
   const dy = e.clientY - prev.y;
 
-  cube.rotation.y += dx * 0.005;
-  cube.rotation.x += dy * 0.005;
+  cube.rotation.y += dx * 0.005; // 横方向の回転
+  cube.rotation.x += dy * 0.005; // 縦方向の回転
 
   prev = { x: e.clientX, y: e.clientY };
 });
 
+// マウスホイールによるカメラの前後移動
 window.addEventListener('wheel', e => {
   camera.position.z += e.deltaY * 0.01;
-  camera.position.z = Math.min(Math.max(camera.position.z, 2), 5);
+  camera.position.z = Math.min(Math.max(camera.position.z, 2), 5); // ズーム制限
 });
 
-/* =========================
-   Resize
-========================= */
+/* ============================================================
+   G. リサイズ・画面復帰処理
+   ウィンドウサイズ変更時やタブの切り替え時に動作を最適化します。
+============================================================ */
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
+// 他のページから戻ってきた時の再開処理
 window.addEventListener('pageshow', e => {
   if (e.persisted) {
     isRunning = true;
@@ -221,6 +262,7 @@ window.addEventListener('pageshow', e => {
   }
 });
 
+// タブが非表示の時は描画を止めて負荷を軽減
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
     isRunning = true;
@@ -231,21 +273,24 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-
-
-/* =========================
-   Animation Loop
-========================= */
+/* ============================================================
+   H. アニメーションループ
+   毎フレーム実行されるメインループです。
+============================================================ */
 let isRunning = true;
 
 function animate() {
   if (!isRunning) return;
   requestAnimationFrame(animate);
+
+  // 何も操作していない時も少しずつ回転させる
   cube.rotation.x += 0.002;
   cube.rotation.y += 0.003;
+
   renderer.render(scene, camera);
 }
 
+// アニメーション開始
 animate();
 
 </script>
