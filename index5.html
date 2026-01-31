@@ -213,17 +213,41 @@ window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
+window.addEventListener('pageshow', e => {
+  if (e.persisted) {
+    isRunning = true;
+    animate();
+    video.play().catch(() => {});
+  }
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    isRunning = true;
+    animate();
+    video.play().catch(() => {});
+  } else {
+    isRunning = false;
+  }
+});
+
+
+
 /* =========================
    Animation Loop
 ========================= */
+let isRunning = true;
+
 function animate() {
+  if (!isRunning) return;
   requestAnimationFrame(animate);
-  cube.rotation.x += 0.004;
-  cube.rotation.y += 0.004;
+  cube.rotation.x += 0.002;
+  cube.rotation.y += 0.003;
   renderer.render(scene, camera);
 }
 
 animate();
+
 </script>
 </body>
 </html>
