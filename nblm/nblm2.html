@@ -6,21 +6,46 @@
 
    <style>
     body {
-      font-family: "Segoe UI", sans-serif;
-      background: linear-gradient(135deg, #254a44, #213245, #673455);
+      /* font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #133831, #20364e, #b8629a);
       background-size: 300% 300%;
       animation: gradientMove 10s ease infinite;
       margin: 0;
       padding: 40px 0;
-      text-align: center;
+      text-align: center; */
       color: #fff;
+      background: url(../backpic2.jpg) center / 120% no-repeat;
+      position: relative;
+      margin: 0;
+      height: 100vh;
     }
 
-    @keyframes gradientMove {
+    body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: inherit;
+        background-size: inherit;
+        background-position: inherit;
+        background-repeat: inherit;
+
+        /* 初期 filter */
+        filter: brightness(1.2) contrast(1.0);
+
+        animation: lightShift 4s ease-in-out infinite;
+        z-index: -1;
+    }
+        @keyframes lightShift {
+        0%   { filter: brightness(0.7) contrast(1.0); }
+        50%  { filter: brightness(0.4) contrast(1.0); }
+        100% { filter: brightness(0.7) contrast(1.0); }
+    }
+
+    /* @keyframes gradientMove {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
-    }
+    } */
 
     /* ================================
       three.js 背景レイヤー
@@ -30,6 +55,7 @@
       inset: 0;             /* top/right/bottom/left を一括指定 */
       z-index: -1;           /* UIより背面 */
       pointer-events: none; /* マウス操作をUIに透過 */
+      background-color: transparent; /* コンテナ自体は透明 */
     }
 
     /* UI の見た目（今まで通り） */
@@ -156,7 +182,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-camera.position.z = 3.3;
+camera.position.z = 4.2;
 
 /* =========================
    Renderer (透明背景)
