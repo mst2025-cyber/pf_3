@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Chosen Palette: Calm Harmony (Warm Neutrals) -->
-    <!-- Application Structure Plan: 「コンセプト解説＆インタラクティブ計算機」SPA。構成：[1]ヘッダー [2]イントロ（核心的差異） [3]並列比較（定義、キーワード、公式を2カラムで） [4]インタラクティブ計算機（nとkを入力） [5]計算結果の動的表示（PとCの値、および比較棒グラフ） [6]視覚的デモ（計算機と連動し、PとCの実際のパターン例を生成・表示） [7]まとめの比較表。この構造は、静的な定義の学習から、動的な計算、そして視覚的な確認へとユーザーを導く「学習フロー」を意図している。静的なレポートをなぞるのではなく、比較とインタラクティブな体験を通じて「なぜ数が異なるのか」を理解させることを最優先した設計である。 -->
+    <!-- Application Structure Plan: 「コンセプト解説＆インタラクティブ計算機」SPA。構成：[1]ヘッダー（分類情報を追加） [2]イントロ（核心的差異） [3]並列比較（定義、キーワード、公式を2カラムで） [4]インタラクティブ計算機（nとkを入力） [5]計算結果の動的表示（PとCの値、および比較棒グラフ） [6]視覚的デモ（計算機と連動し、PとCの実際のパターン例を生成・表示） [7]まとめの比較表。ヘッダーに学術的・実用的分類を明示することで、学習の文脈をより明確にしている。 -->
     <!-- Visualization & Content Choices: 
         1. [情報] PとCの定義/キーワード: [ゴール] 比較/理解: [手法] 2カラムのTailwindグリッドレイアウト: [インタラクション] 並列配置による視覚的な比較: [正当性] レポートの上下構造よりも直接的な比較が可能: [ライブラリ] HTML/Tailwind
         2. [情報] P(n,k)とC(n,k)の計算: [ゴール] 数量的差異の理解: [手法] ユーザー入力(n, k)に基づくJS計算機と、Chart.jsによる動的棒グラフ: [インタラクション] ユーザーがn,kを変更し計算実行。数値結果とグラフが即時更新される: [正当性] 静的な例(5,3)を超え、n,kの変化が結果にどう影響するかを動的に探求できる。グラフは規模感の差を視覚的に強調する: [ライブラリ] Vanilla JS, Chart.js (Canvas)
@@ -72,7 +72,17 @@
 
         <header class="text-center my-8">
             <h1 class="text-4xl md:text-5xl font-bold text-indigo-600">順列と組み合わせ</h1>
-            <p class="text-xl mt-2 text-slate-600">インタラクティブ・ガイド</p>
+            <p class="text-xl mt-2 text-slate-600 mb-6">インタラクティブ・ガイド</p>
+            
+            <!-- 分類セクション -->
+            <div class="max-w-3xl mx-auto px-6 py-4 bg-white/60 rounded-xl border border-slate-200 text-sm md:text-base text-slate-500 shadow-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-8 text-left">
+                    <p><span class="font-bold text-slate-700">大ジャンル:</span> 数学 (Mathematics)</p>
+                    <p><span class="font-bold text-slate-700">中ジャンル:</span> 離散数学 / 組合せ論</p>
+                    <p><span class="font-bold text-slate-700">小ジャンル:</span> 場合の数 / 確率・統計</p>
+                    <p><span class="font-bold text-slate-700">実用分野:</span> データサイエンス、アルゴリズム設計、情報理論、統計学</p>
+                </div>
+            </div>
         </header>
 
         <section id="intro" class="bg-white p-6 rounded-lg shadow-md mb-8">

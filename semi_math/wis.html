@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>インタラクティブ解説: ウィルコクソンの順位和検定</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container { height: 350px; }
+        }
+        body { font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; }
+        .data-block { transition: all 0.5s ease; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased leading-relaxed">
+
+    <!-- Chosen Palette: Calm Educational (Slate background, Indigo primary, Blue/Orange for group contrast) -->
+    <!-- Application Structure Plan: The SPA is designed as a linear, interactive educational journey. It starts with the core concept and when to use the test (visualized with distributions). Then, it transitions into an interactive "step-by-step" calculator based on the report's concrete example, allowing the user to click through the algorithm. Finally, it provides the Python implementation and a summary. This structure prioritizes understanding the *process* of the rank sum, rather than just reading static text. Added classification labels at the top for better indexing and information architecture. -->
+    <!-- Visualization & Content Choices: 
+         1. Concept (When to use): Chart.js Area Charts -> Shows Normal vs Skewed distributions to visually explain "non-parametric" necessity.
+         2. Calculation Process: Custom DOM Interactive Step-through -> Visually moves data points into a combined list, ranks them, and sums them. This directly translates the report's text example into an active learning tool. NO SVG/Mermaid used.
+         3. Code & Summary: Styled text blocks with clear typography for readability. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <header class="bg-indigo-700 text-white pt-8 pb-12 px-6 shadow-md mb-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- 整理用ラベル / Classification Labels -->
+            <div class="mb-6">
+                <span class="inline-block bg-indigo-800 text-indigo-200 text-xs px-2 py-1 rounded mb-2 uppercase tracking-widest font-bold">まとめ：整理用ラベル</span>
+                <div class="flex flex-wrap gap-2 text-xs">
+                    <span class="bg-indigo-600 border border-indigo-400 px-2 py-1 rounded">大ジャンル：統計学 / 推計統計学</span>
+                    <span class="bg-indigo-600 border border-indigo-400 px-2 py-1 rounded">中カテゴリ：検定（仮説検定）</span>
+                    <span class="bg-indigo-600 border border-indigo-400 px-2 py-1 rounded">小カテゴリ：ノンパラメトリック検定</span>
+                </div>
+            </div>
+            
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">ウィルコクソンの順位和検定</h1>
+            <p class="text-indigo-100 text-lg md:text-xl">具体的項目名：ウィルコクソンの順位和検定（マン・ホイットニーのU検定）</p>
+            <p class="mt-4 text-sm md:text-base text-indigo-200">2つの独立したグループ間に有意な差があるかを判断する強力なノンパラメトリック検定手法です。</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-6 pb-20 space-y-16">
+
+        <section id="introduction" class="bg-white rounded-xl shadow-sm p-8 border border-slate-100">
+            <h2 class="text-2xl font-bold text-slate-800 border-b-2 border-indigo-100 pb-2 mb-6">💡 検定の基本と特徴</h2>
+            <p class="mb-6 text-slate-600">
+                このセクションでは、ウィルコクソンの順位和検定がどのような場合に使われるのか、その前提条件を解説します。t検定が使えない状況での代替手段として、データの「順位」に着目する点が最大の特徴です。
+            </p>
+
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                    <div class="text-2xl mb-2">📊</div>
+                    <h3 class="font-bold mb-2">ノンパラメトリック</h3>
+                    <p class="text-sm text-slate-600">データの背後に正規分布などの特定の分布を仮定せずに検定を行います。</p>
+                </div>
+                <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                    <div class="text-2xl mb-2">🔢</div>
+                    <h3 class="font-bold mb-2">順位に基づく</h3>
+                    <p class="text-sm text-slate-600">実際の数値の大きさではなく、小さい順に並べたときの「順位」を使って計算します。</p>
+                </div>
+                <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
+                    <div class="text-2xl mb-2">🤝</div>
+                    <h3 class="font-bold mb-2">マン・ホイットニーと同等</h3>
+                    <p class="text-sm text-slate-600">マン・ホイットニーのU検定と実質的に同じであり、多くの場合同じ結果を返します。</p>
+                </div>
+            </div>
+
+            <div class="bg-indigo-50 rounded-lg p-6">
+                <h3 class="font-bold text-indigo-900 mb-4">使用するための3つの条件</h3>
+                <ul class="space-y-3">
+                    <li class="flex items-start">
+                        <span class="text-indigo-600 mr-2">✔</span>
+                        <span><strong>独立した2群:</strong> 比較する2つのグループに重複がなく、互いに影響を与えないこと。</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-indigo-600 mr-2">✔</span>
+                        <span><strong>順序尺度以上:</strong> データが明確に順位（大小）をつけられるものであること。</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-indigo-600 mr-2">✔</span>
+                        <span><strong>正規分布を仮定できない:</strong> サンプルサイズが小さい、あるいはデータが著しく偏っている。</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="distributions" class="bg-white rounded-xl shadow-sm p-8 border border-slate-100">
+            <h2 class="text-2xl font-bold text-slate-800 border-b-2 border-indigo-100 pb-2 mb-6">📈 なぜこの検定が必要なのか？</h2>
+            <p class="mb-6 text-slate-600">
+                データの分布形状によって適切な検定手法が異なります。以下のグラフは、パラメトリック検定（t検定）が適している「正規分布」と、ノンパラメトリック検定（ウィルコクソン）が必要となる「偏った分布」の違いを示しています。
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-center font-bold text-slate-700 mb-2">正規分布 (t検定が適任)</h3>
+                    <div class="chart-container">
+                        <canvas id="normalChart"></canvas>
+                    </div>
+                    <p class="text-xs text-center text-slate-500 mt-2">左右対称でベル型の分布</p>
+                </div>
+                <div>
+                    <h3 class="text-center font-bold text-slate-700 mb-2">偏った分布 (ウィルコクソンが適任)</h3>
+                    <div class="chart-container">
+                        <canvas id="skewedChart"></canvas>
+                    </div>
+                    <p class="text-xs text-center text-slate-500 mt-2">外れ値や左右非対称な偏りがある分布</p>
+                </div>
+            </div>
+            
+            <div class="mt-8 bg-slate-50 p-4 rounded-lg border-l-4 border-indigo-500">
+                <h4 class="font-bold mb-2">検定の仮説</h4>
+                <p><strong>帰無仮説 (H0):</strong> 2つのグループの分布は同じである（差がない）。</p>
+                <p><strong>対立仮説 (H1):</strong> 2つのグループの分布は異なる（あるいは一方が他方より大きい）。</p>
+            </div>
+        </section>
+
+        <section id="interactive-demo" class="bg-white rounded-xl shadow-sm p-8 border border-slate-100">
+            <h2 class="text-2xl font-bold text-slate-800 border-b-2 border-indigo-100 pb-2 mb-6">⚙️ インタラクティブ計算シミュレーター</h2>
+            <p class="mb-6 text-slate-600">
+                2つのクラス（クラスAとクラスB）のテスト点数を比較する具体例を使って、実際にどのように順位和が計算されるのかをステップ・バイ・ステップで確認してみましょう。ボタンを押して処理を進めてください。
+            </p>
+
+            <div class="flex justify-between items-center mb-6 bg-slate-100 p-4 rounded-lg">
+                <div>
+                    <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-bold mr-2">クラスA</span>
+                    <span class="inline-block px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-bold">クラスB</span>
+                </div>
+                <div class="space-x-2">
+                    <button id="btnReset" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded transition-colors text-sm font-bold">リセット</button>
+                    <button id="btnNext" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded transition-colors font-bold shadow-sm">次のステップへ ➔</button>
+                </div>
+            </div>
+
+            <div class="min-h-[300px] border-2 border-dashed border-slate-200 rounded-xl p-6 relative">
+                
+                <h3 id="stepTitle" class="text-xl font-bold text-center mb-2 text-indigo-800">初期状態: 元のデータ</h3>
+                <p id="stepDesc" class="text-center text-slate-500 mb-8">それぞれのクラスのテスト点数データです。</p>
+
+                <div id="visualizationArea" class="flex flex-col items-center justify-center space-y-6">
+                </div>
+
+            </div>
+
+            <div class="mt-6 text-sm text-slate-500 bg-slate-50 p-4 rounded border border-slate-200 hidden" id="mathFormulaBox">
+                <p class="font-bold mb-2">💡 サンプルサイズが大きい場合の有意性判定 (Z値の計算)</p>
+                <p class="mb-1">データが多い場合は、正規近似を用いて Z値を計算し p値を求めます。</p>
+                <div class="text-center font-mono bg-white p-3 rounded border my-2">
+                    Z = (W - E(W)) / σ_W
+                </div>
+                <p class="text-xs">W: 順位和, E(W): 期待値, σ_W: 標準偏差</p>
+            </div>
+        </section>
+
+        <section id="python-code" class="bg-white rounded-xl shadow-sm p-8 border border-slate-100">
+            <h2 class="text-2xl font-bold text-slate-800 border-b-2 border-indigo-100 pb-2 mb-6">💻 Pythonによる実行例</h2>
+            <p class="mb-6 text-slate-600">
+                実務で手計算をすることは少なく、プログラミング言語を利用します。Pythonの<code>scipy</code>ライブラリを使用すると、わずか数行で計算が完了します。
+            </p>
+            <div class="bg-slate-800 rounded-lg p-6 overflow-x-auto">
+<pre class="text-green-400 font-mono text-sm leading-relaxed">
+<span class="text-purple-400">from</span> scipy <span class="text-purple-400">import</span> stats
+
+<span class="text-slate-400"># データの定義</span>
+group_a = [70, 85, 90, 75, 88]
+group_b = [60, 72, 80, 65, 70]
+
+<span class="text-slate-400"># ウィルコクソンの順位和検定（マン・ホイットニーのU検定）</span>
+res = stats.mannwhitneyu(group_a, group_b, alternative=<span class="text-yellow-300">'two-sided'</span>)
+
+<span class="text-blue-300">print</span>(<span class="text-yellow-300">f"統計量: </span><span class="text-white">{</span>res.statistic<span class="text-white">}</span><span class="text-yellow-300">"</span>)
+<span class="text-blue-300">print</span>(<span class="text-yellow-300">f"p値: </span><span class="text-white">{</span>res.pvalue<span class="text-white">}</span><span class="text-yellow-300">"</span>)
+</pre>
+            </div>
+        </section>
+
+        <section id="summary" class="bg-indigo-900 text-white rounded-xl shadow-sm p-8">
+            <h2 class="text-2xl font-bold border-b-2 border-indigo-700 pb-2 mb-6">📌 まとめ</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="font-bold text-indigo-200 mb-2">メリット</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-start"><span class="mr-2">✨</span> 正規性がないデータに対しても強力に機能する</li>
+                        <li class="flex items-start"><span class="mr-2">🛡️</span> 値そのものではなく順位を使うため、極端な「外れ値」の影響を受けにくい</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-indigo-200 mb-2">デメリット・注意点</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-start"><span class="mr-2">⚠️</span> データが明らかに正規分布に従う場合は、t検定の方が検出力（差を見つける力）が高くなる</li>
+                        <li class="flex items-start"><span class="mr-2">🔢</span> 同順位（タイ）が多い場合の処理に注意が必要</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            const normalCtx = document.getElementById('normalChart').getContext('2d');
+            new Chart(normalCtx, {
+                type: 'line',
+                data: {
+                    labels: ['-3', '-2', '-1', '0', '1', '2', '3'],
+                    datasets: [{
+                        label: '頻度',
+                        data: [1, 5, 20, 50, 20, 5, 1],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { display: false, beginAtZero: true },
+                        x: { display: false }
+                    }
+                }
+            });
+
+            const skewedCtx = document.getElementById('skewedChart').getContext('2d');
+            new Chart(skewedCtx, {
+                type: 'line',
+                data: {
+                    labels: ['0', '1', '2', '3', '4', '5', '6', '7', '8'],
+                    datasets: [{
+                        label: '頻度',
+                        data: [2, 10, 45, 25, 10, 5, 2, 1, 1],
+                        borderColor: '#f97316',
+                        backgroundColor: 'rgba(249, 115, 22, 0.2)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { display: false, beginAtZero: true },
+                        x: { display: false }
+                    }
+                }
+            });
+
+            let currentStep = 0;
+            const btnNext = document.getElementById('btnNext');
+            const btnReset = document.getElementById('btnReset');
+            const stepTitle = document.getElementById('stepTitle');
+            const stepDesc = document.getElementById('stepDesc');
+            const visArea = document.getElementById('visualizationArea');
+            const mathBox = document.getElementById('mathFormulaBox');
+
+            const classA = [70, 85, 90];
+            const classB = [60, 75, 80];
+            
+            const combinedData = [
+                { val: 60, group: 'B', originalIndex: 0 },
+                { val: 70, group: 'A', originalIndex: 0 },
+                { val: 75, group: 'B', originalIndex: 1 },
+                { val: 80, group: 'B', originalIndex: 2 },
+                { val: 85, group: 'A', originalIndex: 1 },
+                { val: 90, group: 'A', originalIndex: 2 }
+            ];
+
+            function createBlock(val, group, label = "", extraClass="") {
+                const colorClass = group === 'A' ? 'bg-blue-100 border-blue-400 text-blue-800' : 'bg-orange-100 border-orange-400 text-orange-800';
+                return `<div class="data-block border-2 font-bold px-4 py-3 rounded-lg shadow-sm flex flex-col items-center justify-center min-w-[60px] ${colorClass} ${extraClass}">
+                            <span class="text-xl">${val}</span>
+                            ${label ? `<span class="text-xs font-normal mt-1 bg-white px-2 py-0.5 rounded-full">${label}</span>` : ''}
+                        </div>`;
+            }
+
+            function renderStep0() {
+                stepTitle.innerText = "初期状態: 元のデータ";
+                stepDesc.innerText = "クラスAとクラスBの点数データがそれぞれ存在しています。";
+                
+                let html = `<div class="w-full flex flex-col items-center gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-20 text-right font-bold text-slate-600">クラスA</div>
+                        <div class="flex gap-2">${classA.map(v => createBlock(v, 'A')).join('')}</div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="w-20 text-right font-bold text-slate-600">クラスB</div>
+                        <div class="flex gap-2">${classB.map(v => createBlock(v, 'B')).join('')}</div>
+                    </div>
+                </div>`;
+                visArea.innerHTML = html;
+                mathBox.classList.add('hidden');
+                btnNext.innerText = "ステップ1: 結合して並べる ➔";
+            }
+
+            function renderStep1() {
+                stepTitle.innerText = "ステップ1 & 2: データの統合と並び替え";
+                stepDesc.innerText = "すべてのデータを1つのグループにまとめ、値が小さい順（昇順）に並べ替えます。";
+                
+                let html = `<div class="flex flex-wrap justify-center gap-3">
+                    ${combinedData.map(d => createBlock(d.val, d.group)).join('')}
+                </div>`;
+                visArea.innerHTML = html;
+                btnNext.innerText = "ステップ3: 順位をつける ➔";
+            }
+
+            function renderStep2() {
+                stepTitle.innerText = "ステップ3: 順位付け (Ranking)";
+                stepDesc.innerText = "並べ替えたデータに対して、1から順番に順位（ランク）を割り当てます。";
+                
+                let html = `<div class="flex flex-wrap justify-center gap-3">
+                    ${combinedData.map((d, i) => createBlock(d.val, d.group, `${i+1}位`, "transform scale-110")).join('')}
+                </div>`;
+                visArea.innerHTML = html;
+                btnNext.innerText = "ステップ4: 順位和の計算 ➔";
+            }
+
+            function renderStep3() {
+                stepTitle.innerText = "ステップ4: グループごとの順位和 (Rank Sum)";
+                stepDesc.innerText = "割り当てられた順位を、元のグループごとに足し合わせます。";
+                
+                let sumA = [2, 5, 6];
+                let sumB = [1, 3, 4];
+
+                let html = `<div class="w-full flex flex-col items-center gap-8">
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-200 w-full max-w-md">
+                        <div class="font-bold text-blue-800 mb-2 text-center">クラスAの順位和 (W_A)</div>
+                        <div class="flex items-center justify-center text-xl font-mono">
+                            2 + 5 + 6 = <span class="text-3xl font-bold ml-2 text-blue-600">13</span>
+                        </div>
+                    </div>
+                    <div class="bg-orange-50 p-4 rounded-lg border border-orange-200 w-full max-w-md">
+                        <div class="font-bold text-orange-800 mb-2 text-center">クラスBの順位和 (W_B)</div>
+                        <div class="flex items-center justify-center text-xl font-mono">
+                            1 + 3 + 4 = <span class="text-3xl font-bold ml-2 text-orange-600">8</span>
+                        </div>
+                    </div>
+                </div>`;
+                visArea.innerHTML = html;
+                mathBox.classList.remove('hidden');
+                btnNext.innerText = "完了 (リセット)";
+            }
+
+            btnNext.addEventListener('click', () => {
+                currentStep++;
+                if (currentStep > 3) currentStep = 0;
+                updateVisualization();
+            });
+
+            btnReset.addEventListener('click', () => {
+                currentStep = 0;
+                updateVisualization();
+            });
+
+            function updateVisualization() {
+                if (currentStep === 0) renderStep0();
+                else if (currentStep === 1) renderStep1();
+                else if (currentStep === 2) renderStep2();
+                else if (currentStep === 3) renderStep3();
+            }
+
+            renderStep0();
+        });
+    </script>
+</body>
+</html>

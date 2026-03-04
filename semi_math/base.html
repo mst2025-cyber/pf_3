@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>進法変換マスター</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Fira+Code&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .mono {
+            font-family: 'Fira Code', monospace;
+        }
+        .step-card {
+            transition: all 0.3s ease;
+        }
+        .step-card:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="min-h-screen py-8 px-4">
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <header class="mb-8">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-6">
+                <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+                    <div>
+                        <h1 class="text-4xl font-extrabold text-slate-800 mb-2">進法変換マスター</h1>
+                        <p class="text-slate-600">数値を入力して、異なる進数間の変換と計算過程を確認しましょう。</p>
+                    </div>
+                    <div class="text-xs text-slate-500 bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-1 self-start min-w-[280px]">
+                        <p class="font-bold text-slate-700 border-b border-slate-200 pb-1 mb-1">【分類情報】</p>
+                        <p><strong>大ジャンル:</strong> コンピュータサイエンス / 情報工学</p>
+                        <p><strong>中カテゴリ:</strong> データの基礎 / 数値表現</p>
+                        <p><strong>項目名:</strong> バイナリ計算, 進数演算, データ構造と表現</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Left Panel: Input -->
+            <div class="lg:col-span-1 space-y-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-lg font-semibold text-slate-700 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        入力設定
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1">数値</label>
+                            <input type="text" id="inputValue" value="255" 
+                                class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none mono text-lg transition-all"
+                                placeholder="数値を入力...">
+                            <p id="errorText" class="text-red-500 text-xs mt-1 hidden">無効な入力です</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1">変換元の進法</label>
+                            <select id="fromBase" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                                <option value="2">2進数 (Binary)</option>
+                                <option value="8">8進数 (Octal)</option>
+                                <option value="10" selected>10進数 (Decimal)</option>
+                                <option value="16">16進数 (Hexadecimal)</option>
+                                <option value="custom">カスタム...</option>
+                            </select>
+                            <input type="number" id="customFromBase" min="2" max="36" value="3" class="hidden mt-2 w-full px-4 py-2 rounded-xl border border-slate-200 mono">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1">カスタム表示（変換先）</label>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-slate-400">Base</span>
+                                <input type="number" id="toBase" min="2" max="36" value="2" 
+                                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none mono transition-all">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Results -->
+                <div class="bg-indigo-600 p-6 rounded-2xl shadow-lg text-white">
+                    <h2 class="text-lg font-semibold mb-4 opacity-90">クイック表示</h2>
+                    <div class="space-y-3 mono text-sm">
+                        <div class="flex justify-between items-center border-b border-indigo-500 pb-2">
+                            <span>10進数:</span>
+                            <span id="quickDec" class="font-bold">-</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-indigo-500 pb-2">
+                            <span>2進数:</span>
+                            <span id="quickBin" class="font-bold">-</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-indigo-500 pb-2">
+                            <span>16進数:</span>
+                            <span id="quickHex" class="font-bold uppercase">-</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span>8進数:</span>
+                            <span id="quickOct" class="font-bold">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Conversion Details & Explanation -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Result Display -->
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center justify-center text-center">
+                    <span class="text-sm font-medium text-slate-400 uppercase tracking-widest mb-2">変換結果 (<span id="targetBaseLabel">2</span>進数)</span>
+                    <div id="resultValue" class="text-5xl font-bold text-slate-800 mono break-all">0</div>
+                    <button id="copyBtn" class="mt-4 px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                        結果をコピー
+                    </button>
+                </div>
+
+                <!-- Explanation Area -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17H4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                        計算プロセスの解説
+                    </h2>
+                    
+                    <div id="explanationContent" class="space-y-4">
+                        <!-- Content generated by JS -->
+                        <p class="text-slate-500 italic">数値を入力すると、変換の仕組みが表示されます。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-12 text-center text-slate-400 text-sm">
+            <p>&copy; 2024 進法変換マスター - 学習用ツール</p>
+        </footer>
+    </div>
+
+    <!-- Feedback Message Box -->
+    <div id="toast" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-full shadow-2xl opacity-0 transition-opacity pointer-events-none">
+        コピーしました！
+    </div>
+
+    <script>
+        const inputEl = document.getElementById('inputValue');
+        const fromBaseEl = document.getElementById('fromBase');
+        const customFromBaseEl = document.getElementById('customFromBase');
+        const toBaseEl = document.getElementById('toBase');
+        const resultValEl = document.getElementById('resultValue');
+        const errorText = document.getElementById('errorText');
+        const targetBaseLabel = document.getElementById('targetBaseLabel');
+        const explanationContent = document.getElementById('explanationContent');
+        const copyBtn = document.getElementById('copyBtn');
+        
+        // Quick display elements
+        const qDec = document.getElementById('quickDec');
+        const qBin = document.getElementById('quickBin');
+        const qHex = document.getElementById('quickHex');
+        const qOct = document.getElementById('quickOct');
+
+        function updateConversion() {
+            let val = inputEl.value.trim();
+            let fromBase = fromBaseEl.value === 'custom' ? parseInt(customFromBaseEl.value) : parseInt(fromBaseEl.value);
+            let toBase = parseInt(toBaseEl.value);
+
+            if (!val) {
+                resetUI();
+                return;
+            }
+
+            // Validate
+            let decimalValue;
+            try {
+                // Check if digits are valid for the base
+                const validChars = "0123456789abcdefghijklmnopqrstuvwxyz".substring(0, fromBase);
+                const checkRegex = new RegExp(`^[-+]?[${validChars}]+$`, 'i');
+                
+                if (!checkRegex.test(val)) {
+                    throw new Error("Invalid digits for base");
+                }
+
+                decimalValue = parseInt(val, fromBase);
+                if (isNaN(decimalValue)) throw new Error("NaN");
+                
+                errorText.classList.add('hidden');
+                inputEl.classList.remove('border-red-500');
+            } catch (e) {
+                errorText.classList.remove('hidden');
+                inputEl.classList.add('border-red-500');
+                resetUI(true);
+                return;
+            }
+
+            // Perform Conversions
+            const result = decimalValue.toString(toBase).toUpperCase();
+            resultValEl.textContent = result;
+            targetBaseLabel.textContent = toBase;
+
+            // Update Quick Results
+            qDec.textContent = decimalValue.toString(10);
+            qBin.textContent = decimalValue.toString(2);
+            qHex.textContent = decimalValue.toString(16).toUpperCase();
+            qOct.textContent = decimalValue.toString(8);
+
+            generateExplanation(decimalValue, toBase);
+        }
+
+        function generateExplanation(decimalValue, targetBase) {
+            if (targetBase < 2 || targetBase > 36) {
+                explanationContent.innerHTML = `<p class="text-red-500">進数は2から36の間で指定してください。</p>`;
+                return;
+            }
+
+            let html = `<p class="mb-4 text-slate-700">10進数の <strong>${decimalValue}</strong> を <strong>${targetBase}進数</strong> に変換するには、商が0になるまで${targetBase}で割り続け、その余りを逆順に並べます。</p>`;
+            
+            html += `<div class="overflow-x-auto"><table class="w-full text-left border-collapse mono text-sm">
+                <thead>
+                    <tr class="bg-slate-50">
+                        <th class="p-3 border-b text-slate-500 font-medium">計算</th>
+                        <th class="p-3 border-b text-slate-500 font-medium">商</th>
+                        <th class="p-3 border-b text-slate-500 font-medium">余り</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+            let temp = decimalValue;
+            let remainders = [];
+            
+            if (temp === 0) {
+                html += `<tr><td class="p-3 border-b">0 &divide; ${targetBase}</td><td class="p-3 border-b font-bold">0</td><td class="p-3 border-b text-blue-600 font-bold">0</td></tr>`;
+                remainders.push("0");
+            }
+
+            while (temp > 0) {
+                let quotient = Math.floor(temp / targetBase);
+                let remainder = temp % targetBase;
+                let remainderChar = remainder.toString(targetBase).toUpperCase();
+                
+                html += `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-3 border-b">${temp} &divide; ${targetBase}</td>
+                        <td class="p-3 border-b font-bold">${quotient}</td>
+                        <td class="p-3 border-b text-blue-600 font-bold">${remainderChar} ${remainder > 9 ? `(${remainder})` : ''}</td>
+                    </tr>
+                `;
+                remainders.push(remainderChar);
+                temp = quotient;
+            }
+
+            html += `</tbody></table></div>`;
+
+            const finalResult = remainders.reverse().join('');
+            html += `
+                <div class="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                    <p class="text-blue-800">
+                        余りを下から順に並べると: <span class="font-bold text-lg ml-2">${finalResult}</span>
+                    </p>
+                </div>
+            `;
+
+            explanationContent.innerHTML = html;
+        }
+
+        function resetUI(keepError = false) {
+            resultValEl.textContent = "0";
+            qDec.textContent = "-";
+            qBin.textContent = "-";
+            qHex.textContent = "-";
+            qOct.textContent = "-";
+            if (!keepError) {
+                explanationContent.innerHTML = `<p class="text-slate-500 italic">数値を入力すると、変換の仕組みが表示されます。</p>`;
+                errorText.classList.add('hidden');
+                inputEl.classList.remove('border-red-500');
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.remove('opacity-0');
+            setTimeout(() => toast.classList.add('opacity-0'), 2000);
+        }
+
+        // Events
+        inputEl.addEventListener('input', updateConversion);
+        toBaseEl.addEventListener('input', updateConversion);
+        fromBaseEl.addEventListener('change', () => {
+            if (fromBaseEl.value === 'custom') {
+                customFromBaseEl.classList.remove('hidden');
+            } else {
+                customFromBaseEl.classList.add('hidden');
+            }
+            updateConversion();
+        });
+        customFromBaseEl.addEventListener('input', updateConversion);
+
+        copyBtn.addEventListener('click', () => {
+            const text = resultValEl.textContent;
+            const tempInput = document.createElement('input');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            showToast('結果をクリップボードにコピーしました！');
+        });
+
+        // Initialize
+        window.onload = updateConversion;
+    </script>
+</body>
+</html>
